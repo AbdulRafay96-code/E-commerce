@@ -18,6 +18,8 @@
     border-radius: 8px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     padding: 30px;
+    overflow-x: hidden;
+    max-width: 100%;
 }
 
 /* Empty cart message */
@@ -30,7 +32,7 @@
     padding: 60px 0;
 }
 
-.empty-cart-message i {
+.empty-cart-message > i {
     font-size: 64px;
     color: #ddd;
     margin-bottom: 20px;
@@ -45,6 +47,35 @@
     font-size: 16px;
     color: #888;
     margin-bottom: 20px;
+    max-width: 480px;
+}
+
+.empty-cart-message .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--primary-color);
+    color: var(--gold-color);
+    border: none;
+    padding: 12px 28px;
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+.empty-cart-message .btn-primary:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.empty-cart-message .btn-primary i {
+    font-size: 14px;
+    color: var(--gold-color);
+    margin: 0;
 }
 
 /* Order content layout */
@@ -68,7 +99,9 @@
 .cart-items-container {
     max-height: 600px;
     overflow-y: auto;
+    overflow-x: hidden;
     margin-bottom: 30px;
+    max-width: 100%;
 }
 
 .cart-item {
@@ -78,6 +111,8 @@
     padding: 15px 0;
     border-bottom: 1px solid #eee;
     position: relative;
+    min-width: 0;
+    max-width: 100%;
 }
 
 .cart-item-image {
@@ -99,6 +134,8 @@
 
 .cart-item-details {
     flex: 2;
+    min-width: 0;
+    max-width: 100%;
 }
 
 .cart-item-details h3 {
@@ -113,23 +150,23 @@
 }
 
 .cart-item-details .design-details {
-    color: #4CAF50;
-    font-size: 14px;
+    color: #8a7428;
+    font-size: 13px;
     margin-top: 8px;
-    padding: 5px 8px;
-    background-color: #f0f8ff;
-    border-radius: 4px;
-    border-left: 3px solid #4CAF50;
+    padding: 8px 10px;
+    background-color: #fdf8ec;
+    border-radius: 6px;
+    border-left: 3px solid var(--gold-color);
 }
 
 /* Measurements Display in Order Item */
 .item-measurements-display {
     margin-top: 10px;
     padding: 12px;
-    background: linear-gradient(135deg, #f8f9fa, #fff9e6);
+    background: linear-gradient(135deg, var(--bg-gray), #fff9e6);
     border-radius: 8px;
     border: 1px solid #e9ecef;
-    border-left: 4px solid #d4af37;
+    border-left: 4px solid var(--gold-color);
 }
 
 .item-measurements-display .measurements-header {
@@ -144,14 +181,14 @@
 .item-measurements-display .measurements-header h5 {
     margin: 0;
     font-size: 14px;
-    color: #333;
+    color: var(--accent-color);
     display: flex;
     align-items: center;
     gap: 6px;
 }
 
 .item-measurements-display .measurements-header h5 i {
-    color: #d4af37;
+    color: var(--gold-color);
 }
 
 .item-measurements-grid {
@@ -179,7 +216,7 @@
 .measurement-item .value {
     font-size: 14px;
     font-weight: 600;
-    color: #333;
+    color: var(--accent-color);
 }
 
 .measurement-item .value span {
@@ -243,7 +280,7 @@
 .remove-item {
     background: none;
     border: none;
-    color: #d9534f;
+    color: var(--error-color);
     cursor: pointer;
     font-size: 16px;
     padding: 5px;
@@ -254,27 +291,59 @@
     color: #c9302c;
 }
 
+/* Design button group */
+.design-btn-group {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
 /* Item customize button */
 .customize-item-btn {
-    background-color: #6A0DAD;
-    color: white;
-    border: none;
+    background-color: var(--text-color);
+    color: var(--gold-color);
+    border: 1.5px solid var(--gold-color);
     font-size: 12px;
-    padding: 5px 10px;
-    border-radius: 3px;
+    padding: 8px 14px;
+    border-radius: 6px;
     cursor: pointer;
-    margin-top: 10px;
-    transition: background-color 0.3s;
+    transition: all 0.3s;
     display: inline-flex;
     align-items: center;
+    font-weight: 600;
 }
 
 .customize-item-btn i {
-    margin-right: 5px;
+    margin-right: 6px;
 }
 
 .customize-item-btn:hover {
-    background-color: #5a0b92;
+    background-color: var(--gold-color);
+    color: var(--text-color);
+}
+
+/* Measurement button */
+.measurement-btn {
+    background-color: #fff;
+    color: var(--text-color);
+    border: 1.5px solid var(--text-color);
+    font-size: 12px;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    font-weight: 600;
+}
+
+.measurement-btn i {
+    margin-right: 6px;
+}
+
+.measurement-btn:hover {
+    background-color: var(--text-color);
+    color: #fff;
 }
 
 /* Item design container */
@@ -285,15 +354,16 @@
 
 /* Item design options - REDUCED SIZE */
 .item-design-options {
-    background-color: #f9f9f9;
-    border-radius: 6px;
-    padding: 15px;
-    margin: 5px 0;
-    border: 1px solid #eee;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    max-width: 90%;
-    margin-left: auto;
-    margin-right: auto;
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 10px auto;
+    border: 1px solid #e8e8e8;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 /* Design header with close button */
@@ -301,15 +371,16 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 8px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 12px;
 }
 
 .design-header h4 {
-    font-size: 16px;
+    font-size: 18px;
+    font-family: 'Playfair Display', serif;
     margin: 0;
-    color: #333;
+    color: var(--text-color);
 }
 
 .close-design-btn {
@@ -317,8 +388,8 @@
     border: none;
     color: #999;
     cursor: pointer;
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -327,32 +398,210 @@
 }
 
 .close-design-btn:hover {
-    background-color: #eee;
-    color: #333;
+    background-color: #f0f0f0;
+    color: var(--accent-color);
 }
 
-/* Design sections */
-.design-section {
+/* ===== Wizard Progress Bar ===== */
+.wizard-progress {
+    width: 100%;
+    height: 4px;
+    background: #e8e8e8;
+    border-radius: 4px;
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+
+.wizard-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold-color), #c4a030);
+    border-radius: 4px;
+    transition: width 0.4s ease;
+}
+
+/* Step Dots */
+.wizard-steps-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding: 0 5px;
+    flex-wrap: wrap;
+    gap: 4px;
+    row-gap: 8px;
+}
+
+.wizard-step-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #f0f0f0;
+    color: #999;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+}
+
+.wizard-step-dot.active {
+    background: var(--text-color);
+    color: var(--gold-color);
+    border-color: var(--gold-color);
+}
+
+.wizard-step-dot.completed {
+    background: var(--gold-color);
+    color: #fff;
+    border-color: var(--gold-color);
+}
+
+/* Wizard Steps */
+.wizard-step {
+    display: none;
+    animation: wizardFadeIn 0.3s ease;
+}
+
+.wizard-step.active {
+    display: block;
+}
+
+@keyframes wizardFadeIn {
+    from { opacity: 0; transform: translateX(15px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.wizard-step-header {
     margin-bottom: 15px;
 }
 
+.wizard-step-number {
+    font-size: 11px;
+    color: var(--gold-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+.wizard-step-header h5 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-top: 4px;
+}
+
+.wizard-step-header h5 i {
+    color: var(--gold-color);
+    margin-right: 8px;
+}
+
+/* Wizard Navigation */
+.wizard-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.wizard-btn {
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.wizard-prev {
+    background: #fff;
+    color: #555;
+    border: 1.5px solid #ddd;
+}
+
+.wizard-prev:hover:not(:disabled) {
+    border-color: var(--text-color);
+    color: var(--text-color);
+}
+
+.wizard-prev:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.wizard-next {
+    background: var(--text-color);
+    color: var(--gold-color);
+    border: 1.5px solid var(--text-color);
+}
+
+.wizard-next:hover {
+    background: var(--gold-color);
+    color: var(--text-color);
+    border-color: var(--gold-color);
+}
+
+/* Wizard Review */
+.wizard-review {
+    background: #fafafa;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.wizard-review-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 13px;
+}
+
+.wizard-review-item:last-child {
+    border-bottom: none;
+}
+
+.wizard-review-label {
+    color: #888;
+    font-weight: 500;
+}
+
+.wizard-review-value {
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+/* Design sections (kept for compatibility) */
+.design-section {
+    margin-bottom: 18px;
+}
+
 .design-section h5 {
-    font-size: 14px;
-    margin-bottom: 8px;
-    color: #333;
-    border-left: 3px solid #6A0DAD;
-    padding-left: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+    color: var(--text-color);
+    border-left: 3px solid var(--gold-color);
+    padding-left: 10px;
 }
 
 /* Design options styling */
 .design-options {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
 }
 
 .design-option {
-    width: calc(50% - 5px);
+    flex: 1 1 calc(33.333% - 6px);
+    min-width: 120px;
     position: relative;
 }
 
@@ -364,46 +613,53 @@
 }
 
 .design-option label {
-    padding: 10px 15px;
+    padding: 10px 12px;
     text-align: center;
-    background-color: #f8f9fa;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    transition: all 0.3s;
+    background-color: #fafafa;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 8px;
+    transition: all 0.25s ease;
     display: block;
     width: 100%;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #555;
 }
 
 .design-option input[type="radio"]:checked + label {
-    background-color: #6A0DAD;
-    color: white;
-    border-color: #6A0DAD;
+    background-color: var(--text-color);
+    color: var(--gold-color);
+    border-color: var(--gold-color);
+    font-weight: 600;
 }
 
 .design-option label:hover {
-    border-color: #6A0DAD;
-    background-color: #f0e8f7;
+    border-color: var(--gold-color);
+    background-color: #fdf8ec;
+    color: var(--accent-color);
 }
 
 /* Confirm design button */
 .btn-confirm-design {
-    background-color: #4CAF50;
-    color: white;
+    background-color: var(--gold-color);
+    color: #fff;
     border: none;
-    padding: 8px 12px;
-    border-radius: 4px;
-    font-weight: 600;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-weight: 700;
     cursor: pointer;
     width: 100%;
-    transition: background-color 0.3s;
-    margin-top: 10px;
+    transition: all 0.3s;
+    margin-top: 15px;
     font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .btn-confirm-design:hover {
-    background-color: #45a049;
+    background-color: var(--text-color);
+    color: var(--gold-color);
 }
 
 /* Cart actions */
@@ -414,28 +670,31 @@
 }
 
 .btn-view-cart {
-    background-color: #4CAF50;
-    color: white;
+    background-color: var(--gold-color);
+    color: #fff;
     padding: 12px 30px;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
-    font-weight: 600;
-    font-size: 16px;
+    font-weight: 700;
+    font-size: 15px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    transition: background-color 0.3s;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .btn-view-cart:hover {
-    background-color: #45a049;
+    background-color: var(--text-color);
+    color: var(--gold-color);
 }
 
 .btn-clear-cart {
-    background-color: #f8f9fa;
-    color: #dc3545;
-    border: 1px solid #dc3545;
+    background-color: var(--bg-gray);
+    color: var(--error-color);
+    border: 1px solid var(--error-color);
     padding: 12px 30px;
     border-radius: 4px;
     cursor: pointer;
@@ -445,7 +704,7 @@
 }
 
 .btn-clear-cart:hover {
-    background-color: #dc3545;
+    background-color: var(--error-color);
     color: white;
 }
 
@@ -457,7 +716,7 @@
     z-index: 99;
     width: 40px;
     height: 40px;
-    background-color: #333;
+    background-color: var(--accent-color);
     color: #fff;
     border-radius: 50%;
     display: flex;
@@ -519,7 +778,7 @@
 
 .measurement-header h3 {
     margin: 0;
-    color: #333;
+    color: var(--accent-color);
     font-size: 22px;
 }
 
@@ -533,7 +792,7 @@
 }
 
 .close-measurement-btn:hover {
-    color: #000;
+    color: var(--primary-color);
 }
 
 .measurement-table-container {
@@ -548,11 +807,11 @@
 }
 
 .measurement-table th {
-    background-color: #f5f5f5;
+    background-color: var(--bg-gray);
     padding: 12px 15px;
     text-align: left;
     font-weight: 600;
-    color: #333;
+    color: var(--accent-color);
 }
 
 .measurement-table td {
@@ -573,7 +832,7 @@
 }
 
 .measurement-table input:focus {
-    border-color: #d4af37;
+    border-color: var(--gold-color);
     box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
     outline: none;
 }
@@ -594,7 +853,7 @@
 }
 
 .info-icon:hover {
-    background-color: #d4af37;
+    background-color: var(--gold-color);
 }
 
 .measurement-notes {
@@ -617,7 +876,7 @@
 }
 
 .measurement-notes textarea:focus {
-    border-color: #d4af37;
+    border-color: var(--gold-color);
     box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
     outline: none;
 }
@@ -628,7 +887,7 @@
 
 .save-measurement-btn {
     padding: 10px 24px;
-    background-color: #d4af37;
+    background-color: var(--gold-color);
     color: white;
     border: none;
     border-radius: 4px;
@@ -655,7 +914,7 @@
     margin-top: 0;
     margin-bottom: 10px;
     font-size: 15px;
-    color: #333;
+    color: var(--accent-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -665,7 +924,7 @@
     font-size: 14px;
     background: none;
     border: none;
-    color: #d4af37;
+    color: var(--gold-color);
     cursor: pointer;
 }
 
@@ -698,7 +957,7 @@
 }
 
 .measurement-option {
-    background: #f8f9fa;
+    background: var(--bg-gray);
     border: 2px solid #e9ecef;
     border-radius: 15px;
     padding: 30px 20px;
@@ -710,36 +969,36 @@
 }
 
 .measurement-option:hover {
-    border-color: #d4af37;
+    border-color: var(--gold-color);
     transform: translateY(-5px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
 .measurement-option.selected {
-    border-color: #d4af37;
+    border-color: var(--gold-color);
     background: #fff9e6;
 }
 
 .option-icon {
     font-size: 48px;
-    color: #d4af37;
+    color: var(--gold-color);
     margin-bottom: 15px;
 }
 
 .measurement-option h4 {
-    color: #333;
+    color: var(--accent-color);
     margin: 15px 0 10px 0;
     font-size: 20px;
 }
 
 .measurement-option p {
-    color: #666;
+    color: var(--text-muted);
     margin-bottom: 20px;
     line-height: 1.5;
 }
 
 .option-btn {
-    background: #d4af37;
+    background: var(--gold-color);
     color: white;
     border: none;
     padding: 12px 24px;
@@ -757,7 +1016,7 @@
 /* Manual Measurement Modal Enhancements */
 .measurement-guide {
     cursor: pointer;
-    color: #d4af37;
+    color: var(--gold-color);
     font-size: 18px;
     transition: all 0.3s ease;
 }
@@ -781,7 +1040,7 @@
 
 .camera-section {
     position: relative;
-    background: #000;
+    background: var(--primary-color);
     border-radius: 10px;
     overflow: hidden;
     min-height: 400px;
@@ -821,11 +1080,11 @@
 .pose-guide p {
     margin: 0 0 15px 0;
     font-weight: 600;
-    color: #333;
+    color: var(--accent-color);
 }
 
 .pose-indicators .indicator {
-    background: #d4af37;
+    background: var(--gold-color);
     color: white;
     padding: 8px 15px;
     border-radius: 20px;
@@ -841,7 +1100,7 @@
 }
 
 .webcam-btn {
-    background: #d4af37;
+    background: var(--gold-color);
     color: white;
     border: none;
     padding: 12px 20px;
@@ -867,7 +1126,7 @@
 
 /* Webcam Results Styles */
 .webcam-results {
-    background: #f8f9fa;
+    background: var(--bg-gray);
     padding: 20px;
     border-radius: 10px;
     border: 2px solid #e9ecef;
@@ -893,7 +1152,7 @@
 .measurement-row label {
     font-weight: 600;
     min-width: 120px;
-    color: #333;
+    color: var(--accent-color);
 }
 
 .measurement-row input {
@@ -901,7 +1160,7 @@
     padding: 8px 12px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    background: #f8f9fa;
+    background: var(--bg-gray);
 }
 
 .measurement-row input:not([readonly]) {
@@ -911,7 +1170,7 @@
 .edit-measurement-btn {
     background: none;
     border: none;
-    color: #d4af37;
+    color: var(--gold-color);
     cursor: pointer;
     padding: 5px;
     border-radius: 3px;
@@ -944,7 +1203,7 @@
 .measurement-tooltip {
     position: fixed;
     background: white;
-    border: 2px solid #d4af37;
+    border: 2px solid var(--gold-color);
     border-radius: 10px;
     padding: 15px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
@@ -955,7 +1214,7 @@
 
 .tooltip-content h4 {
     margin: 0 0 10px 0;
-    color: #d4af37;
+    color: var(--gold-color);
     font-size: 16px;
 }
 
@@ -968,7 +1227,7 @@
 
 .tooltip-content p {
     margin: 0;
-    color: #666;
+    color: var(--text-muted);
     font-size: 14px;
     line-height: 1.4;
 }
@@ -1023,4 +1282,227 @@
 
 .measurement-modal-content {
     animation: slideIn 0.3s ease;
+}
+
+/* ===== Measurement Modals Theme ===== */
+.modal .modal-content {
+    background: #fff !important;
+    border-radius: 14px !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid #e8e8e8 !important;
+}
+
+.modal .modal-content h3 {
+    font-family: 'Playfair Display', serif !important;
+    color: var(--text-color) !important;
+    font-size: 20px !important;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 12px;
+}
+
+.modal .modal-content h3 i {
+    color: var(--gold-color) !important;
+}
+
+.modal .close-modal {
+    color: #999 !important;
+    font-size: 22px !important;
+    width: 32px;
+    height: 32px;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.modal .close-modal:hover {
+    background: #f0f0f0;
+    color: var(--accent-color) !important;
+}
+
+/* Measurement method buttons */
+#webcam-measurement-option {
+    background: var(--text-color) !important;
+    color: var(--gold-color) !important;
+    border: 1.5px solid var(--gold-color) !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    font-size: 15px !important;
+    padding: 16px 20px !important;
+}
+
+#webcam-measurement-option:hover {
+    background: var(--gold-color) !important;
+    color: var(--text-color) !important;
+}
+
+#manual-measurement-option {
+    background: #fff !important;
+    color: var(--text-color) !important;
+    border: 1.5px solid var(--text-color) !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    font-size: 15px !important;
+    padding: 16px 20px !important;
+}
+
+#manual-measurement-option:hover {
+    background: var(--text-color) !important;
+    color: #fff !important;
+}
+
+/* Webcam modal controls */
+.webcam-btn {
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    padding: 10px 18px !important;
+}
+
+#start-camera-btn {
+    background: var(--text-color) !important;
+    color: var(--gold-color) !important;
+    border: 1.5px solid var(--gold-color) !important;
+}
+
+#start-camera-btn:hover {
+    background: var(--gold-color) !important;
+    color: var(--text-color) !important;
+}
+
+#stop-camera-btn {
+    background: #fff !important;
+    color: var(--error-color) !important;
+    border: 1.5px solid var(--error-color) !important;
+}
+
+#capture-measurement-btn {
+    background: var(--gold-color) !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+#capture-measurement-btn:hover {
+    background: #c4a030 !important;
+}
+
+#retake-measurement-btn {
+    background: #fff !important;
+    color: #555 !important;
+    border: 1.5px solid #ddd !important;
+}
+
+/* Pose indicator */
+#pose-indicator {
+    background: #fdf8ec !important;
+    border-left: 4px solid var(--gold-color) !important;
+    color: #8a7428 !important;
+    font-weight: 500 !important;
+}
+
+/* Webcam results */
+#webcam-results h4 {
+    color: var(--gold-color) !important;
+}
+
+#webcam-results input {
+    border: 1.5px solid #e0e0e0 !important;
+    border-radius: 8px !important;
+    padding: 10px !important;
+    font-size: 13px !important;
+}
+
+/* Instructions box */
+.modal .modal-content > div:last-child {
+    background: #fafafa !important;
+    border-radius: 10px !important;
+    border: 1px solid #eee !important;
+}
+
+/* Manual measurement form */
+.measurement-field label {
+    color: var(--text-color) !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+}
+
+.measurement-field label i {
+    color: var(--gold-color) !important;
+}
+
+.measurement-field input {
+    border: 1.5px solid #e0e0e0 !important;
+    border-radius: 8px !important;
+    padding: 10px 12px !important;
+    transition: border-color 0.3s !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    display: block !important;
+    margin: 6px 0 !important;
+}
+
+.measurement-field {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.measurement-field label {
+    margin-bottom: 2px !important;
+}
+
+.measurement-field small {
+    display: block;
+    margin-top: 4px;
+    line-height: 1.3;
+}
+
+.measurement-field input:focus {
+    border-color: var(--gold-color) !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1) !important;
+}
+
+.measurement-field small {
+    color: #999 !important;
+}
+
+/* Save measurements button */
+#measurement-form button[type="submit"] {
+    background: var(--gold-color) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    padding: 12px 30px !important;
+    transition: all 0.3s !important;
+}
+
+#measurement-form button[type="submit"]:hover {
+    background: var(--text-color) !important;
+    color: var(--gold-color) !important;
+}
+
+/* Notes textarea */
+#notes {
+    border: 1.5px solid #e0e0e0 !important;
+    border-radius: 8px !important;
+    padding: 10px !important;
+}
+
+#notes:focus {
+    border-color: var(--gold-color) !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1) !important;
+}
+
+/* Camera section */
+.camera-section {
+    border: 2px solid #e8e8e8 !important;
+    border-radius: 14px !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
 }

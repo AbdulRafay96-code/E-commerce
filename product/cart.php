@@ -145,7 +145,7 @@ if (empty($recommendedProducts)) {
                 <?php else: ?>
                 <div class="cart-content">
                     <div class="cart-items">
-                        <h2>Cart Items</h2>
+                        <h2 class="reveal">Cart Items</h2>
                         <div class="cart-items-container">
                             <?php foreach ($cartItems as $index => $item): ?>
                             <div class="cart-item">
@@ -177,9 +177,6 @@ if (empty($recommendedProducts)) {
                                             <tr>
                                                 <td><?php echo $label; ?>:</td>
                                                 <td><?php echo e($m['value']); ?> inches</td>
-                                                <td style="color: <?php echo getConfidenceColor($m['confidence']); ?>">
-                                                    (<?php echo round($m['confidence'] * 100); ?>%)
-                                                </td>
                                             </tr>
                                             <?php
                                                     endif;
@@ -218,7 +215,7 @@ if (empty($recommendedProducts)) {
                         </div>
                     </div>
 
-                    <div class="cart-summary">
+                    <div class="cart-summary reveal">
                         <h2>Order Summary</h2>
                         <div class="summary-row">
                             <span>Subtotal</span>
@@ -234,7 +231,7 @@ if (empty($recommendedProducts)) {
                         </div>
                         <a href="checkout.php" class="checkout-btn">Proceed to Checkout</a>
                         <div class="continue-shopping">
-                            <a href="order.php">Continue Shopping</a>
+                            <a href="order.php"><i class="fas fa-arrow-left"></i> Continue Shopping</a>
                         </div>
                         <form method="post" style="margin-top: 15px;">
                             <input type="hidden" name="action" value="clear_cart">
@@ -253,7 +250,7 @@ if (empty($recommendedProducts)) {
     <!-- Recommended Products -->
     <section class="product-section">
         <div class="container">
-            <div class="section-header">
+            <div class="section-header reveal">
                 <h2>YOU MIGHT ALSO LIKE</h2>
                 <p>Other popular fabrics from our collection</p>
             </div>

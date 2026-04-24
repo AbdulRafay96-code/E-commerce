@@ -12,10 +12,13 @@ $pageStyles = ['login.css'];
 
 $error = '';
 $success = '';
-$activeTab = 'login';
+// Respect ?tab=register so refresh / deep link stays on the right tab
+$activeTab = (($_GET['tab'] ?? '') === 'register') ? 'register' : 'login';
 
 // Handle form submissions
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER["REQUEST_METHOD"] == "POST" && !csrfVerify()) {
+    $error = 'Invalid request. Please refresh the page and try again.';
+} elseif ($_SERVER["REQUEST_METHOD"] == "POST") {
     $formType = $_POST['form_type'] ?? '';
 
     if ($formType === 'login') {
@@ -33,10 +36,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($result->num_rows === 1) {
                 $user = $result->fetch_assoc();
                 if (password_verify($password, $user['password'])) {
+                    sessionRegenerate(); // prevent session fixation
                     $_SESSION['user_id'] = $user['id'];
                     $_SESSION['user_name'] = $user['name'];
                     $_SESSION['user_email'] = $user['email'];
-                    header("Location: index.php");
+                    header("Location: dashboard.php");
                     exit;
                 } else {
                     $error = "Invalid password";
@@ -74,8 +78,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $stmt->bind_param("ssss", $name, $email, $phone, $hashedPassword);
 
                 if ($stmt->execute()) {
-                    $success = "Account created successfully! Please login.";
-                    $activeTab = 'login';
+                    // Auto-login the new user and redirect into the site
+                    $newUserId = $conn->insert_id;
+                    sessionRegenerate(); // prevent session fixation
+                    $_SESSION['user_id']    = $newUserId;
+                    $_SESSION['user_name']  = $name;
+                    $_SESSION['user_email'] = $email;
+                    header("Location: dashboard.php?welcome=1");
+                    exit;
                 } else {
                     $error = "Error creating account. Please try again.";
                 }
@@ -103,7 +113,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <section class="login-section">
         <div class="container">
-            <div class="login-container">
+            <div class="login-container reveal">
                 <div class="form-tabs">
                     <button class="tab-btn <?php echo $activeTab === 'login' ? 'active' : ''; ?>" data-tab="login">Sign In</button>
                     <button class="tab-btn <?php echo $activeTab === 'register' ? 'active' : ''; ?>" data-tab="register">Register</button>
@@ -124,6 +134,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <?php endif; ?>
 
                         <form method="post">
+                            <?php echo csrfField(); ?>
                             <input type="hidden" name="form_type" value="login">
                             <div class="form-group">
                                 <label for="login-email">Email Address</label>
@@ -163,6 +174,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <?php endif; ?>
 
                         <form method="post">
+                            <?php echo csrfField(); ?>
                             <input type="hidden" name="form_type" value="register">
                             <div class="form-group">
                                 <label for="register-name">Full Name</label>
@@ -203,7 +215,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <div class="form-options">
                                 <div class="terms">
                                     <input type="checkbox" id="terms" name="terms" required>
-                                    <label for="terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+                                    <label for="terms">I agree to the <a href="terms.php" target="_blank">Terms of Service</a> and <a href="privacy.php" target="_blank">Privacy Policy</a></label>
                                 </div>
                             </div>
                             <button type="submit" class="btn-primary btn-register">
@@ -221,13 +233,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Tab switching
+        // Tab switching — update URL so refresh keeps the tab
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
                 btn.classList.add('active');
                 document.getElementById(btn.dataset.tab + '-form').classList.add('active');
+                const newUrl = btn.dataset.tab === 'register'
+                    ? 'login.php?tab=register'
+                    : 'login.php';
+                history.replaceState(null, '', newUrl);
             });
         });
 

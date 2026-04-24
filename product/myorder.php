@@ -1,6 +1,8 @@
 <?php
 require_once 'db_connection.php';
+require_once 'includes/functions.php';
 session_start();
+initializeCart();
 
 // CSRF protection
 if (!isset($_SESSION['csrf_token'])) {
@@ -87,18 +89,10 @@ if (isset($_SERVER['HTTP_REFERER']) && strpos($_SERVER['HTTP_REFERER'], 'cart.ph
     }
 }
 
-// Initialize cart count for both shopping cart and final cart
-$cartCount = 0;
-if (isset($_SESSION['shoppingCart']) && is_array($_SESSION['shoppingCart'])) {
-    foreach ($_SESSION['shoppingCart'] as $item) {
-        $cartCount += $item['quantity'];
-    }
-}
-if (isset($_SESSION['finalCart']) && is_array($_SESSION['finalCart'])) {
-    foreach ($_SESSION['finalCart'] as $item) {
-        $cartCount += $item['quantity'];
-    }
-}
+// Cart icon shows items ready for checkout (finalCart)
+// Scissors icon shows items awaiting customization (shoppingCart)
+$cartCount = getCartCount();
+$myOrderCount = getMyOrderCount();
 
 // Check if we need to clear the cart
 if (isset($_POST['action']) && $_POST['action'] === 'clear_cart') {
@@ -132,23 +126,31 @@ if (isset($_POST['action']) && $_POST['action'] === 'update_quantity' && isset($
 // Check if we need to update design
 if (isset($_POST['action']) && $_POST['action'] === 'save_design' && isset($_POST['index'])) {
     $index = (int)$_POST['index'];
-    
+
     if (isset($_SESSION['shoppingCart'][$index])) {
-        $collar = isset($_POST['collar']) ? $_POST['collar'] : '';
-        $kurta = isset($_POST['kurta']) ? $_POST['kurta'] : '';
-        $bottom = isset($_POST['bottom']) ? $_POST['bottom'] : '';
-        $frontPocket = isset($_POST['front_pocket']) ? $_POST['front_pocket'] : '';
-        $sidePocket = isset($_POST['side_pocket']) ? $_POST['side_pocket'] : '';
-        
-        if ($collar && $kurta && $bottom && $frontPocket && $sidePocket) {
-            $designDescription = "$kurta with $collar, $bottom, $frontPocket, and $sidePocket";
+        $collar        = $_POST['collar']        ?? '';
+        $kurta         = $_POST['kurta']         ?? '';
+        $daman         = $_POST['daman']         ?? '';
+        $cuff          = $_POST['cuff']          ?? '';
+        $placket       = $_POST['placket']       ?? '';
+        $bottom        = $_POST['bottom']        ?? '';
+        $frontPocket   = $_POST['front_pocket']  ?? '';
+        $sidePocket    = $_POST['side_pocket']   ?? '';
+        $fitPreference = $_POST['fit_preference'] ?? 'regular';
+
+        if ($collar && $kurta && $bottom && $frontPocket && $sidePocket && $fitPreference) {
+            $designDescription = "$kurta with $collar, $bottom, $frontPocket, $sidePocket ($fitPreference fit)";
             $_SESSION['shoppingCart'][$index]['design'] = $designDescription;
             $_SESSION['shoppingCart'][$index]['designOptions'] = [
-                'collar' => $collar,
-                'kurta' => $kurta,
-                'bottom' => $bottom,
-                'front_pocket' => $frontPocket,
-                'side_pocket' => $sidePocket
+                'collar'         => $collar,
+                'kurta'          => $kurta,
+                'daman'          => $daman,
+                'cuff'           => $cuff,
+                'placket'        => $placket,
+                'bottom'         => $bottom,
+                'front_pocket'   => $frontPocket,
+                'side_pocket'    => $sidePocket,
+                'fit_preference' => $fitPreference
             ];
         }
     }
@@ -159,39 +161,72 @@ if (isset($_POST['action']) && $_POST['action'] === 'save_design' && isset($_POS
 // Save measurements - FIXED VERSION
 if (isset($_POST['action']) && $_POST['action'] === 'save_measurements' && isset($_POST['index'])) {
     $index = (int)$_POST['index'];
-    
+
     if (isset($_SESSION['shoppingCart'][$index])) {
-        $fields = ['chest', 'waist', 'hip', 'shoulder', 'sleeve_length', 'trouser_length', 'kameez_length', 'neck', 'notes'];
+        $requiredFields = ['chest', 'waist', 'hip', 'shoulder', 'sleeve_length', 'trouser_length', 'kameez_length', 'neck'];
         $validMeasurements = [];
-        $measurementCount = 0;
-        
-        foreach ($fields as $field) {
-            if (isset($_POST[$field]) && !empty($_POST[$field])) {
-                $value = $field === 'notes' ? $_POST[$field] : floatval($_POST[$field]);
-                $confidence = isset($_POST[$field.'_confidence']) ? floatval($_POST[$field.'_confidence']) : 0.8;
-                
-                // FIXED: Store as individual values, not arrays
-                $validMeasurements[$field] = [
-                    'value' => $value,
-                    'confidence' => $confidence,
-                    'source' => isset($_POST['source']) ? $_POST['source'] : 'manual'
-                ];
-                
-                if ($field !== 'notes') {
-                    $measurementCount++;
-                }
+        $missing = [];
+
+        foreach ($requiredFields as $field) {
+            $raw = $_POST[$field] ?? '';
+            $value = is_numeric($raw) ? floatval($raw) : 0;
+            if ($value <= 0) {
+                $missing[] = ucwords(str_replace('_', ' ', $field));
+                continue;
             }
+            $confidence = isset($_POST[$field.'_confidence']) ? floatval($_POST[$field.'_confidence']) : 0.8;
+            $validMeasurements[$field] = [
+                'value' => $value,
+                'confidence' => $confidence,
+                'source' => $_POST['source'] ?? 'manual'
+            ];
         }
-        
-        if ($measurementCount >= 3) {
+
+        // Notes remain optional
+        $notesRaw = trim($_POST['notes'] ?? '');
+        if ($notesRaw !== '') {
+            $validMeasurements['notes'] = [
+                'value' => $notesRaw,
+                'confidence' => 1.0,
+                'source' => $_POST['source'] ?? 'manual'
+            ];
+        }
+
+        if (empty($missing)) {
             $_SESSION['shoppingCart'][$index]['measurements'] = $validMeasurements;
             $_SESSION['shoppingCart'][$index]['hasMeasurements'] = true;
-            $_SESSION['shoppingCart'][$index]['measurementSource'] = 
-                (isset($_POST['source']) && $_POST['source'] === 'ai_webcam') ? 'AI Webcam' : 'Manual Entry';
-            
+            $source = (isset($_POST['source']) && $_POST['source'] === 'ai_webcam') ? 'AI Webcam' : 'Manual Entry';
+            $_SESSION['shoppingCart'][$index]['measurementSource'] = $source;
+
+            // SRS §3.4 Measurement class — persist to user's profile for reuse across orders
+            if (isLoggedIn()) {
+                $capturedVia = ($source === 'AI Webcam') ? 'ai' : 'manual';
+                $label = ($capturedVia === 'ai' ? 'AI Capture ' : 'Manual ') . date('d M Y');
+                $pick = fn($f) => isset($validMeasurements[$f]['value']) ? (string)$validMeasurements[$f]['value'] : null;
+                $notesVal = $validMeasurements['notes']['value'] ?? null;
+
+                $stmt = $conn->prepare(
+                    "INSERT INTO measurements
+                     (user_id, label, chest, waist, hip, shoulder, sleeve_length, trouser_length, kameez_length, neck, notes, captured_via)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                );
+                if ($stmt) {
+                    $uid = (int)getUserId();
+                    $chest = $pick('chest'); $waist = $pick('waist'); $hip = $pick('hip');
+                    $shoulder = $pick('shoulder'); $sleeve = $pick('sleeve_length');
+                    $trouser = $pick('trouser_length'); $kameez = $pick('kameez_length'); $neck = $pick('neck');
+                    $stmt->bind_param(
+                        "isssssssssss",
+                        $uid, $label, $chest, $waist, $hip, $shoulder,
+                        $sleeve, $trouser, $kameez, $neck, $notesVal, $capturedVia
+                    );
+                    $stmt->execute();
+                }
+            }
+
             $_SESSION['success_message'] = "Measurements saved successfully!";
         } else {
-            $_SESSION['error_message'] = "Please provide at least 3 valid measurements.";
+            $_SESSION['error_message'] = "Please fill in all measurement fields: " . implode(', ', $missing);
         }
     }
     
@@ -385,19 +420,14 @@ $logged_in = isset($_SESSION['user_id']);
 $user_name = $logged_in ? $_SESSION['user_name'] : '';
 ?>
 
+<?php
+    $pageTitle = 'My Order - Stitch House';
+    $pageStyles = ['order.css', 'myorder.css'];
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Order - Stitch House</title>
-    <link rel="stylesheet" href="variables.css">
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="order.css">
-    <link rel="stylesheet" href="shop.css">
-    <link rel="stylesheet" href="myorder.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;500;600;700&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+    <?php include 'includes/head.php'; ?>
     <style>
         /* Additional styles for the new buttons */
         .measurement-btn, .add-to-cart-btn {
@@ -405,7 +435,7 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
             align-items: center;
             justify-content: center;
             padding: 8px 12px;
-            background-color: #d4af37;
+            background-color: var(--gold-color);
             color: white;
             border: none;
             border-radius: 4px;
@@ -519,7 +549,7 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
         .edit-measurements {
             background: none;
             border: none;
-            color: #d4af37;
+            color: var(--gold-color);
             cursor: pointer;
             font-size: 12px;
         }
@@ -529,7 +559,7 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background-color: #d4af37;
+            background-color: var(--gold-color);
             color: white;
             border: none;
             border-radius: 50%;
@@ -607,8 +637,6 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
 
     <!-- Add your custom MediaPipe files -->
     <link rel="stylesheet" href="mediapipe-pose/css/mediapipe-styles.css">
-    <script src="mediapipe-pose/js/pose-detector.js"></script>
-    <script src="mediapipe-pose/js/measurement-calculator.js"></script>
     <script src="mediapipe-pose/js/mediapipe-pose.js"></script>
 </head>
 <body>
@@ -671,6 +699,13 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
                     </div>
                 <?php endif; ?>
                 
+                <div class="myorder-link">
+                    <a href="myorder.php" title="My Order">
+                        <i class="fas fa-cut"></i>
+                        <span class="myorder-count"><?php echo $myOrderCount; ?></span>
+                    </a>
+                </div>
+
                 <div class="cart-link">
                     <a href="cart.php">
                         <i class="fas fa-shopping-cart"></i>
@@ -720,10 +755,10 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
             <div class="order-container">
                 <?php if (empty($_SESSION['shoppingCart'])): ?>
                 <div class="empty-cart-message">
-                    <i class="fas fa-shopping-cart"></i>
-                    <h2>Your cart is empty</h2>
-                    <p>Browse our collection and add some fabrics to your cart</p>
-                    <a href="order.php" class="btn-primary">Shop Now</a>
+                    <i class="fas fa-cut"></i>
+                    <h2>Nothing to customize yet</h2>
+                    <p>Add a fabric from the shop, then come back here to design your kameez and enter measurements.</p>
+                    <a href="order.php" class="btn-primary"><i class="fas fa-shopping-bag"></i> Browse Fabrics</a>
                 </div>
                 <?php else: ?>
                 <div class="order-content">
@@ -779,12 +814,6 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
                                     <div class="measurements-display">
                                         <h4>
                                             <?php echo isset($item['measurementSource']) ? $item['measurementSource'] : 'Measurements'; ?>
-                                            <?php if (isset($item['accuracy'])): ?>
-                                                <span style="font-size: 12px; color: 
-                                                    <?php echo $item['accuracy'] >= 85 ? '#28a745' : ($item['accuracy'] >= 75 ? '#ffc107' : '#dc3545'); ?>">
-                                                    (<?php echo $item['accuracy']; ?>% accuracy)
-                                                </span>
-                                            <?php endif; ?>
                                             <button type="button" class="edit-measurements" data-index="<?php echo $index; ?>">
                                                 <i class="fas fa-edit"></i> Edit
                                             </button>
@@ -802,15 +831,10 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
                                                 if (isset($item['measurements'][$key])):
                                                     $measurement = $item['measurements'][$key];
                                                     $value = is_array($measurement) ? $measurement['value'] : $measurement;
-                                                    $confidence = is_array($measurement) ? ($measurement['confidence'] ?? 0.8) : 0.8;
                                             ?>
                                             <tr>
                                                 <td style="padding: 2px 5px; font-weight: 500;"><?php echo $label; ?>:</td>
                                                 <td style="padding: 2px 5px;"><?php echo htmlspecialchars($value); ?> inches</td>
-                                                <td style="padding: 2px 5px; font-size: 10px; color: 
-                                                    <?php echo $confidence >= 0.85 ? '#28a745' : ($confidence >= 0.75 ? '#ffc107' : '#dc3545'); ?>">
-                                                    (<?php echo round($confidence * 100); ?>%)
-                                                </td>
                                             </tr>
                                             <?php 
                                                 endif;
@@ -877,92 +901,170 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
         </div>
     </section>
 
-    <!-- Item Design Template (Hidden) -->
+    <!-- Item Design Template (Hidden) - Step Wizard -->
     <div id="design-options-template" class="item-design-options" style="display: none;">
         <div class="design-header">
             <h4>Customize Your Design</h4>
             <button class="close-design-btn" title="Close"><i class="fas fa-times"></i></button>
         </div>
-        
+
+        <!-- Progress Bar -->
+        <div class="wizard-progress">
+            <div class="wizard-progress-bar" style="width: 11%"></div>
+        </div>
+        <div class="wizard-steps-nav">
+            <span class="wizard-step-dot active" data-step="1">1</span>
+            <span class="wizard-step-dot" data-step="2">2</span>
+            <span class="wizard-step-dot" data-step="3">3</span>
+            <span class="wizard-step-dot" data-step="4">4</span>
+            <span class="wizard-step-dot" data-step="5">5</span>
+            <span class="wizard-step-dot" data-step="6">6</span>
+            <span class="wizard-step-dot" data-step="7">7</span>
+            <span class="wizard-step-dot" data-step="8">8</span>
+            <span class="wizard-step-dot" data-step="9">9</span>
+            <span class="wizard-step-dot" data-step="10">10</span>
+        </div>
+
         <form method="post" class="design-form">
             <input type="hidden" name="action" value="save_design">
             <input type="hidden" name="index" value="ITEMID">
-            
-            <div class="design-section collar-style">
-                <h5>Collar Style</h5>
+
+            <!-- Step 1: Collar -->
+            <div class="wizard-step active" data-step="1">
+                <div class="wizard-step-header">
+                    <span class="wizard-step-number">Step 1 of 10</span>
+                    <h5><i class="fas fa-tshirt"></i> Collar Design</h5>
+                </div>
                 <div class="design-options">
-                    <div class="design-option">
-                        <input type="radio" id="collar-band-ITEMID" name="collar" value="Band Collar">
-                        <label for="collar-band-ITEMID">Band Collar</label>
-                    </div>
-                    <div class="design-option">
-                        <input type="radio" id="collar-straight-ITEMID" name="collar" value="Straight Collar">
-                        <label for="collar-straight-ITEMID">Straight Collar</label>
-                    </div>
+                    <div class="design-option"><input type="radio" id="collar-band-ITEMID" name="collar" value="Band Collar"><label for="collar-band-ITEMID">Band Collar</label></div>
+                    <div class="design-option"><input type="radio" id="collar-mandarin-ITEMID" name="collar" value="Mandarin Collar"><label for="collar-mandarin-ITEMID">Mandarin Collar</label></div>
+                    <div class="design-option"><input type="radio" id="collar-vneck-ITEMID" name="collar" value="V-Neck"><label for="collar-vneck-ITEMID">V-Neck</label></div>
+                    <div class="design-option"><input type="radio" id="collar-round-ITEMID" name="collar" value="Round Neck"><label for="collar-round-ITEMID">Round Neck</label></div>
+                    <div class="design-option"><input type="radio" id="collar-sherwani-ITEMID" name="collar" value="Sherwani Collar"><label for="collar-sherwani-ITEMID">Sherwani Collar</label></div>
                 </div>
             </div>
-            
-            <div class="design-section kurta-style">
-                <h5>Kameez Style</h5>
+
+            <!-- Step 2: Kameez Style -->
+            <div class="wizard-step" data-step="2">
+                <div class="wizard-step-header">
+                    <span class="wizard-step-number">Step 2 of 10</span>
+                    <h5><i class="fas fa-vest"></i> Kameez Style</h5>
+                </div>
                 <div class="design-options">
-                    <div class="design-option">
-                        <input type="radio" id="kurta-style-ITEMID" name="kurta" value="Kurta Style">
-                        <label for="kurta-style-ITEMID">Kurta Style</label>
-                    </div>
-                    <div class="design-option">
-                        <input type="radio" id="simple-kameez-ITEMID" name="kurta" value="Simple Kameez">
-                        <label for="simple-kameez-ITEMID">Simple Kameez</label>
-                    </div>
+                    <div class="design-option"><input type="radio" id="kurta-style-ITEMID" name="kurta" value="Kurta Style"><label for="kurta-style-ITEMID">Kurta Style</label></div>
+                    <div class="design-option"><input type="radio" id="simple-kameez-ITEMID" name="kurta" value="Simple Kameez"><label for="simple-kameez-ITEMID">Simple Kameez</label></div>
                 </div>
             </div>
-            
-            <div class="design-section bottom-style">
-                <h5>Bottom Style</h5>
+
+            <!-- Step 3: Daman Style -->
+            <div class="wizard-step" data-step="3">
+                <div class="wizard-step-header">
+                    <span class="wizard-step-number">Step 3 of 10</span>
+                    <h5><i class="fas fa-cut"></i> Daman Style</h5>
+                </div>
                 <div class="design-options">
-                    <div class="design-option">
-                        <input type="radio" id="bottom-shalwar-ITEMID" name="bottom" value="Shalwar">
-                        <label for="bottom-shalwar-ITEMID">Shalwar</label>
-                    </div>
-                    <div class="design-option">
-                        <input type="radio" id="bottom-trouser-ITEMID" name="bottom" value="Trouser">
-                        <label for="bottom-trouser-ITEMID">Trouser</label>
-                    </div>
+                    <div class="design-option"><input type="radio" id="daman-straight-ITEMID" name="daman" value="Straight Daman"><label for="daman-straight-ITEMID">Straight Daman</label></div>
+                    <div class="design-option"><input type="radio" id="daman-gol-ITEMID" name="daman" value="Gol Daman"><label for="daman-gol-ITEMID">Gol Daman (Apple Cut)</label></div>
+                    <div class="design-option"><input type="radio" id="daman-curved-ITEMID" name="daman" value="Curved Daman"><label for="daman-curved-ITEMID">Curved Daman</label></div>
                 </div>
             </div>
-            
-            <div class="design-section front-pocket-style">
-                <h5>Front Pocket</h5>
+
+            <!-- Step 4: Cuff Style -->
+            <div class="wizard-step" data-step="4">
+                <div class="wizard-step-header">
+                    <span class="wizard-step-number">Step 4 of 10</span>
+                    <h5><i class="fas fa-hand-paper"></i> Cuff Style</h5>
+                </div>
                 <div class="design-options">
-                    <div class="design-option">
-                        <input type="radio" id="front-pocket-yes-ITEMID" name="front_pocket" value="With Front Pocket">
-                        <label for="front-pocket-yes-ITEMID">With Front Pocket</label>
-                    </div>
-                    <div class="design-option">
-                        <input type="radio" id="front-pocket-no-ITEMID" name="front_pocket" value="No Front Pocket">
-                        <label for="front-pocket-no-ITEMID">No Front Pocket</label>
-                    </div>
+                    <div class="design-option"><input type="radio" id="cuff-simple-ITEMID" name="cuff" value="Simple Cuff"><label for="cuff-simple-ITEMID">Simple Cuff</label></div>
+                    <div class="design-option"><input type="radio" id="cuff-double-ITEMID" name="cuff" value="Double Cuff"><label for="cuff-double-ITEMID">Double Cuff</label></div>
+                    <div class="design-option"><input type="radio" id="cuff-button-ITEMID" name="cuff" value="Button Cuff"><label for="cuff-button-ITEMID">Button Cuff</label></div>
+                    <div class="design-option"><input type="radio" id="cuff-open-ITEMID" name="cuff" value="Open Sleeve"><label for="cuff-open-ITEMID">Open Sleeve</label></div>
                 </div>
             </div>
-            
-            <div class="design-section side-pocket-style">
-                <h5>Side Pockets</h5>
+
+            <!-- Step 5: Placket -->
+            <div class="wizard-step" data-step="5">
+                <div class="wizard-step-header">
+                    <span class="wizard-step-number">Step 5 of 10</span>
+                    <h5><i class="fas fa-grip-lines-vertical"></i> Button / Placket</h5>
+                </div>
                 <div class="design-options">
-                    <div class="design-option">
-                        <input type="radio" id="side-pocket-two-ITEMID" name="side_pocket" value="Two Side Pockets">
-                        <label for="side-pocket-two-ITEMID">Two Side Pockets</label>
-                    </div>
-                    <div class="design-option">
-                        <input type="radio" id="side-pocket-one-ITEMID" name="side_pocket" value="One Side Pocket">
-                        <label for="side-pocket-one-ITEMID">One Side Pocket</label>
-                    </div>
-                    <div class="design-option">
-                        <input type="radio" id="side-pocket-none-ITEMID" name="side_pocket" value="No Side Pockets">
-                        <label for="side-pocket-none-ITEMID">No Side Pockets</label>
-                    </div>
+                    <div class="design-option"><input type="radio" id="placket-hidden-ITEMID" name="placket" value="Hidden Placket"><label for="placket-hidden-ITEMID">Hidden Placket</label></div>
+                    <div class="design-option"><input type="radio" id="placket-visible-ITEMID" name="placket" value="Visible Buttons"><label for="placket-visible-ITEMID">Visible Buttons</label></div>
+                    <div class="design-option"><input type="radio" id="placket-loop-ITEMID" name="placket" value="Loop Buttons"><label for="placket-loop-ITEMID">Loop Buttons</label></div>
                 </div>
             </div>
-            
-            <button type="submit" class="btn-confirm-design" data-item-id="ITEMID">Confirm Design</button>
+
+            <!-- Step 6: Bottom Style -->
+            <div class="wizard-step" data-step="6">
+                <div class="wizard-step-header">
+                    <span class="wizard-step-number">Step 6 of 10</span>
+                    <h5><i class="fas fa-socks"></i> Shalwar / Trouser Style</h5>
+                </div>
+                <div class="design-options">
+                    <div class="design-option"><input type="radio" id="bottom-shalwar-ITEMID" name="bottom" value="Simple Shalwar"><label for="bottom-shalwar-ITEMID">Simple Shalwar</label></div>
+                    <div class="design-option"><input type="radio" id="bottom-pajama-ITEMID" name="bottom" value="Pajama Style"><label for="bottom-pajama-ITEMID">Pajama Style</label></div>
+                    <div class="design-option"><input type="radio" id="bottom-churidar-ITEMID" name="bottom" value="Churidar"><label for="bottom-churidar-ITEMID">Churidar</label></div>
+                    <div class="design-option"><input type="radio" id="bottom-trouser-ITEMID" name="bottom" value="Straight Trouser"><label for="bottom-trouser-ITEMID">Straight Trouser</label></div>
+                </div>
+            </div>
+
+            <!-- Step 7: Front Pocket -->
+            <div class="wizard-step" data-step="7">
+                <div class="wizard-step-header">
+                    <span class="wizard-step-number">Step 7 of 10</span>
+                    <h5><i class="fas fa-square"></i> Front Pocket</h5>
+                </div>
+                <div class="design-options">
+                    <div class="design-option"><input type="radio" id="front-pocket-yes-ITEMID" name="front_pocket" value="With Front Pocket"><label for="front-pocket-yes-ITEMID">With Front Pocket</label></div>
+                    <div class="design-option"><input type="radio" id="front-pocket-no-ITEMID" name="front_pocket" value="No Front Pocket"><label for="front-pocket-no-ITEMID">No Front Pocket</label></div>
+                </div>
+            </div>
+
+            <!-- Step 8: Side Pockets -->
+            <div class="wizard-step" data-step="8">
+                <div class="wizard-step-header">
+                    <span class="wizard-step-number">Step 8 of 10</span>
+                    <h5><i class="fas fa-th-large"></i> Side Pockets</h5>
+                </div>
+                <div class="design-options">
+                    <div class="design-option"><input type="radio" id="side-pocket-two-ITEMID" name="side_pocket" value="Two Side Pockets"><label for="side-pocket-two-ITEMID">Two Side Pockets</label></div>
+                    <div class="design-option"><input type="radio" id="side-pocket-one-ITEMID" name="side_pocket" value="One Side Pocket"><label for="side-pocket-one-ITEMID">One Side Pocket</label></div>
+                    <div class="design-option"><input type="radio" id="side-pocket-none-ITEMID" name="side_pocket" value="No Side Pockets"><label for="side-pocket-none-ITEMID">No Side Pockets</label></div>
+                </div>
+            </div>
+
+            <!-- Step 9: Fit Preference -->
+            <div class="wizard-step" data-step="9">
+                <div class="wizard-step-header">
+                    <span class="wizard-step-number">Step 9 of 10</span>
+                    <h5><i class="fas fa-user-tie"></i> Fit Preference</h5>
+                </div>
+                <div class="design-options">
+                    <div class="design-option"><input type="radio" id="fit-slim-ITEMID" name="fit_preference" value="slim"><label for="fit-slim-ITEMID">Slim Fit</label></div>
+                    <div class="design-option"><input type="radio" id="fit-regular-ITEMID" name="fit_preference" value="regular" checked><label for="fit-regular-ITEMID">Regular Fit</label></div>
+                    <div class="design-option"><input type="radio" id="fit-loose-ITEMID" name="fit_preference" value="loose"><label for="fit-loose-ITEMID">Loose Fit</label></div>
+                </div>
+            </div>
+
+            <!-- Step 10: Review & Confirm -->
+            <div class="wizard-step" data-step="10">
+                <div class="wizard-step-header">
+                    <span class="wizard-step-number">Step 10 of 10</span>
+                    <h5><i class="fas fa-check-double"></i> Review Your Design</h5>
+                </div>
+                <div class="wizard-review"></div>
+                <button type="submit" class="btn-confirm-design" data-item-id="ITEMID">
+                    <i class="fas fa-check"></i> Confirm Design
+                </button>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="wizard-nav">
+                <button type="button" class="wizard-btn wizard-prev" disabled><i class="fas fa-arrow-left"></i> Previous</button>
+                <button type="button" class="wizard-btn wizard-next">Next <i class="fas fa-arrow-right"></i></button>
+            </div>
         </form>
     </div>
 
@@ -979,7 +1081,7 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
             
             <div style="display: flex; flex-direction: column; gap: 15px;">
                 <button id="webcam-measurement-option" class="measurement-option-btn" style="
-                    background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+                    background: linear-gradient(135deg, var(--gold-color) 0%, #A68B52 100%);
                     color: white;
                     border: none;
                     padding: 15px 20px;
@@ -1029,8 +1131,18 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
             <!-- Hidden input for measurement index -->
             <input type="hidden" id="webcam-measurement-item-index" value="">
             
-            <!-- Camera Section -->
-            <div class="camera-section" style="position: relative; width: 100%; max-width: 640px; margin: 0 auto 20px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+            <!-- Height Calibration (critical for accuracy) -->
+            <div id="height-calibration" style="max-width: 820px; margin: 0 auto 15px; padding: 14px 18px; background: #FDF6E3; border-left: 4px solid var(--gold-color); border-radius: 6px;">
+                <label style="display:flex; align-items:center; gap:14px; flex-wrap:wrap; font-size:14px; color:#5B4A34; font-weight:600;">
+                    <i class="fas fa-ruler-vertical" style="color:#8B6914;"></i>
+                    <span>Your height (needed for accurate measurement):</span>
+                    <input type="number" id="user-height-feet" min="4" max="7" value="5" style="width:60px; padding:6px 8px; border:1px solid #ddd; border-radius:4px; text-align:center; font-size:14px;"> ft
+                    <input type="number" id="user-height-inches" min="0" max="11" value="6" style="width:60px; padding:6px 8px; border:1px solid #ddd; border-radius:4px; text-align:center; font-size:14px;"> in
+                </label>
+            </div>
+
+            <!-- Camera Section — sized larger for visibility, processing stays at 640×480 native -->
+            <div class="camera-section" style="position: relative; width: 100%; max-width: 820px; margin: 0 auto 20px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
                 <video id="webcam-video" width="640" height="480" autoplay muted playsinline style="width: 100%; height: auto; display: block; background: #000;"></video>
                 <!-- Canvas will be added here by JavaScript -->
             </div>
@@ -1047,6 +1159,42 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
                 color: #495057;
             ">
                 📷 Position yourself in the frame
+            </div>
+
+            <!-- Auto-capture stability badge (shown after calibration) -->
+            <div id="auto-capture-status" style="
+                display: none;
+                text-align: center;
+                padding: 10px 14px;
+                margin: 10px auto;
+                max-width: 600px;
+                background: #E8F5E9;
+                border-left: 4px solid #2D5A4A;
+                border-radius: 6px;
+                font-size: 13px;
+                color: #1B4332;
+                font-weight: 500;
+            ">
+                <i class="fas fa-circle-notch fa-spin"></i>
+                <span id="auto-capture-text">Hold still — auto-capturing in <b id="auto-capture-countdown">3</b>s…</span>
+            </div>
+
+            <!-- Countdown overlay (big number, shown while countdown ticks) -->
+            <div id="countdown-overlay" style="
+                display: none;
+                text-align: center;
+                padding: 20px;
+                margin: 15px auto;
+                max-width: 600px;
+                background: rgba(26, 26, 26, 0.95);
+                color: var(--gold-color);
+                border-radius: 12px;
+                font-size: 14px;
+                font-weight: 600;
+            ">
+                Step back into the frame.<br>
+                <span id="countdown-number" style="font-size:72px; font-family:'Playfair Display',serif; display:block; line-height:1; margin:10px 0;">10</span>
+                <button id="cancel-countdown-btn" style="background:transparent; border:1px solid var(--gold-color); color:var(--gold-color); padding:6px 14px; border-radius:6px; cursor:pointer; font-size:12px; margin-top:6px;">Cancel</button>
             </div>
             
             <!-- Controls -->
@@ -1086,7 +1234,7 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
                 </button>
                 
                 <button id="capture-measurement-btn" class="webcam-btn" style="
-                    background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+                    background: linear-gradient(135deg, var(--gold-color) 0%, #A68B52 100%);
                     color: white;
                     border: none;
                     padding: 12px 20px;
@@ -1099,7 +1247,24 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
                     gap: 8px;
                     transition: all 0.3s ease;
                 ">
-                    <i class="fas fa-check"></i> Capture Measurements
+                    <i class="fas fa-check"></i> Capture Now
+                </button>
+
+                <button id="countdown-capture-btn" class="webcam-btn" style="
+                    background: linear-gradient(135deg, #1A1A1A 0%, #2C2C2C 100%);
+                    color: var(--gold-color);
+                    border: 1px solid var(--gold-color);
+                    padding: 12px 20px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    margin: 5px;
+                    font-size: 14px;
+                    display: none;
+                    align-items: center;
+                    gap: 8px;
+                    transition: all 0.3s ease;
+                " title="Start a 10-second countdown so you can step back">
+                    <i class="fas fa-hourglass-half"></i> Capture After 10s
                 </button>
                 
                 <button id="retake-measurement-btn" class="webcam-btn" style="
@@ -1154,26 +1319,26 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
 
     <!-- Manual Measurement Modal -->
     <div id="manual-measurement-modal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1001; justify-content: center; align-items: center;">
-        <div class="modal-content" style="background: white; padding: 20px; border-radius: 12px; max-width: 600px; width: 95%; max-height: 90vh; overflow-y: auto; position: relative;">
+        <div class="modal-content" style="background: white; padding: 20px; border-radius: 12px; max-width: 600px; width: 95%; max-height: 90vh; overflow-y: auto; overflow-x: hidden; box-sizing: border-box; position: relative;">
             <span class="close-modal" style="position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #999; z-index: 10;">&times;</span>
-            
+
             <h3 style="margin-bottom: 20px; color: #333; text-align: center;">
                 <i class="fas fa-ruler"></i> Enter Your Measurements
             </h3>
-            
+
             <!-- Hidden input for measurement index -->
             <input type="hidden" id="measurement-item-index" value="">
-            
+
             <form method="post" id="measurement-form">
                 <input type="hidden" name="action" value="save_measurements">
                 <input type="hidden" name="index" id="measurement-form-index" value="">
-                
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px;">
+
+                <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 20px;">
                     <div class="measurement-field">
                         <label for="chest" style="display: block; margin-bottom: 5px; font-weight: 500;">
                             <i class="fas fa-expand-arrows-alt"></i> Chest (inches)
                         </label>
-                        <input type="number" id="chest" name="chest" step="0.1" placeholder="e.g. 40.5" 
+                        <input type="number" id="chest" name="chest" required min="1" step="0.1" placeholder="e.g. 40.5" 
                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
                         <small style="color: #666; font-size: 12px;">Measure around fullest part of chest</small>
                     </div>
@@ -1182,7 +1347,7 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
                         <label for="waist" style="display: block; margin-bottom: 5px; font-weight: 500;">
                             <i class="fas fa-expand-arrows-alt"></i> Waist (inches)
                         </label>
-                        <input type="number" id="waist" name="waist" step="0.1" placeholder="e.g. 32.0"
+                        <input type="number" id="waist" name="waist" required min="1" step="0.1" placeholder="e.g. 32.0"
                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
                         <small style="color: #666; font-size: 12px;">Measure around natural waistline</small>
                     </div>
@@ -1191,7 +1356,7 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
                         <label for="hip" style="display: block; margin-bottom: 5px; font-weight: 500;">
                             <i class="fas fa-expand-arrows-alt"></i> Hip (inches)
                         </label>
-                        <input type="number" id="hip" name="hip" step="0.1" placeholder="e.g. 38.0"
+                        <input type="number" id="hip" name="hip" required min="1" step="0.1" placeholder="e.g. 38.0"
                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
                         <small style="color: #666; font-size: 12px;">Measure around fullest part of hips</small>
                     </div>
@@ -1200,7 +1365,7 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
                         <label for="shoulder" style="display: block; margin-bottom: 5px; font-weight: 500;">
                             <i class="fas fa-expand-arrows-alt"></i> Shoulder (inches)
                         </label>
-                        <input type="number" id="shoulder" name="shoulder" step="0.1" placeholder="e.g. 16.5"
+                        <input type="number" id="shoulder" name="shoulder" required min="1" step="0.1" placeholder="e.g. 16.5"
                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
                         <small style="color: #666; font-size: 12px;">Measure from shoulder edge to edge</small>
                     </div>
@@ -1209,7 +1374,7 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
                         <label for="sleeve_length" style="display: block; margin-bottom: 5px; font-weight: 500;">
                             <i class="fas fa-expand-arrows-alt"></i> Sleeve Length (inches)
                         </label>
-                        <input type="number" id="sleeve_length" name="sleeve_length" step="0.1" placeholder="e.g. 24.0"
+                        <input type="number" id="sleeve_length" name="sleeve_length" required min="1" step="0.1" placeholder="e.g. 24.0"
                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
                         <small style="color: #666; font-size: 12px;">Measure from shoulder to wrist</small>
                     </div>
@@ -1218,7 +1383,7 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
                         <label for="trouser_length" style="display: block; margin-bottom: 5px; font-weight: 500;">
                             <i class="fas fa-expand-arrows-alt"></i> Trouser Length (inches)
                         </label>
-                        <input type="number" id="trouser_length" name="trouser_length" step="0.1" placeholder="e.g. 42.0"
+                        <input type="number" id="trouser_length" name="trouser_length" required min="1" step="0.1" placeholder="e.g. 42.0"
                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
                         <small style="color: #666; font-size: 12px;">Measure from waist to ankle</small>
                     </div>
@@ -1227,7 +1392,7 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
                         <label for="kameez_length" style="display: block; margin-bottom: 5px; font-weight: 500;">
                             <i class="fas fa-expand-arrows-alt"></i> Kameez Length (inches)
                         </label>
-                        <input type="number" id="kameez_length" name="kameez_length" step="0.1" placeholder="e.g. 36.0"
+                        <input type="number" id="kameez_length" name="kameez_length" required min="1" step="0.1" placeholder="e.g. 36.0"
                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
                         <small style="color: #666; font-size: 12px;">Measure from shoulder to desired length</small>
                     </div>
@@ -1236,7 +1401,7 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
                         <label for="neck" style="display: block; margin-bottom: 5px; font-weight: 500;">
                             <i class="fas fa-expand-arrows-alt"></i> Neck (inches)
                         </label>
-                        <input type="number" id="neck" name="neck" step="0.1" placeholder="e.g. 15.0"
+                        <input type="number" id="neck" name="neck" required min="1" step="0.1" placeholder="e.g. 15.0"
                                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
                         <small style="color: #666; font-size: 12px;">Measure around the base of your neck</small>
                     </div>
@@ -1312,7 +1477,7 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
                 </div>
                 <div class="footer-section contact">
                     <h3>Contact Info</h3>
-                    <p><i class="fas fa-map-marker-alt"></i>Main Gulberg, Lahore, Pakistan</p>
+                    <p><i class="fas fa-map-marker-alt"></i> IUB Baghdad-ul-Jadeed Campus, Hasilpur Road, Bahawalpur 63100, Pakistan</p>
                     <p><i class="fas fa-phone"></i> +0304-2292813</p>
                     <p><i class="fas fa-envelope"></i> info@stitchhouse.com</p>
                 </div>
@@ -1455,31 +1620,100 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
         function addDesignPanelEventListeners(index) {
             const designContainer = document.querySelector(`.item-design-container[data-index="${index}"]`);
             if (!designContainer) return;
-            
+
             const closeBtn = designContainer.querySelector('.close-design-btn');
             if (closeBtn) {
                 closeBtn.addEventListener('click', function() {
                     designContainer.innerHTML = '';
                 });
             }
-            
+
+            // Wizard navigation (10 steps: 9 customization + 1 review)
+            const totalSteps = 10;
+            let currentStep = 1;
+            const steps = designContainer.querySelectorAll('.wizard-step');
+            const dots = designContainer.querySelectorAll('.wizard-step-dot');
+            const progressBar = designContainer.querySelector('.wizard-progress-bar');
+            const prevBtn = designContainer.querySelector('.wizard-prev');
+            const nextBtn = designContainer.querySelector('.wizard-next');
+
+            function goToStep(step) {
+                currentStep = step;
+                steps.forEach(s => s.classList.remove('active'));
+                dots.forEach(d => d.classList.remove('active'));
+
+                const activeStep = designContainer.querySelector(`.wizard-step[data-step="${step}"]`);
+                const activeDot = designContainer.querySelector(`.wizard-step-dot[data-step="${step}"]`);
+                if (activeStep) activeStep.classList.add('active');
+                if (activeDot) activeDot.classList.add('active');
+
+                // Mark completed dots
+                dots.forEach(d => {
+                    const dotStep = parseInt(d.dataset.step);
+                    if (dotStep < step) d.classList.add('completed');
+                    else d.classList.remove('completed');
+                });
+
+                // Update progress bar
+                if (progressBar) progressBar.style.width = ((step / totalSteps) * 100) + '%';
+
+                // Toggle buttons
+                if (prevBtn) prevBtn.disabled = step === 1;
+                if (nextBtn) nextBtn.style.display = step === totalSteps ? 'none' : 'inline-flex';
+
+                // Build review on last step
+                if (step === totalSteps) buildReview();
+            }
+
+            if (prevBtn) prevBtn.addEventListener('click', () => { if (currentStep > 1) goToStep(currentStep - 1); });
+            if (nextBtn) nextBtn.addEventListener('click', () => { if (currentStep < totalSteps) goToStep(currentStep + 1); });
+
+            // Click on dots to jump
+            dots.forEach(dot => {
+                dot.addEventListener('click', () => goToStep(parseInt(dot.dataset.step)));
+            });
+
+            // Auto-advance when option selected
+            designContainer.querySelectorAll('.design-option input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    setTimeout(() => { if (currentStep < totalSteps) goToStep(currentStep + 1); }, 300);
+                });
+            });
+
+            function buildReview() {
+                const reviewContainer = designContainer.querySelector('.wizard-review');
+                if (!reviewContainer) return;
+
+                const labels = {
+                    collar: 'Collar Design', kurta: 'Kameez Style', daman: 'Daman Style',
+                    cuff: 'Cuff Style', placket: 'Button / Placket', bottom: 'Shalwar / Trouser',
+                    front_pocket: 'Front Pocket', side_pocket: 'Side Pockets',
+                    fit_preference: 'Fit Preference'
+                };
+
+                let html = '';
+                Object.keys(labels).forEach(name => {
+                    const checked = designContainer.querySelector(`input[name="${name}"]:checked`);
+                    const value = checked ? checked.value : '<span style="color:var(--gold-color)">Not selected</span>';
+                    html += `<div class="wizard-review-item"><span class="wizard-review-label">${labels[name]}</span><span class="wizard-review-value">${value}</span></div>`;
+                });
+                reviewContainer.innerHTML = html;
+            }
+
+            // Form validation
             const designForm = designContainer.querySelector('.design-form');
             if (designForm) {
                 designForm.addEventListener('submit', function(e) {
-                    const requiredFields = ['collar', 'kurta', 'bottom', 'front_pocket', 'side_pocket'];
+                    const requiredFields = ['collar', 'kurta', 'bottom', 'front_pocket', 'side_pocket', 'fit_preference'];
                     const missingFields = [];
-                    
                     requiredFields.forEach(field => {
-                        const selected = designForm.querySelector(`input[name="${field}"]:checked`);
-                        if (!selected) {
+                        if (!designForm.querySelector(`input[name="${field}"]:checked`)) {
                             missingFields.push(field.replace('_', ' '));
                         }
                     });
-                    
                     if (missingFields.length > 0) {
                         e.preventDefault();
                         alert(`Please select: ${missingFields.join(', ')}`);
-                        return false;
                     }
                 });
             }
@@ -1561,7 +1795,7 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
             saveBtn.id = 'save-webcam-measurements-btn';
             saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Measurements';
             saveBtn.style.cssText = `
-                background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+                background: linear-gradient(135deg, var(--gold-color) 0%, #A68B52 100%);
                 color: white;
                 border: none;
                 padding: 12px 20px;
@@ -1824,31 +2058,57 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
                 });
             }
 
+            // Preload last-used height from localStorage so repeat users don't re-enter
+            try {
+                const savedHeight = parseInt(localStorage.getItem('userHeightInches') || '0', 10);
+                if (savedHeight >= 48 && savedHeight <= 84) {
+                    document.getElementById('user-height-feet').value = Math.floor(savedHeight / 12);
+                    document.getElementById('user-height-inches').value = savedHeight % 12;
+                }
+            } catch (_) {}
+
             // Camera control buttons
             document.getElementById('start-camera-btn')?.addEventListener('click', async function() {
                 try {
+                    // Read and validate user height before starting
+                    const ft = parseInt(document.getElementById('user-height-feet').value, 10);
+                    const inch = parseInt(document.getElementById('user-height-inches').value, 10);
+                    if (isNaN(ft) || ft < 4 || ft > 7 || isNaN(inch) || inch < 0 || inch > 11) {
+                        alert('Please enter a valid height between 4\'0" and 7\'11".');
+                        return;
+                    }
+                    const userHeightInches = ft * 12 + inch;
+                    try { localStorage.setItem('userHeightInches', String(userHeightInches)); } catch (_) {}
+
                     this.disabled = true;
                     this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Starting Camera...';
-                    
-                    console.log('📹 Starting camera...');
+
+                    console.log('📹 Starting camera... (user height: ' + userHeightInches + ' inches)');
 
                     const hasPermission = await checkCameraPermissions();
                     if (!hasPermission) {
                         throw new Error('Camera permission denied');
                     }
-                    
+
                     if (!mediaPipeMeasurement) {
                         console.log('🔄 Creating new MediaPipe instance...');
                         mediaPipeMeasurement = new MediaPipeMeasurement();
                         await mediaPipeMeasurement.initialize();
                     }
-                    
+
+                    // Apply the real user height BEFORE camera starts (calibration depends on this)
+                    mediaPipeMeasurement.setUserHeight(userHeightInches);
+
                     await mediaPipeMeasurement.startCamera('webcam-video');
-                    
+
                     this.style.display = 'none';
                     document.getElementById('stop-camera-btn').style.display = 'inline-flex';
                     document.getElementById('capture-measurement-btn').style.display = 'inline-flex';
-                    
+                    document.getElementById('countdown-capture-btn').style.display = 'inline-flex';
+
+                    // Start background auto-capture monitor (fires once when measurements stable)
+                    startAutoCaptureMonitor();
+
                     console.log('✅ Camera started successfully');
                     
                 } catch (error) {
@@ -1871,17 +2131,22 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
 
             document.getElementById('stop-camera-btn')?.addEventListener('click', function() {
                 console.log('🛑 Stopping camera...');
-                
+
+                // Clean up timers first
+                stopAutoCaptureMonitor();
+                cancelCountdown();
+
                 if (mediaPipeMeasurement) {
                     mediaPipeMeasurement.stopCamera();
                 }
-                
+
                 document.getElementById('start-camera-btn').style.display = 'inline-flex';
                 document.getElementById('start-camera-btn').disabled = false;
                 document.getElementById('start-camera-btn').innerHTML = '<i class="fas fa-camera"></i> Start Camera';
-                
+
                 this.style.display = 'none';
                 document.getElementById('capture-measurement-btn').style.display = 'none';
+                document.getElementById('countdown-capture-btn').style.display = 'none';
                 document.getElementById('retake-measurement-btn').style.display = 'none';
                 
                 const resultsDiv = document.getElementById('webcam-results');
@@ -1892,35 +2157,158 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
                 console.log('✅ Camera stopped and UI reset');
             });
 
+            // ===== Auto-capture + Countdown helpers =====
+            let autoCaptureMonitor = null;
+            let autoCaptureFired = false;
+            let stableSince = null;
+            let lastSnapshot = null;
+            let countdownTimer = null;
+
+            // Short beep using Web Audio API (no asset file needed)
+            function beep(freq = 880, durationMs = 150) {
+                try {
+                    const Ctx = window.AudioContext || window.webkitAudioContext;
+                    if (!Ctx) return;
+                    const ctx = new Ctx();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+                    gain.gain.value = 0.15;
+                    osc.connect(gain).connect(ctx.destination);
+                    osc.start();
+                    setTimeout(() => { osc.stop(); ctx.close(); }, durationMs);
+                } catch (_) {}
+            }
+
+            // Compare two measurement snapshots — are they within 0.3" of each other on every field?
+            function measurementsStable(a, b) {
+                if (!a || !b) return false;
+                const keys = ['shoulder','chest','hip','waist','sleeve_length','kameez_length','trouser_length','neck'];
+                for (const k of keys) {
+                    const av = a[k]?.value ?? null;
+                    const bv = b[k]?.value ?? null;
+                    if (av === null || bv === null) return false;
+                    if (Math.abs(av - bv) > 0.3) return false;
+                }
+                return true;
+            }
+
+            // Perform the actual capture — fills input fields, does NOT save
+            function performCapture() {
+                if (!mediaPipeMeasurement || !mediaPipeMeasurement.isCalibrated) return false;
+                const measurements = mediaPipeMeasurement.getCurrentMeasurements();
+                const valid = Object.entries(measurements).filter(([k, d]) => d && d.value > 0);
+                if (valid.length < 3) return false;
+
+                displayWebcamMeasurements(measurements);
+                beep(1200, 200); // success tone
+                stopAutoCaptureMonitor();
+
+                // Toggle UI — hide the capture buttons, show Retake
+                document.getElementById('capture-measurement-btn').style.display = 'none';
+                document.getElementById('countdown-capture-btn').style.display = 'none';
+                document.getElementById('auto-capture-status').style.display = 'none';
+                document.getElementById('retake-measurement-btn').style.display = 'inline-flex';
+                return true;
+            }
+
+            function startAutoCaptureMonitor() {
+                stopAutoCaptureMonitor();
+                autoCaptureFired = false;
+                stableSince = null;
+                lastSnapshot = null;
+
+                const statusEl = document.getElementById('auto-capture-status');
+                const countdownEl = document.getElementById('auto-capture-countdown');
+
+                autoCaptureMonitor = setInterval(() => {
+                    if (autoCaptureFired || !mediaPipeMeasurement || !mediaPipeMeasurement.isCalibrated) return;
+                    const current = mediaPipeMeasurement.getCurrentMeasurements();
+                    if (!current || Object.keys(current).length < 8) return;
+
+                    if (measurementsStable(lastSnapshot, current)) {
+                        if (stableSince === null) stableSince = Date.now();
+                        const elapsed = (Date.now() - stableSince) / 1000;
+                        const remaining = Math.max(0, Math.ceil(3 - elapsed));
+
+                        statusEl.style.display = 'block';
+                        countdownEl.textContent = remaining;
+
+                        if (elapsed >= 3) {
+                            autoCaptureFired = true;
+                            performCapture();
+                        }
+                    } else {
+                        stableSince = null;
+                        statusEl.style.display = 'none';
+                    }
+                    lastSnapshot = current;
+                }, 500);
+            }
+
+            function stopAutoCaptureMonitor() {
+                if (autoCaptureMonitor) { clearInterval(autoCaptureMonitor); autoCaptureMonitor = null; }
+                document.getElementById('auto-capture-status').style.display = 'none';
+            }
+
+            // 10-second countdown capture (user steps back after clicking)
+            function startCountdownCapture() {
+                if (countdownTimer) return;
+                if (!mediaPipeMeasurement || !mediaPipeMeasurement.isCalibrated) {
+                    alert('Wait for calibration to complete first (hold still ~5 seconds).');
+                    return;
+                }
+                const overlay = document.getElementById('countdown-overlay');
+                const numEl = document.getElementById('countdown-number');
+                let n = 10;
+                overlay.style.display = 'block';
+                numEl.textContent = n;
+                beep(600, 120);
+
+                countdownTimer = setInterval(() => {
+                    n -= 1;
+                    if (n <= 0) {
+                        clearInterval(countdownTimer); countdownTimer = null;
+                        overlay.style.display = 'none';
+                        performCapture();
+                        return;
+                    }
+                    numEl.textContent = n;
+                    beep(n <= 3 ? 1000 : 600, n <= 3 ? 180 : 100);
+                }, 1000);
+            }
+
+            function cancelCountdown() {
+                if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+                document.getElementById('countdown-overlay').style.display = 'none';
+            }
+
+            document.getElementById('countdown-capture-btn')?.addEventListener('click', startCountdownCapture);
+            document.getElementById('cancel-countdown-btn')?.addEventListener('click', cancelCountdown);
+
             document.getElementById('capture-measurement-btn')?.addEventListener('click', function() {
                 console.log('📸 Capture button clicked');
-                console.log('MediaPipe exists:', !!mediaPipeMeasurement);
-                console.log('Is calibrated:', mediaPipeMeasurement?.isCalibrated);
-                
+
                 if (!mediaPipeMeasurement) {
                     alert('AI system not initialized. Please restart camera.');
                     return;
                 }
-                
+
                 if (!mediaPipeMeasurement.isCalibrated) {
                     alert('Please wait for calibration to complete. Stand still in front of camera for 5 seconds.');
                     return;
                 }
-                
+
                 const measurements = mediaPipeMeasurement.getCurrentMeasurements();
-                console.log('� Current measurements:', measurements);
-                
+
                 if (measurements && Object.keys(measurements).length > 0) {
-                    const validMeasurements = Object.entries(measurements).filter(([key, data]) => 
+                    const validMeasurements = Object.entries(measurements).filter(([key, data]) =>
                         data && data.value && data.value > 0
                     );
-                    
-                    console.log(`✅ Valid measurements found: ${validMeasurements.length}`);
-                    
+
                     if (validMeasurements.length >= 3) {
-                        displayWebcamMeasurements(measurements);
-                        this.style.display = 'none';
-                        document.getElementById('retake-measurement-btn').style.display = 'inline-flex';
+                        performCapture();
                     } else {
                         alert(`Only ${validMeasurements.length} valid measurements detected. Please ensure proper pose and try again.`);
                     }
@@ -1933,7 +2321,10 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
                 console.log('🔄 Retaking measurements...');
                 document.getElementById('webcam-results').style.display = 'none';
                 document.getElementById('capture-measurement-btn').style.display = 'inline-flex';
+                document.getElementById('countdown-capture-btn').style.display = 'inline-flex';
                 this.style.display = 'none';
+                // Restart auto-capture monitor for the retake
+                startAutoCaptureMonitor();
             });
 
             // Close modal functionality

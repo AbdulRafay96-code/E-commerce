@@ -11,6 +11,7 @@ initializeCart();
 
 $pageTitle = 'Shop Now - Stitch House';
 $pageStyles = ['order.css'];
+$criticalBg = '#1A1A1A'; // dark page banner at top
 
 // Handle add to cart
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'add_to_cart') {
@@ -21,6 +22,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
         'image' => $_POST['image'] ?? '',
         'quantity' => 1
     ];
+
+    // Determine how many of this product are already in the cart
+    $existingQty = 0;
+    foreach ($_SESSION['shoppingCart'] as $cartItem) {
+        if ($cartItem['id'] == $item['id']) {
+            $existingQty = $cartItem['quantity'];
+            break;
+        }
+    }
+
+    // Stock check (SRS §3.2.3.5)
+    if (!hasStock($item['id'], $existingQty + 1)) {
+        if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false,
+                'error' => 'out_of_stock',
+                'message' => 'This fabric is currently out of stock.'
+            ]);
+            exit;
+        }
+        $_SESSION['error_message'] = 'This fabric is currently out of stock.';
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit;
+    }
 
     $found = false;
     foreach ($_SESSION['shoppingCart'] as $key => $cartItem) {
@@ -35,9 +61,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
         $_SESSION['shoppingCart'][] = $item;
     }
 
-    // Sync carts
-    $_SESSION['finalCart'] = $_SESSION['shoppingCart'];
-
     // AJAX response
     if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
         echo json_encode([
@@ -45,7 +68,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
             'id' => $item['id'],
             'name' => $item['name'],
             'image' => $item['image'],
-            'cartCount' => getCartCount()
+            'cartCount' => getCartCount(),
+            'myOrderCount' => getMyOrderCount(),
+            'remainingStock' => getProductStock($item['id'])
         ]);
         exit;
     }
@@ -65,7 +90,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
     <!-- Page Banner -->
     <section class="page-banner">
         <div class="container">
-            <h1>Shop Fabrics</h1>
+            <h1 class="reveal">Shop Fabrics</h1>
             <div class="breadcrumb">
                 <a href="index.php">Home</a> / <span>Shop Now</span>
             </div>
@@ -148,20 +173,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
                 })
                 .then(response => response.json())
                 .then(data => {
-                    document.querySelector('.cart-count').textContent = data.cartCount;
-                    showNotification(data.name + ' added to cart!');
+                    if (!data.success) {
+                        alert(data.message || 'Unable to add this item.');
+                        return;
+                    }
+                    const myOrderCountEl = document.querySelector('.myorder-count');
+                    if (myOrderCountEl && typeof data.myOrderCount !== 'undefined') {
+                        myOrderCountEl.textContent = data.myOrderCount;
+                    }
+                    showOrderModal(data.name, data.image, this.dataset.price);
                 })
                 .catch(error => console.error('Error:', error));
             });
         });
 
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.className = 'toast-notification';
-            notification.innerHTML = '<i class="fas fa-check-circle"></i> ' + message;
-            notification.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#28a745;color:#fff;padding:15px 25px;border-radius:5px;z-index:9999;animation:fadeIn 0.3s';
-            document.body.appendChild(notification);
-            setTimeout(() => notification.remove(), 3000);
+        function showOrderModal(name, image, price) {
+            const existing = document.querySelector('.order-popup');
+            if (existing) existing.remove();
+
+            const popup = document.createElement('div');
+            popup.className = 'order-popup';
+            popup.innerHTML = `
+                <button class="order-popup-close" onclick="this.parentElement.remove()">&times;</button>
+                <div class="order-popup-header">
+                    <i class="fas fa-check-circle"></i> Added to Order
+                </div>
+                <div class="order-popup-product">
+                    <img src="images/${image}" alt="${name}" onerror="this.src='images/placeholder.jpg'">
+                    <div>
+                        <p class="order-popup-name">${name}</p>
+                        <p class="order-popup-price">PKR. ${Number(price).toLocaleString()}</p>
+                    </div>
+                </div>
+                <a href="myorder.php" class="order-popup-btn">View My Order <i class="fas fa-arrow-right"></i></a>
+            `;
+            document.body.appendChild(popup);
+
+            // Stays until user closes it
         }
     });
     </script>

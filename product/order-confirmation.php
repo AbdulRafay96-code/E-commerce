@@ -27,11 +27,11 @@ unset($_SESSION['order_success'], $_SESSION['order_id'], $_SESSION['order_detail
     <style>
         .confirmation-section { padding: 60px 0; text-align: center; }
         .confirmation-container { max-width: 600px; margin: 0 auto; padding: 40px; background: #fff; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
-        .confirmation-icon { font-size: 80px; color: #28a745; margin-bottom: 20px; }
+        .confirmation-icon { font-size: 80px; color: var(--success-color); margin-bottom: 20px; }
         .confirmation-container h2 { font-family: 'Playfair Display', serif; margin-bottom: 15px; }
-        .order-number { background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0; }
-        .order-number strong { color: #d4af37; font-size: 1.2em; }
-        .confirmation-details { color: #666; line-height: 1.8; margin: 20px 0; }
+        .order-number { background: var(--bg-gray); padding: 15px; border-radius: 5px; margin: 20px 0; }
+        .order-number strong { color: var(--gold-color); font-size: 1.2em; }
+        .confirmation-details { color: var(--text-muted); line-height: 1.8; margin: 20px 0; }
         .confirmation-actions { margin-top: 30px; }
         .confirmation-actions a { display: inline-block; padding: 12px 30px; margin: 5px; border-radius: 5px; text-decoration: none; }
         .btn-primary { background: #000; color: #fff; }
@@ -52,7 +52,7 @@ unset($_SESSION['order_success'], $_SESSION['order_id'], $_SESSION['order_detail
 
     <section class="confirmation-section">
         <div class="container">
-            <div class="confirmation-container">
+            <div class="confirmation-container reveal">
                 <div class="confirmation-icon">
                     <i class="fas fa-check-circle"></i>
                 </div>
@@ -67,13 +67,13 @@ unset($_SESSION['order_success'], $_SESSION['order_id'], $_SESSION['order_detail
 
                 <div class="confirmation-details">
                     <p>We've received your order and will begin processing it right away.</p>
-                    <p>You should receive an email confirmation shortly.</p>
+                    <p>Track your order status anytime from your dashboard.</p>
                 </div>
 
                 <div class="confirmation-actions">
                     <a href="order.php" class="btn-primary">Continue Shopping</a>
                     <?php if (isLoggedIn()): ?>
-                    <a href="myorder.php" class="btn-secondary">View My Orders</a>
+                    <a href="dashboard.php?tab=orders" class="btn-secondary"><i class="fas fa-map-marker-alt"></i> Track This Order</a>
                     <?php endif; ?>
                 </div>
             </div>

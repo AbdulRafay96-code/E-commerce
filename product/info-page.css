@@ -1,0 +1,284 @@
+/**
+ * Info Pages — Shipping, Returns, Size Guide, FAQs
+ * Shared styling for static content pages
+ */
+
+.info-section {
+    padding: 50px 0 80px;
+    background-color: var(--bg-light);
+}
+
+.info-panel {
+    background: #fff;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 50px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+.info-intro {
+    font-size: 16px;
+    line-height: 1.7;
+    color: #5B4A34;
+    margin-bottom: 30px;
+    padding-bottom: 25px;
+    border-bottom: 1px solid #eee;
+}
+
+.info-panel h2 {
+    font-family: var(--font-heading, 'Playfair Display', serif);
+    color: var(--primary-color);
+    font-size: 22px;
+    margin: 35px 0 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.info-panel h2 i {
+    color: var(--gold-color);
+    font-size: 18px;
+}
+
+.info-panel h2:first-of-type {
+    margin-top: 10px;
+}
+
+.info-panel p {
+    color: #444;
+    line-height: 1.7;
+    margin: 0 0 12px;
+    font-size: 14.5px;
+}
+
+.info-panel a {
+    color: #8B6914;
+    text-decoration: none;
+    font-weight: 600;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s;
+}
+
+.info-panel a:hover {
+    border-bottom-color: var(--gold-color);
+}
+
+/* Lists */
+.info-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 15px;
+}
+
+.info-list li {
+    position: relative;
+    padding: 8px 0 8px 26px;
+    color: #444;
+    line-height: 1.6;
+    font-size: 14.5px;
+}
+
+.info-list li::before {
+    content: '\f00c';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    color: var(--gold-color);
+    position: absolute;
+    left: 0;
+    top: 10px;
+    font-size: 12px;
+}
+
+ol.info-list {
+    counter-reset: infolist;
+}
+
+ol.info-list li {
+    counter-increment: infolist;
+}
+
+ol.info-list li::before {
+    content: counter(infolist);
+    font-family: inherit;
+    background: var(--primary-color);
+    color: var(--gold-color);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    top: 8px;
+}
+
+.info-list.two-col {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0 20px;
+}
+
+/* Tables */
+.info-table {
+    overflow-x: auto;
+    margin: 15px 0 25px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+.info-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.info-table thead {
+    background: var(--primary-color);
+    color: var(--gold-color);
+}
+
+.info-table th {
+    padding: 12px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.info-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #444;
+}
+
+.info-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.info-table tbody tr:nth-child(even) {
+    background: #fafafa;
+}
+
+.info-table tbody tr:hover {
+    background: var(--bg-light);
+}
+
+/* Callout box */
+.info-callout {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: #FDF6E3;
+    border-left: 4px solid var(--gold-color);
+    padding: 18px 20px;
+    border-radius: 6px;
+    margin: 30px 0 10px;
+}
+
+.info-callout i {
+    color: var(--gold-color);
+    font-size: 22px;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.info-callout strong {
+    display: block;
+    color: var(--primary-color);
+    margin-bottom: 4px;
+}
+
+.info-callout div {
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: #5B4A34;
+}
+
+/* FAQ collapsibles */
+.faq {
+    margin: 15px 0 25px;
+}
+
+.faq details {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+}
+
+.faq details[open] {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+    border-color: var(--gold-color);
+}
+
+.faq summary {
+    padding: 16px 20px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--primary-color);
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.2s;
+}
+
+.faq summary::-webkit-details-marker {
+    display: none;
+}
+
+.faq summary:hover {
+    background: var(--bg-light);
+}
+
+.faq summary::after {
+    content: '\f078';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    font-size: 11px;
+    color: var(--gold-color);
+    transition: transform 0.3s;
+    flex-shrink: 0;
+}
+
+.faq details[open] summary::after {
+    transform: rotate(180deg);
+}
+
+.faq details p {
+    padding: 0 20px 16px;
+    color: #555;
+    font-size: 14px;
+    line-height: 1.7;
+    margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .info-panel {
+        padding: 30px 20px;
+    }
+
+    .info-panel h2 {
+        font-size: 19px;
+    }
+
+    .info-list.two-col {
+        grid-template-columns: 1fr;
+    }
+
+    .info-table {
+        font-size: 12px;
+    }
+
+    .info-table th,
+    .info-table td {
+        padding: 8px 10px;
+    }
+}

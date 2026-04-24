@@ -1,0 +1,299 @@
+/**
+ * Admin Orders & Tickets — Stitch House
+ * SRS §3.2.6 (Admin Dashboard), §3.2.7 (Support Tickets)
+ */
+
+/* ---------- Shared toolbar (filter pills) ---------- */
+.orders-toolbar,
+.tickets-toolbar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.orders-toolbar a,
+.tickets-toolbar a {
+    padding: 8px 14px;
+    border-radius: 20px;
+    background: #f0f0f0;
+    color: #333;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: background 0.2s, color 0.2s;
+}
+
+.orders-toolbar a:hover,
+.tickets-toolbar a:hover {
+    background: #e4e4e4;
+}
+
+.orders-toolbar a.active,
+.tickets-toolbar a.active {
+    background: #1A1A1A;
+    color: #C9A96E;
+}
+
+.orders-toolbar a .cnt,
+.tickets-toolbar a .cnt {
+    opacity: 0.7;
+    margin-left: 6px;
+}
+
+/* ---------- Flash / feedback ---------- */
+.flash {
+    background: #D9E9D9;
+    color: #2D5A4A;
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+}
+
+/* ---------- Order cards ---------- */
+.order-row {
+    background: #fff;
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    border-left: 4px solid #ccc;
+}
+
+.order-row.s-pending { border-left-color: #8B6914; }
+.order-row.s-processing { border-left-color: #C9A96E; }
+.order-row.s-in_tailoring { border-left-color: #5B4A34; }
+.order-row.s-shipped { border-left-color: #3B6B8B; }
+.order-row.s-completed { border-left-color: #2D5A4A; }
+.order-row.s-cancelled { border-left-color: #A4343A; }
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.order-id {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.status-chip {
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+}
+
+.s-pending .status-chip { background: #8B6914; color: #fff; }
+.s-processing .status-chip { background: #C9A96E; color: #1A1A1A; }
+.s-in_tailoring .status-chip { background: #5B4A34; color: #fff; }
+.s-shipped .status-chip { background: #3B6B8B; color: #fff; }
+.s-completed .status-chip { background: #2D5A4A; color: #fff; }
+.s-cancelled .status-chip { background: #A4343A; color: #fff; }
+
+.order-meta {
+    color: #7A7267;
+    font-size: 13px;
+    margin: 6px 0;
+}
+
+.order-meta i {
+    width: 14px;
+    color: #C9A96E;
+}
+
+.order-actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn-advance,
+.btn-cancel,
+.btn-toggle {
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    transition: opacity 0.2s;
+}
+
+.btn-advance { background: #2D5A4A; color: #fff; }
+.btn-advance:hover { opacity: 0.9; }
+.btn-cancel { background: #fff; border: 1px solid #A4343A; color: #A4343A; }
+.btn-cancel:hover { background: #A4343A; color: #fff; }
+.btn-toggle { background: #fff; border: 1px solid #C9A96E; color: #8B6914; }
+.btn-toggle:hover { background: #C9A96E; color: #1A1A1A; }
+
+.order-details {
+    margin-top: 14px;
+    display: none;
+    padding: 12px;
+    background: #F5F0E8;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.order-row.expanded .order-details {
+    display: block;
+}
+
+.order-items-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+}
+
+.order-items-table th,
+.order-items-table td {
+    text-align: left;
+    padding: 6px 8px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.order-items-table th {
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #7A7267;
+}
+
+form.inline {
+    display: inline;
+}
+
+/* ---------- Ticket cards ---------- */
+.ticket-row {
+    background: #fff;
+    border-left: 4px solid #ccc;
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.ticket-row.status-open { border-left-color: #8B1538; }
+.ticket-row.status-in_progress { border-left-color: #C9A96E; }
+.ticket-row.status-resolved { border-left-color: #2D5A4A; }
+.ticket-row.status-closed { border-left-color: #7A7267; }
+
+.ticket-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+
+.ticket-number {
+    font-weight: 700;
+    font-family: 'Playfair Display', serif;
+}
+
+.ticket-status {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.status-open .ticket-status { background: #8B1538; color: #fff; }
+.status-in_progress .ticket-status { background: #C9A96E; color: #1A1A1A; }
+.status-resolved .ticket-status { background: #2D5A4A; color: #fff; }
+.status-closed .ticket-status { background: #7A7267; color: #fff; }
+
+.ticket-meta {
+    color: #7A7267;
+    font-size: 13px;
+    margin: 4px 0;
+}
+
+.ticket-subject {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 6px 0;
+}
+
+.ticket-message {
+    background: #F5F0E8;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    white-space: pre-wrap;
+}
+
+.ticket-response-form {
+    margin-top: 12px;
+    display: none;
+}
+
+.ticket-row.expanded .ticket-response-form {
+    display: block;
+}
+
+.ticket-response-form textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.ticket-response-form select {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    margin-right: 8px;
+}
+
+.ticket-response-form button {
+    background: #1A1A1A;
+    color: #C9A96E;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: opacity 0.2s;
+}
+
+.ticket-response-form button:hover {
+    opacity: 0.9;
+}
+
+.ticket-response-existing {
+    background: #E8E3DC;
+    padding: 10px 12px;
+    border-radius: 6px;
+    margin-top: 10px;
+    font-size: 13px;
+}
+
+.toggle-respond {
+    background: none;
+    border: 1px solid #C9A96E;
+    color: #8B6914;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.toggle-respond:hover {
+    background: #C9A96E;
+    color: #1A1A1A;
+}
