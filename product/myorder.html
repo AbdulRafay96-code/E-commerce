@@ -1,299 +1,227 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Order - Stitch House</title>
-    <link rel="stylesheet" href="variables.css">
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="order.css">
-    <link rel="stylesheet" href="myorder.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;500;600;700&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#F5F0E8">
+<title>My Order - Stitch House</title>
+<style>html,body{background-color:#F5F0E8;margin:0;}</style>
+<link rel="stylesheet" href="variables.css?v=1776672380">
+<link rel="stylesheet" href="styles.css?v=1777057551">
+<link rel="stylesheet" href="order.css?v=1777047309">
+<link rel="stylesheet" href="myorder.css?v=1777056194">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;500;600;700&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="3d-effects.css?v=1776672380">
     <style>
-        /* My Order Link Styles */
-        .myorder-link {
-            position: relative;
-            margin-right: 15px;
-        }
-        .myorder-link a {
-            color: var(--text-color, #333);
-            font-size: 20px;
-            transition: color 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .myorder-link a:hover { color: var(--gold-color, #d4af37); }
-        .myorder-count {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background-color: #d4af37;
-            color: white;
-            font-size: 10px;
-            min-width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-
-        .customize-item-btn, .measurement-btn, .add-to-cart-btn {
+        /* Additional styles for the new buttons */
+        .measurement-btn, .add-to-cart-btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             padding: 8px 12px;
-            background-color: #d4af37;
+            background-color: var(--gold-color);
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 14px;
             margin-top: 8px;
             transition: all 0.3s ease;
-            gap: 5px;
         }
-        .customize-item-btn { background-color: #d4af37; }
-        .measurement-btn { margin-left: 10px; background-color: #333; }
-        .customize-item-btn:hover, .measurement-btn:hover, .add-to-cart-btn:hover {
+        
+        .measurement-btn {
+            margin-left: 10px;
+            background-color: #333;
+        }
+        
+        .measurement-btn:hover, .add-to-cart-btn:hover {
             opacity: 0.85;
             transform: translateY(-2px);
         }
-        .add-to-cart-btn { margin-top: 10px; width: 100%; background-color: #28a745; }
-        .add-to-cart-btn.disabled { background-color: #ccc; cursor: not-allowed; }
-        .design-btn-group { display: flex; align-items: center; margin-top: 8px; flex-wrap: wrap; gap: 5px; }
-        .cart-item-total { display: flex; flex-direction: column; align-items: flex-end; }
-
-        /* Design Panel Styles */
-        .item-design-options {
-            background: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 15px;
-            animation: slideDown 0.3s ease;
-        }
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .design-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #ddd;
-        }
-        .design-header h4 { margin: 0; color: #333; }
-        .close-design-btn {
-            background: none;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-            color: #999;
-        }
-        .close-design-btn:hover { color: #333; }
-        .design-section { margin-bottom: 15px; }
-        .design-section h5 { margin: 0 0 10px 0; color: #555; font-size: 14px; }
-        .design-options { display: flex; flex-wrap: wrap; gap: 10px; }
-        .design-option {
-            flex: 1;
-            min-width: 120px;
-        }
-        .design-option input[type="radio"] { display: none; }
-        .design-option label {
-            display: block;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 13px;
-        }
-        .design-option input[type="radio"]:checked + label {
-            border-color: #d4af37;
-            background-color: #fdf8e8;
-            color: #b8941f;
-        }
-        .btn-confirm-design {
+        
+        .add-to-cart-btn {
+            margin-top: 10px;
             width: 100%;
-            padding: 12px;
-            background: #d4af37;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            margin-top: 15px;
         }
-        .btn-confirm-design:hover { background: #b8941f; }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
+        
+        .add-to-cart-btn.disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .design-btn-group {
+            display: flex;
+            align-items: center;
+            margin-top: 8px;
+        }
+        
+        .cart-item-total {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        
+        /* Success message styling */
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            border-left: 5px solid #155724;
+            animation: fadeOut 5s forwards;
+        }
+        
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        
+        /* Measurement Modal Styling */
+        .measurement-modal {
+            display: none; /* Hidden by default */
             position: fixed;
-            top: 0;
+            z-index: 2000; /* Ensure it's above everything */
             left: 0;
+            top: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 2000;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
             justify-content: center;
             align-items: center;
         }
-        .modal.active { display: flex; }
-        .modal-content {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
+        
+        .measurement-modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
             max-width: 600px;
-            width: 95%;
             max-height: 90vh;
             overflow-y: auto;
-            position: relative;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             animation: modalFadeIn 0.3s;
         }
+        
         @keyframes modalFadeIn {
-            from { opacity: 0; transform: translateY(-30px); }
+            from { opacity: 0; transform: translateY(-50px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .close-modal {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 28px;
-            cursor: pointer;
-            color: #999;
-            background: none;
-            border: none;
-        }
-        .close-modal:hover { color: #333; }
-        .modal h3 {
-            margin: 0 0 20px 0;
-            color: #333;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .measurement-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-        .measurement-field label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-            color: #333;
-            font-size: 14px;
-        }
-        .measurement-field input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        .measurement-field small {
-            color: #666;
-            font-size: 11px;
-        }
-        .btn-save-measurements {
-            width: 100%;
-            padding: 12px;
-            background: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            margin-top: 20px;
-        }
-        .btn-save-measurements:hover { background: #218838; }
-
-        /* Measurements Display */
+        
+        /* Improve styling of measurement display */
         .measurements-display {
-            background: #e8f5e9;
+            background-color: #f9f9f9;
             border-radius: 5px;
             padding: 10px;
             margin-top: 10px;
-            font-size: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #eee;
         }
-        .measurements-display h5 {
-            margin: 0 0 8px 0;
-            color: #28a745;
+        
+        .measurements-display h4 {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-top: 0;
+            margin-bottom: 8px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
         }
-        .measurements-display table { width: 100%; }
-        .measurements-display td { padding: 2px 5px; }
-
-        /* User Dropdown Styles */
-        .user-dropdown { position: relative; display: inline-block; }
-        .user-dropdown-btn {
-            display: flex; align-items: center; gap: 8px;
-            background: none; border: none; cursor: pointer;
-            padding: 8px 12px; color: #333; font-size: 14px;
-            border-radius: 25px; transition: all 0.3s ease;
+        
+        .edit-measurements {
+            background: none;
+            border: none;
+            color: var(--gold-color);
+            cursor: pointer;
+            font-size: 12px;
         }
-        .user-dropdown-btn:hover { background-color: rgba(212, 175, 55, 0.1); }
-        .user-dropdown-btn .fa-user-circle { font-size: 22px; color: #d4af37; }
-        .user-dropdown-btn .dropdown-arrow { font-size: 10px; transition: transform 0.3s; }
-        .user-dropdown.active .dropdown-arrow { transform: rotate(180deg); }
-        .user-dropdown-content {
-            display: none; position: absolute; right: 0; top: calc(100% + 5px);
-            background: white; min-width: 200px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            border-radius: 10px; z-index: 1000; overflow: hidden; border: 1px solid #eee;
-        }
-        .user-dropdown.active .user-dropdown-content { display: block; animation: dropdownFade 0.2s ease; }
-        @keyframes dropdownFade {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .user-dropdown-content a {
-            display: flex; align-items: center; gap: 12px;
-            padding: 14px 18px; color: #333; text-decoration: none;
-            transition: all 0.2s; font-size: 14px;
-        }
-        .user-dropdown-content a:hover { background: linear-gradient(90deg, rgba(212,175,55,0.1), transparent); color: #d4af37; }
-        .user-dropdown-content a i { width: 20px; color: #d4af37; }
-        .user-dropdown-content a:first-child { border-bottom: 1px solid #eee; }
-
-        /* Toast Notification */
-        .toast {
+        
+        /* Back to top button */
+        .back-to-top {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: #28a745;
+            background-color: var(--gold-color);
             color: white;
-            padding: 15px 25px;
-            border-radius: 8px;
-            z-index: 9999;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            animation: slideIn 0.3s ease;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
-        @keyframes slideIn {
+        
+        .back-to {
+            opacity: 1;
+        }
+        
+        .back-to-top i {
+            font-size: 24px;
+        }
+
+        /* Measurement success notification */
+        .measurement-success-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+            z-index: 9999;
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        @keyframes slideInRight {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
-    </style>
+        
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
 
-    <!-- MediaPipe Scripts -->
+        /* Accuracy indicator styling */
+        #accuracy-indicator {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        /* Confidence colors */
+        .confidence-high { 
+            background-color: #d4edda !important; 
+            border-color: #28a745 !important; 
+        }
+
+        .confidence-medium { 
+            background-color: #fff3cd !important; 
+            border-color: #ffc107 !important; 
+        }
+
+        .confidence-low { 
+            background-color: #f8d7da !important; 
+            border-color: #dc3545 !important; 
+        }
+    </style>
+    
+    <!-- Add these scripts before closing </head> tag -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js"></script>
 
-    <!-- Custom MediaPipe Files -->
+    <!-- Add your custom MediaPipe files -->
     <link rel="stylesheet" href="mediapipe-pose/css/mediapipe-styles.css">
     <script src="mediapipe-pose/js/mediapipe-pose.js"></script>
 </head>
@@ -311,10 +239,10 @@
             </div>
             <div class="side-nav-links">
                 <ul>
-                    <li><a href="index.html"><i class="fas fa-home"></i>Home</a></li>
-                    <li><a href="order.html"><i class="fas fa-shopping-bag"></i>Shop Now</a></li>
-                    <li><a href="myorder.html" class="active"><i class="fas fa-shopping-cart"></i>My Order</a></li>
-                    <li><a href="contact.html"><i class="fas fa-envelope"></i>Contact Us</a></li>
+                    <li><a href="index.php"><i class="fas fa-home"></i>Home</a></li>
+                    <li><a href="order.php"><i class="fas fa-shopping-bag"></i>Shop Now</a></li>
+                    <li><a href="myorder.php" class="active"><i class="fas fa-shopping-cart"></i>My Order</a></li>
+                    <li><a href="contact.php"><i class="fas fa-envelope"></i>Contact Us</a></li>
                 </ul>
             </div>
             <div class="side-nav-footer">
@@ -336,48 +264,40 @@
                 <i class="fas fa-bars"></i>
             </div>
             <div class="site-title">
-                <a href="index.html">
+                <a href="index.php">
                     <h1 class="logo-text">Stitch House</h1>
                 </a>
             </div>
             <nav>
                 <ul>
-                    <li><a href="index.html" class="nav-link">Home</a></li>
-                    <li><a href="order.html" class="nav-link">Shop Now</a></li>
-                    <li><a href="myorder.html" class="nav-link active">My Order</a></li>
-                    <li><a href="contact.html" class="nav-link">Contact Us</a></li>
+                    <li><a href="index.php" class="nav-link">Home</a></li>
+                    <li><a href="order.php" class="nav-link">Shop Now</a></li>
+                    <li><a href="myorder.php" class="nav-link active">My Order</a></li>
+                    <li><a href="contact.php" class="nav-link">Contact Us</a></li>
                 </ul>
             </nav>
             <div class="header-actions">
-                <div class="login-link" id="login-link">
-                    <a href="login.html">
-                        <i class="fas fa-user"></i>
-                    </a>
-                </div>
+                                    <div class="login-link">
+                        <a href="login.html">
+                            <i class="fas fa-user"></i>
+                        </a>
+                    </div>
+                                
                 <div class="myorder-link">
-                    <a href="myorder.html" title="My Order">
+                    <a href="myorder.php" title="My Order">
                         <i class="fas fa-cut"></i>
                         <span class="myorder-count">0</span>
                     </a>
                 </div>
+
                 <div class="cart-link">
-                    <a href="cart.html" title="Cart">
+                    <a href="cart.php">
                         <i class="fas fa-shopping-cart"></i>
                         <span class="cart-count">0</span>
                     </a>
                 </div>
-                <div class="user-dropdown" id="user-dropdown" style="display: none;">
-                    <button class="user-dropdown-btn" onclick="toggleUserDropdown()">
-                        <i class="fas fa-user-circle"></i>
-                        <span class="user-name"></span>
-                        <i class="fas fa-chevron-down dropdown-arrow"></i>
-                    </button>
-                    <div class="user-dropdown-content">
-                        <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-                        <a href="#" onclick="handleLogout(); return false;"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                    </div>
-                </div>
-            </div>
+                
+                            </div>
         </div>
     </header>
 
@@ -386,7 +306,7 @@
         <div class="container">
             <h1>My Order</h1>
             <div class="breadcrumb">
-                <a href="index.html">Home</a> / <a href="order.html">Shop</a> / <span>My Order</span>
+                <a href="index.php">Home</a> / <a href="order.php">Shop</a> / <span>My Order</span>
             </div>
         </div>
     </section>
@@ -394,380 +314,572 @@
     <!-- My Order Section -->
     <section class="my-order-section">
         <div class="container">
+                        
+                        
             <div class="order-container">
-                <div class="empty-cart-message" style="display: none;">
-                    <i class="fas fa-shopping-cart"></i>
-                    <h2>Your order is empty</h2>
-                    <p>Browse our collection and add some fabrics to customize</p>
-                    <a href="order.html" class="btn-primary">Shop Now</a>
+                                <div class="empty-cart-message">
+                    <i class="fas fa-cut"></i>
+                    <h2>Nothing to customize yet</h2>
+                    <p>Add a fabric from the shop, then come back here to design your kameez and enter measurements.</p>
+                    <a href="order.php" class="btn-primary"><i class="fas fa-shopping-bag"></i> Browse Fabrics</a>
                 </div>
-
-                <div class="order-content">
-                    <div class="order-items">
-                        <h2>Order Items - Customize Your Fabrics</h2>
-                        <div class="cart-items-container">
-                            <!-- Cart items will be loaded here dynamically -->
-                        </div>
-
-                        <div class="cart-actions">
-                            <a href="cart.html" class="btn-view-cart">View Final Cart</a>
-                            <button class="btn-clear-cart">Clear All</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                            </div>
         </div>
     </section>
 
-    <!-- Measurement Options Modal -->
-    <div id="measurement-options-modal" class="modal">
-        <div class="modal-content" style="max-width: 500px;">
-            <button class="close-modal">&times;</button>
-            <h3 style="text-align: center; margin-bottom: 25px;">
-                <i class="fas fa-ruler-combined" style="color: #d4af37;"></i> Choose Measurement Method
-            </h3>
-            <input type="hidden" id="options-measurement-index" value="">
+    <!-- Item Design Template (Hidden) - Step Wizard -->
+    <div id="design-options-template" class="item-design-options" style="display: none;">
+        <div class="design-header">
+            <h4>Customize Your Design</h4>
+            <button class="close-design-btn" title="Close"><i class="fas fa-times"></i></button>
+        </div>
 
+        <!-- Progress Bar -->
+        <div class="wizard-progress">
+            <div class="wizard-progress-bar" style="width: 11%"></div>
+        </div>
+        <div class="wizard-steps-nav">
+            <span class="wizard-step-dot active" data-step="1">1</span>
+            <span class="wizard-step-dot" data-step="2">2</span>
+            <span class="wizard-step-dot" data-step="3">3</span>
+            <span class="wizard-step-dot" data-step="4">4</span>
+            <span class="wizard-step-dot" data-step="5">5</span>
+            <span class="wizard-step-dot" data-step="6">6</span>
+            <span class="wizard-step-dot" data-step="7">7</span>
+            <span class="wizard-step-dot" data-step="8">8</span>
+            <span class="wizard-step-dot" data-step="9">9</span>
+            <span class="wizard-step-dot" data-step="10">10</span>
+        </div>
+
+        <form method="post" class="design-form">
+            <input type="hidden" name="action" value="save_design">
+            <input type="hidden" name="index" value="ITEMID">
+
+            <!-- Step 1: Collar -->
+            <div class="wizard-step active" data-step="1">
+                <div class="wizard-step-header">
+                    <span class="wizard-step-number">Step 1 of 10</span>
+                    <h5><i class="fas fa-tshirt"></i> Collar Design</h5>
+                </div>
+                <div class="design-options">
+                    <div class="design-option"><input type="radio" id="collar-band-ITEMID" name="collar" value="Band Collar"><label for="collar-band-ITEMID">Band Collar</label></div>
+                    <div class="design-option"><input type="radio" id="collar-mandarin-ITEMID" name="collar" value="Mandarin Collar"><label for="collar-mandarin-ITEMID">Mandarin Collar</label></div>
+                    <div class="design-option"><input type="radio" id="collar-vneck-ITEMID" name="collar" value="V-Neck"><label for="collar-vneck-ITEMID">V-Neck</label></div>
+                    <div class="design-option"><input type="radio" id="collar-round-ITEMID" name="collar" value="Round Neck"><label for="collar-round-ITEMID">Round Neck</label></div>
+                    <div class="design-option"><input type="radio" id="collar-sherwani-ITEMID" name="collar" value="Sherwani Collar"><label for="collar-sherwani-ITEMID">Sherwani Collar</label></div>
+                </div>
+            </div>
+
+            <!-- Step 2: Kameez Style -->
+            <div class="wizard-step" data-step="2">
+                <div class="wizard-step-header">
+                    <span class="wizard-step-number">Step 2 of 10</span>
+                    <h5><i class="fas fa-vest"></i> Kameez Style</h5>
+                </div>
+                <div class="design-options">
+                    <div class="design-option"><input type="radio" id="kurta-style-ITEMID" name="kurta" value="Kurta Style"><label for="kurta-style-ITEMID">Kurta Style</label></div>
+                    <div class="design-option"><input type="radio" id="simple-kameez-ITEMID" name="kurta" value="Simple Kameez"><label for="simple-kameez-ITEMID">Simple Kameez</label></div>
+                </div>
+            </div>
+
+            <!-- Step 3: Daman Style -->
+            <div class="wizard-step" data-step="3">
+                <div class="wizard-step-header">
+                    <span class="wizard-step-number">Step 3 of 10</span>
+                    <h5><i class="fas fa-cut"></i> Daman Style</h5>
+                </div>
+                <div class="design-options">
+                    <div class="design-option"><input type="radio" id="daman-straight-ITEMID" name="daman" value="Straight Daman"><label for="daman-straight-ITEMID">Straight Daman</label></div>
+                    <div class="design-option"><input type="radio" id="daman-gol-ITEMID" name="daman" value="Gol Daman"><label for="daman-gol-ITEMID">Gol Daman (Apple Cut)</label></div>
+                    <div class="design-option"><input type="radio" id="daman-curved-ITEMID" name="daman" value="Curved Daman"><label for="daman-curved-ITEMID">Curved Daman</label></div>
+                </div>
+            </div>
+
+            <!-- Step 4: Cuff Style -->
+            <div class="wizard-step" data-step="4">
+                <div class="wizard-step-header">
+                    <span class="wizard-step-number">Step 4 of 10</span>
+                    <h5><i class="fas fa-hand-paper"></i> Cuff Style</h5>
+                </div>
+                <div class="design-options">
+                    <div class="design-option"><input type="radio" id="cuff-simple-ITEMID" name="cuff" value="Simple Cuff"><label for="cuff-simple-ITEMID">Simple Cuff</label></div>
+                    <div class="design-option"><input type="radio" id="cuff-double-ITEMID" name="cuff" value="Double Cuff"><label for="cuff-double-ITEMID">Double Cuff</label></div>
+                    <div class="design-option"><input type="radio" id="cuff-button-ITEMID" name="cuff" value="Button Cuff"><label for="cuff-button-ITEMID">Button Cuff</label></div>
+                    <div class="design-option"><input type="radio" id="cuff-open-ITEMID" name="cuff" value="Open Sleeve"><label for="cuff-open-ITEMID">Open Sleeve</label></div>
+                </div>
+            </div>
+
+            <!-- Step 5: Placket -->
+            <div class="wizard-step" data-step="5">
+                <div class="wizard-step-header">
+                    <span class="wizard-step-number">Step 5 of 10</span>
+                    <h5><i class="fas fa-grip-lines-vertical"></i> Button / Placket</h5>
+                </div>
+                <div class="design-options">
+                    <div class="design-option"><input type="radio" id="placket-hidden-ITEMID" name="placket" value="Hidden Placket"><label for="placket-hidden-ITEMID">Hidden Placket</label></div>
+                    <div class="design-option"><input type="radio" id="placket-visible-ITEMID" name="placket" value="Visible Buttons"><label for="placket-visible-ITEMID">Visible Buttons</label></div>
+                    <div class="design-option"><input type="radio" id="placket-loop-ITEMID" name="placket" value="Loop Buttons"><label for="placket-loop-ITEMID">Loop Buttons</label></div>
+                </div>
+            </div>
+
+            <!-- Step 6: Bottom Style -->
+            <div class="wizard-step" data-step="6">
+                <div class="wizard-step-header">
+                    <span class="wizard-step-number">Step 6 of 10</span>
+                    <h5><i class="fas fa-socks"></i> Shalwar / Trouser Style</h5>
+                </div>
+                <div class="design-options">
+                    <div class="design-option"><input type="radio" id="bottom-shalwar-ITEMID" name="bottom" value="Simple Shalwar"><label for="bottom-shalwar-ITEMID">Simple Shalwar</label></div>
+                    <div class="design-option"><input type="radio" id="bottom-pajama-ITEMID" name="bottom" value="Pajama Style"><label for="bottom-pajama-ITEMID">Pajama Style</label></div>
+                    <div class="design-option"><input type="radio" id="bottom-churidar-ITEMID" name="bottom" value="Churidar"><label for="bottom-churidar-ITEMID">Churidar</label></div>
+                    <div class="design-option"><input type="radio" id="bottom-trouser-ITEMID" name="bottom" value="Straight Trouser"><label for="bottom-trouser-ITEMID">Straight Trouser</label></div>
+                </div>
+            </div>
+
+            <!-- Step 7: Front Pocket -->
+            <div class="wizard-step" data-step="7">
+                <div class="wizard-step-header">
+                    <span class="wizard-step-number">Step 7 of 10</span>
+                    <h5><i class="fas fa-square"></i> Front Pocket</h5>
+                </div>
+                <div class="design-options">
+                    <div class="design-option"><input type="radio" id="front-pocket-yes-ITEMID" name="front_pocket" value="With Front Pocket"><label for="front-pocket-yes-ITEMID">With Front Pocket</label></div>
+                    <div class="design-option"><input type="radio" id="front-pocket-no-ITEMID" name="front_pocket" value="No Front Pocket"><label for="front-pocket-no-ITEMID">No Front Pocket</label></div>
+                </div>
+            </div>
+
+            <!-- Step 8: Side Pockets -->
+            <div class="wizard-step" data-step="8">
+                <div class="wizard-step-header">
+                    <span class="wizard-step-number">Step 8 of 10</span>
+                    <h5><i class="fas fa-th-large"></i> Side Pockets</h5>
+                </div>
+                <div class="design-options">
+                    <div class="design-option"><input type="radio" id="side-pocket-two-ITEMID" name="side_pocket" value="Two Side Pockets"><label for="side-pocket-two-ITEMID">Two Side Pockets</label></div>
+                    <div class="design-option"><input type="radio" id="side-pocket-one-ITEMID" name="side_pocket" value="One Side Pocket"><label for="side-pocket-one-ITEMID">One Side Pocket</label></div>
+                    <div class="design-option"><input type="radio" id="side-pocket-none-ITEMID" name="side_pocket" value="No Side Pockets"><label for="side-pocket-none-ITEMID">No Side Pockets</label></div>
+                </div>
+            </div>
+
+            <!-- Step 9: Fit Preference -->
+            <div class="wizard-step" data-step="9">
+                <div class="wizard-step-header">
+                    <span class="wizard-step-number">Step 9 of 10</span>
+                    <h5><i class="fas fa-user-tie"></i> Fit Preference</h5>
+                </div>
+                <div class="design-options">
+                    <div class="design-option"><input type="radio" id="fit-slim-ITEMID" name="fit_preference" value="slim"><label for="fit-slim-ITEMID">Slim Fit</label></div>
+                    <div class="design-option"><input type="radio" id="fit-regular-ITEMID" name="fit_preference" value="regular" checked><label for="fit-regular-ITEMID">Regular Fit</label></div>
+                    <div class="design-option"><input type="radio" id="fit-loose-ITEMID" name="fit_preference" value="loose"><label for="fit-loose-ITEMID">Loose Fit</label></div>
+                </div>
+            </div>
+
+            <!-- Step 10: Review & Confirm -->
+            <div class="wizard-step" data-step="10">
+                <div class="wizard-step-header">
+                    <span class="wizard-step-number">Step 10 of 10</span>
+                    <h5><i class="fas fa-check-double"></i> Review Your Design</h5>
+                </div>
+                <div class="wizard-review"></div>
+                <button type="submit" class="btn-confirm-design" data-item-id="ITEMID">
+                    <i class="fas fa-check"></i> Confirm Design
+                </button>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="wizard-nav">
+                <button type="button" class="wizard-btn wizard-prev" disabled><i class="fas fa-arrow-left"></i> Previous</button>
+                <button type="button" class="wizard-btn wizard-next">Next <i class="fas fa-arrow-right"></i></button>
+            </div>
+        </form>
+    </div>
+
+    <!-- MODALS SECTION - Yahan update karna hai -->
+    
+    <!-- Measurement Options Modal -->
+    <div id="measurement-options-modal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+        <div class="modal-content" style="background: white; padding: 30px; border-radius: 12px; max-width: 400px; width: 90%; position: relative;">
+            <span class="close-modal" style="position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #999;">&times;</span>
+            
+            <h3 style="margin-bottom: 20px; color: #333;">
+                <i class="fas fa-ruler"></i> Choose Measurement Method
+            </h3>
+            
             <div style="display: flex; flex-direction: column; gap: 15px;">
                 <button id="webcam-measurement-option" class="measurement-option-btn" style="
-                    background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+                    background: linear-gradient(135deg, var(--gold-color) 0%, #A68B52 100%);
                     color: white;
                     border: none;
-                    padding: 20px;
-                    border-radius: 12px;
+                    padding: 15px 20px;
+                    border-radius: 8px;
                     cursor: pointer;
                     font-size: 16px;
                     display: flex;
                     align-items: center;
-                    gap: 15px;
+                    justify-content: center;
+                    gap: 10px;
                     transition: all 0.3s ease;
-                    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
                 ">
-                    <i class="fas fa-camera" style="font-size: 28px;"></i>
-                    <div style="text-align: left;">
-                        <strong style="display: block; font-size: 18px;">AI Webcam Measurement</strong>
-                        <span style="font-size: 13px; opacity: 0.9;">Auto-detect measurements using your camera</span>
-                    </div>
+                    <i class="fas fa-camera"></i>
+                    AI Webcam Measurement (Recommended)
                 </button>
-
+                
                 <button id="manual-measurement-option" class="measurement-option-btn" style="
-                    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+                    background: #6c757d;
                     color: white;
                     border: none;
-                    padding: 20px;
-                    border-radius: 12px;
+                    padding: 15px 20px;
+                    border-radius: 8px;
                     cursor: pointer;
                     font-size: 16px;
                     display: flex;
                     align-items: center;
-                    gap: 15px;
+                    justify-content: center;
+                    gap: 10px;
                     transition: all 0.3s ease;
                 ">
-                    <i class="fas fa-edit" style="font-size: 28px;"></i>
-                    <div style="text-align: left;">
-                        <strong style="display: block; font-size: 18px;">Manual Entry</strong>
-                        <span style="font-size: 13px; opacity: 0.9;">Enter measurements yourself</span>
-                    </div>
+                    <i class="fas fa-edit"></i>
+                    Manual Entry
                 </button>
             </div>
         </div>
     </div>
-
-    <!-- Manual Measurement Modal -->
-    <div id="measurement-modal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal">&times;</button>
-            <h3><i class="fas fa-ruler"></i> Enter Your Measurements</h3>
-            <input type="hidden" id="measurement-item-index" value="">
-
-            <div class="measurement-grid">
-                <div class="measurement-field">
-                    <label for="m-chest"><i class="fas fa-expand-arrows-alt"></i> Chest (inches)</label>
-                    <input type="number" id="m-chest" step="0.1" placeholder="e.g. 40">
-                    <small>Measure around fullest part</small>
-                </div>
-                <div class="measurement-field">
-                    <label for="m-waist"><i class="fas fa-expand-arrows-alt"></i> Waist (inches)</label>
-                    <input type="number" id="m-waist" step="0.1" placeholder="e.g. 32">
-                    <small>Measure at natural waistline</small>
-                </div>
-                <div class="measurement-field">
-                    <label for="m-hip"><i class="fas fa-expand-arrows-alt"></i> Hip (inches)</label>
-                    <input type="number" id="m-hip" step="0.1" placeholder="e.g. 38">
-                    <small>Measure around fullest part</small>
-                </div>
-                <div class="measurement-field">
-                    <label for="m-shoulder"><i class="fas fa-arrows-alt-h"></i> Shoulder (inches)</label>
-                    <input type="number" id="m-shoulder" step="0.1" placeholder="e.g. 18">
-                    <small>Shoulder to shoulder</small>
-                </div>
-                <div class="measurement-field">
-                    <label for="m-sleeve"><i class="fas fa-ruler-vertical"></i> Sleeve Length (inches)</label>
-                    <input type="number" id="m-sleeve" step="0.1" placeholder="e.g. 24">
-                    <small>Shoulder to wrist</small>
-                </div>
-                <div class="measurement-field">
-                    <label for="m-kameez"><i class="fas fa-ruler-vertical"></i> Kameez Length (inches)</label>
-                    <input type="number" id="m-kameez" step="0.1" placeholder="e.g. 42">
-                    <small>Shoulder to desired length</small>
-                </div>
-                <div class="measurement-field">
-                    <label for="m-trouser"><i class="fas fa-ruler-vertical"></i> Trouser Length (inches)</label>
-                    <input type="number" id="m-trouser" step="0.1" placeholder="e.g. 40">
-                    <small>Waist to ankle</small>
-                </div>
-                <div class="measurement-field">
-                    <label for="m-neck"><i class="fas fa-circle"></i> Neck (inches)</label>
-                    <input type="number" id="m-neck" step="0.1" placeholder="e.g. 15">
-                    <small>Around neck</small>
-                </div>
-            </div>
-
-            <div class="measurement-field" style="margin-top: 15px;">
-                <label for="m-notes"><i class="fas fa-sticky-note"></i> Additional Notes</label>
-                <textarea id="m-notes" rows="2" placeholder="Any special instructions..." style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;"></textarea>
-            </div>
-
-            <button class="btn-save-measurements" onclick="saveMeasurements()">
-                <i class="fas fa-check"></i> Save Measurements
-            </button>
-        </div>
-    </div>
-
+    
     <!-- Webcam Measurement Modal -->
-    <div id="webcam-measurement-modal" class="modal" style="z-index: 1002;">
-        <div class="modal-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
-            <button class="close-modal" id="close-webcam-modal">&times;</button>
-            <h3 style="text-align: center; color: #333;">
-                <i class="fas fa-camera" style="color: #d4af37;"></i> AI Body Measurement
+    <div id="webcam-measurement-modal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1001; justify-content: center; align-items: center;">
+        <div class="modal-content" style="background: white; padding: 20px; border-radius: 12px; max-width: 900px; width: 95%; max-height: 90vh; overflow-y: auto; position: relative;">
+            <span class="close-modal" style="position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #999; z-index: 10;">&times;</span>
+            
+            <h3 style="margin-bottom: 20px; color: #333; text-align: center;">
+                <i class="fas fa-robot"></i> AI-Powered Body Measurement
             </h3>
+            
+            <!-- Hidden input for measurement index -->
             <input type="hidden" id="webcam-measurement-item-index" value="">
-
-            <!-- Height Calibration -->
-            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #d4af37;">
-                <label style="font-weight: 600; display: block; margin-bottom: 8px;">
-                    <i class="fas fa-ruler-vertical" style="color: #d4af37;"></i> Enter Your Height (for calibration)
+            
+            <!-- Height Calibration (critical for accuracy) -->
+            <div id="height-calibration" style="max-width: 820px; margin: 0 auto 15px; padding: 14px 18px; background: #FDF6E3; border-left: 4px solid var(--gold-color); border-radius: 6px;">
+                <label style="display:flex; align-items:center; gap:14px; flex-wrap:wrap; font-size:14px; color:#5B4A34; font-weight:600;">
+                    <i class="fas fa-ruler-vertical" style="color:#8B6914;"></i>
+                    <span>Your height (needed for accurate measurement):</span>
+                    <input type="number" id="user-height-feet" min="4" max="7" value="5" style="width:60px; padding:6px 8px; border:1px solid #ddd; border-radius:4px; text-align:center; font-size:14px;"> ft
+                    <input type="number" id="user-height-inches" min="0" max="11" value="6" style="width:60px; padding:6px 8px; border:1px solid #ddd; border-radius:4px; text-align:center; font-size:14px;"> in
                 </label>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <select id="height-feet" style="padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
-                        <option value="4">4 ft</option>
-                        <option value="5" selected>5 ft</option>
-                        <option value="6">6 ft</option>
-                        <option value="7">7 ft</option>
-                    </select>
-                    <select id="height-inches" style="padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
-                        <option value="0">0 in</option>
-                        <option value="1">1 in</option>
-                        <option value="2">2 in</option>
-                        <option value="3">3 in</option>
-                        <option value="4">4 in</option>
-                        <option value="5">5 in</option>
-                        <option value="6" selected>6 in</option>
-                        <option value="7">7 in</option>
-                        <option value="8">8 in</option>
-                        <option value="9">9 in</option>
-                        <option value="10">10 in</option>
-                        <option value="11">11 in</option>
-                    </select>
-                    <button id="set-height-btn" style="padding: 10px 20px; background: #d4af37; color: white; border: none; border-radius: 6px; cursor: pointer;">
-                        Set Height
-                    </button>
-                </div>
             </div>
 
-            <!-- Camera Section -->
-            <div class="camera-section" style="position: relative; width: 100%; max-width: 640px; margin: 0 auto 20px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2); background: #000;">
-                <video id="webcam-video" width="640" height="480" autoplay muted playsinline style="width: 100%; height: auto; display: block;"></video>
+            <!-- Camera Section — sized larger for visibility, processing stays at 640×480 native -->
+            <div class="camera-section" style="position: relative; width: 100%; max-width: 820px; margin: 0 auto 20px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+                <video id="webcam-video" width="640" height="480" autoplay muted playsinline style="width: 100%; height: auto; display: block; background: #000;"></video>
+                <!-- Canvas will be added here by JavaScript -->
+            </div>
+            
+            <!-- Pose Indicator -->
+            <div id="pose-indicator" class="pose-indicator" style="
+                text-align: center;
+                padding: 15px;
+                margin: 15px 0;
+                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                border-radius: 8px;
+                border-left: 4px solid #007bff;
+                font-size: 14px;
+                color: #495057;
+            ">
+                📷 Position yourself in the frame
             </div>
 
-            <!-- Status Indicators -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
-                <div style="background: #fff3cd; padding: 12px; border-radius: 8px; border-left: 4px solid #ffc107;">
-                    <strong style="display: block; margin-bottom: 5px; font-size: 12px; color: #856404;">
-                        <i class="fas fa-user"></i> POSE STATUS
-                    </strong>
-                    <span id="pose-indicator" style="font-size: 13px; color: #856404;">Click Start Camera to begin</span>
-                </div>
-                <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; border-left: 4px solid #6c757d;">
-                    <strong style="display: block; margin-bottom: 5px; font-size: 12px; color: #495057;">
-                        <i class="fas fa-arrows-alt-v"></i> DISTANCE
-                    </strong>
-                    <div style="background: #e9ecef; border-radius: 4px; height: 8px; margin-top: 5px; overflow: hidden;">
-                        <div id="distance-fill" style="height: 100%; width: 0%; background: #28a745; transition: width 0.3s;"></div>
-                    </div>
-                    <span id="distance-text" style="font-size: 11px; color: #666;">Waiting...</span>
-                </div>
+            <!-- Auto-capture stability badge (shown after calibration) -->
+            <div id="auto-capture-status" style="
+                display: none;
+                text-align: center;
+                padding: 10px 14px;
+                margin: 10px auto;
+                max-width: 600px;
+                background: #E8F5E9;
+                border-left: 4px solid #2D5A4A;
+                border-radius: 6px;
+                font-size: 13px;
+                color: #1B4332;
+                font-weight: 500;
+            ">
+                <i class="fas fa-circle-notch fa-spin"></i>
+                <span id="auto-capture-text">Hold still — auto-capturing in <b id="auto-capture-countdown">3</b>s…</span>
             </div>
 
+            <!-- Countdown overlay (big number, shown while countdown ticks) -->
+            <div id="countdown-overlay" style="
+                display: none;
+                text-align: center;
+                padding: 20px;
+                margin: 15px auto;
+                max-width: 600px;
+                background: rgba(26, 26, 26, 0.95);
+                color: var(--gold-color);
+                border-radius: 12px;
+                font-size: 14px;
+                font-weight: 600;
+            ">
+                Step back into the frame.<br>
+                <span id="countdown-number" style="font-size:72px; font-family:'Playfair Display',serif; display:block; line-height:1; margin:10px 0;">10</span>
+                <button id="cancel-countdown-btn" style="background:transparent; border:1px solid var(--gold-color); color:var(--gold-color); padding:6px 14px; border-radius:6px; cursor:pointer; font-size:12px; margin-top:6px;">Cancel</button>
+            </div>
+            
             <!-- Controls -->
             <div class="webcam-controls" style="text-align: center; margin: 20px 0;">
                 <button id="start-camera-btn" class="webcam-btn" style="
                     background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
                     color: white;
                     border: none;
-                    padding: 14px 28px;
+                    padding: 12px 20px;
                     border-radius: 8px;
                     cursor: pointer;
-                    font-size: 15px;
-                    font-weight: 600;
                     margin: 5px;
+                    font-size: 14px;
                     display: inline-flex;
                     align-items: center;
                     gap: 8px;
-                    transition: all 0.3s;
+                    transition: all 0.3s ease;
                 ">
                     <i class="fas fa-camera"></i> Start Camera
                 </button>
-
+                
                 <button id="stop-camera-btn" class="webcam-btn" style="
                     background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
                     color: white;
                     border: none;
-                    padding: 14px 28px;
+                    padding: 12px 20px;
                     border-radius: 8px;
                     cursor: pointer;
-                    font-size: 15px;
-                    font-weight: 600;
                     margin: 5px;
+                    font-size: 14px;
                     display: none;
                     align-items: center;
                     gap: 8px;
-                    transition: all 0.3s;
+                    transition: all 0.3s ease;
                 ">
                     <i class="fas fa-stop"></i> Stop Camera
                 </button>
-
+                
                 <button id="capture-measurement-btn" class="webcam-btn" style="
-                    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+                    background: linear-gradient(135deg, var(--gold-color) 0%, #A68B52 100%);
                     color: white;
                     border: none;
-                    padding: 14px 28px;
+                    padding: 12px 20px;
                     border-radius: 8px;
                     cursor: pointer;
-                    font-size: 15px;
-                    font-weight: 600;
                     margin: 5px;
+                    font-size: 14px;
                     display: none;
                     align-items: center;
                     gap: 8px;
-                    transition: all 0.3s;
-                " disabled>
-                    <i class="fas fa-check"></i> Capture Measurements
+                    transition: all 0.3s ease;
+                ">
+                    <i class="fas fa-check"></i> Capture Now
                 </button>
 
+                <button id="countdown-capture-btn" class="webcam-btn" style="
+                    background: linear-gradient(135deg, #1A1A1A 0%, #2C2C2C 100%);
+                    color: var(--gold-color);
+                    border: 1px solid var(--gold-color);
+                    padding: 12px 20px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    margin: 5px;
+                    font-size: 14px;
+                    display: none;
+                    align-items: center;
+                    gap: 8px;
+                    transition: all 0.3s ease;
+                " title="Start a 10-second countdown so you can step back">
+                    <i class="fas fa-hourglass-half"></i> Capture After 10s
+                </button>
+                
                 <button id="retake-measurement-btn" class="webcam-btn" style="
                     background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
                     color: white;
                     border: none;
-                    padding: 14px 28px;
+                    padding: 12px 20px;
                     border-radius: 8px;
                     cursor: pointer;
-                    font-size: 15px;
-                    font-weight: 600;
                     margin: 5px;
+                    font-size: 14px;
                     display: none;
                     align-items: center;
                     gap: 8px;
-                    transition: all 0.3s;
+                    transition: all 0.3s ease;
                 ">
                     <i class="fas fa-redo"></i> Retake
                 </button>
             </div>
-
-            <!-- Measurement Results -->
-            <div id="webcam-results" style="display: none; margin-top: 20px; background: #d4edda; padding: 20px; border-radius: 10px; border: 1px solid #c3e6cb;">
-                <h4 style="color: #155724; text-align: center; margin-bottom: 15px;">
+            
+            <!-- Measurement Results (initially hidden) -->
+            <div id="webcam-results" style="display: none; margin-top: 20px;">
+                <h4 style="color: #28a745; text-align: center;">
                     <i class="fas fa-check-circle"></i> AI Measurements Detected
                 </h4>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 15px 0;">
+                    <input type="number" id="webcam-shoulder" placeholder="Shoulder Width" step="0.1" readonly style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <input type="number" id="webcam-chest" placeholder="Chest" step="0.1" readonly style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <input type="number" id="webcam-waist" placeholder="Waist" step="0.1" readonly style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <input type="number" id="webcam-hip" placeholder="Hip" step="0.1" readonly style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <input type="number" id="webcam-sleeve_length" placeholder="Sleeve Length" step="0.1" readonly style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <input type="number" id="webcam-trouser_length" placeholder="Trouser Length" step="0.1" readonly style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <input type="number" id="webcam-kameez_length" placeholder="Kameez Length" step="0.1" readonly style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <input type="number" id="webcam-neck" placeholder="Neck" step="0.1" readonly style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+            </div>
+            
+            <!-- Instructions -->
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 15px; font-size: 12px; color: #6c757d;">
+                <strong>Instructions:</strong>
+                <ul style="margin: 5px 0 0 20px;">
+                    <li>Stand 3-4 feet away from camera</li>
+                    <li>Keep arms slightly away from body</li>
+                    <li>Face the camera directly</li>
+                    <li>Ensure good lighting</li>
+                    <li>Stay still during measurement</li>
+                </ul>
+            </div>
+        </div>
+    </div>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
-                    <div class="webcam-result-field">
-                        <label style="font-size: 11px; color: #666; display: block;">Shoulder</label>
-                        <input type="number" id="webcam-shoulder" readonly style="width: 100%; padding: 8px; border: 1px solid #28a745; border-radius: 4px; background: white;">
+    <!-- Manual Measurement Modal -->
+    <div id="manual-measurement-modal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1001; justify-content: center; align-items: center;">
+        <div class="modal-content" style="background: white; padding: 20px; border-radius: 12px; max-width: 600px; width: 95%; max-height: 90vh; overflow-y: auto; overflow-x: hidden; box-sizing: border-box; position: relative;">
+            <span class="close-modal" style="position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #999; z-index: 10;">&times;</span>
+
+            <h3 style="margin-bottom: 20px; color: #333; text-align: center;">
+                <i class="fas fa-ruler"></i> Enter Your Measurements
+            </h3>
+
+            <!-- Hidden input for measurement index -->
+            <input type="hidden" id="measurement-item-index" value="">
+
+            <form method="post" id="measurement-form">
+                <input type="hidden" name="action" value="save_measurements">
+                <input type="hidden" name="index" id="measurement-form-index" value="">
+
+                <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 20px;">
+                    <div class="measurement-field">
+                        <label for="chest" style="display: block; margin-bottom: 5px; font-weight: 500;">
+                            <i class="fas fa-expand-arrows-alt"></i> Chest (inches)
+                        </label>
+                        <input type="number" id="chest" name="chest" required min="1" step="0.1" placeholder="e.g. 40.5" 
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                        <small style="color: #666; font-size: 12px;">Measure around fullest part of chest</small>
                     </div>
-                    <div class="webcam-result-field">
-                        <label style="font-size: 11px; color: #666; display: block;">Chest</label>
-                        <input type="number" id="webcam-chest" readonly style="width: 100%; padding: 8px; border: 1px solid #28a745; border-radius: 4px; background: white;">
+                    
+                    <div class="measurement-field">
+                        <label for="waist" style="display: block; margin-bottom: 5px; font-weight: 500;">
+                            <i class="fas fa-expand-arrows-alt"></i> Waist (inches)
+                        </label>
+                        <input type="number" id="waist" name="waist" required min="1" step="0.1" placeholder="e.g. 32.0"
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                        <small style="color: #666; font-size: 12px;">Measure around natural waistline</small>
                     </div>
-                    <div class="webcam-result-field">
-                        <label style="font-size: 11px; color: #666; display: block;">Waist</label>
-                        <input type="number" id="webcam-waist" readonly style="width: 100%; padding: 8px; border: 1px solid #28a745; border-radius: 4px; background: white;">
+                    
+                    <div class="measurement-field">
+                        <label for="hip" style="display: block; margin-bottom: 5px; font-weight: 500;">
+                            <i class="fas fa-expand-arrows-alt"></i> Hip (inches)
+                        </label>
+                        <input type="number" id="hip" name="hip" required min="1" step="0.1" placeholder="e.g. 38.0"
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                        <small style="color: #666; font-size: 12px;">Measure around fullest part of hips</small>
                     </div>
-                    <div class="webcam-result-field">
-                        <label style="font-size: 11px; color: #666; display: block;">Hip</label>
-                        <input type="number" id="webcam-hip" readonly style="width: 100%; padding: 8px; border: 1px solid #28a745; border-radius: 4px; background: white;">
+                    
+                    <div class="measurement-field">
+                        <label for="shoulder" style="display: block; margin-bottom: 5px; font-weight: 500;">
+                            <i class="fas fa-expand-arrows-alt"></i> Shoulder (inches)
+                        </label>
+                        <input type="number" id="shoulder" name="shoulder" required min="1" step="0.1" placeholder="e.g. 16.5"
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                        <small style="color: #666; font-size: 12px;">Measure from shoulder edge to edge</small>
                     </div>
-                    <div class="webcam-result-field">
-                        <label style="font-size: 11px; color: #666; display: block;">Sleeve Length</label>
-                        <input type="number" id="webcam-sleeve_length" readonly style="width: 100%; padding: 8px; border: 1px solid #28a745; border-radius: 4px; background: white;">
+                    
+                    <div class="measurement-field">
+                        <label for="sleeve_length" style="display: block; margin-bottom: 5px; font-weight: 500;">
+                            <i class="fas fa-expand-arrows-alt"></i> Sleeve Length (inches)
+                        </label>
+                        <input type="number" id="sleeve_length" name="sleeve_length" required min="1" step="0.1" placeholder="e.g. 24.0"
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                        <small style="color: #666; font-size: 12px;">Measure from shoulder to wrist</small>
                     </div>
-                    <div class="webcam-result-field">
-                        <label style="font-size: 11px; color: #666; display: block;">Kameez Length</label>
-                        <input type="number" id="webcam-kameez_length" readonly style="width: 100%; padding: 8px; border: 1px solid #28a745; border-radius: 4px; background: white;">
+                    
+                    <div class="measurement-field">
+                        <label for="trouser_length" style="display: block; margin-bottom: 5px; font-weight: 500;">
+                            <i class="fas fa-expand-arrows-alt"></i> Trouser Length (inches)
+                        </label>
+                        <input type="number" id="trouser_length" name="trouser_length" required min="1" step="0.1" placeholder="e.g. 42.0"
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                        <small style="color: #666; font-size: 12px;">Measure from waist to ankle</small>
                     </div>
-                    <div class="webcam-result-field">
-                        <label style="font-size: 11px; color: #666; display: block;">Trouser Length</label>
-                        <input type="number" id="webcam-trouser_length" readonly style="width: 100%; padding: 8px; border: 1px solid #28a745; border-radius: 4px; background: white;">
+                    
+                    <div class="measurement-field">
+                        <label for="kameez_length" style="display: block; margin-bottom: 5px; font-weight: 500;">
+                            <i class="fas fa-expand-arrows-alt"></i> Kameez Length (inches)
+                        </label>
+                        <input type="number" id="kameez_length" name="kameez_length" required min="1" step="0.1" placeholder="e.g. 36.0"
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                        <small style="color: #666; font-size: 12px;">Measure from shoulder to desired length</small>
                     </div>
-                    <div class="webcam-result-field">
-                        <label style="font-size: 11px; color: #666; display: block;">Neck</label>
-                        <input type="number" id="webcam-neck" readonly style="width: 100%; padding: 8px; border: 1px solid #28a745; border-radius: 4px; background: white;">
+                    
+                    <div class="measurement-field">
+                        <label for="neck" style="display: block; margin-bottom: 5px; font-weight: 500;">
+                            <i class="fas fa-expand-arrows-alt"></i> Neck (inches)
+                        </label>
+                        <input type="number" id="neck" name="neck" required min="1" step="0.1" placeholder="e.g. 15.0"
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                        <small style="color: #666; font-size: 12px;">Measure around the base of your neck</small>
                     </div>
                 </div>
-
-                <button id="save-webcam-measurements-btn" style="
-                    width: 100%;
-                    margin-top: 20px;
-                    padding: 14px;
-                    background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
-                    color: white;
-                    border: none;
-                    border-radius: 8px;
-                    font-size: 16px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    gap: 10px;
-                    transition: all 0.3s;
-                ">
-                    <i class="fas fa-save"></i> Save AI Measurements
-                </button>
-            </div>
-
-            <!-- Instructions -->
-            <div style="margin-top: 20px; padding: 15px; background: #e9ecef; border-radius: 8px;">
-                <h5 style="margin: 0 0 10px 0; color: #495057;"><i class="fas fa-info-circle"></i> Instructions</h5>
-                <ol style="margin: 0; padding-left: 20px; color: #666; font-size: 13px; line-height: 1.8;">
-                    <li>Enter your height and click "Set Height"</li>
-                    <li>Click "Start Camera" and allow camera access</li>
-                    <li>Stand 5-6 feet away, facing the camera</li>
-                    <li>Keep your full body visible (head to feet)</li>
-                    <li>Wait for calibration to complete</li>
-                    <li>Click "Capture Measurements" when ready</li>
-                </ol>
-            </div>
-        </div>
-    </div>
-
-    <!-- Order History Modal -->
-    <div id="order-history-modal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal">&times;</button>
-            <h3><i class="fas fa-history"></i> Your Order History</h3>
-            <div id="order-history-content">
-                <!-- Order history will be loaded here -->
+                
+                <div style="margin-top: 20px;">
+                    <label for="notes" style="display: block; margin-bottom: 5px; font-weight: 500;">
+                        <i class="fas fa-sticky-note"></i> Additional Notes (Optional)
+                    </label>
+                    <textarea id="notes" name="notes" rows="3" placeholder="Any special requirements or notes..." 
+                             style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; resize: vertical;"></textarea>
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button type="submit" style="
+                        padding: 12px 30px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-size: 16px;
+                        font-weight: 500;
+                    ">
+                        <i class="fas fa-save"></i> Save Measurements
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Measurement Guide -->
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 20px; font-size: 12px; color: #6c757d;">
+                <strong>📏 Measurement Tips:</strong>
+                <ul style="margin: 5px 0 0 20px;">
+                    <li>Use a flexible measuring tape</li>
+                    <li>Wear fitted clothing while measuring</li>
+                    <li>Keep the tape snug but not tight</li>
+                    <li>Ask someone to help for better accuracy</li>
+                    <li>Measure twice to confirm accuracy</li>
+                </ul>
             </div>
         </div>
     </div>
 
+    <!-- Back to top button -->
+    <div class="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <!-- Footer -->
     <footer>
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section about">
                     <div class="footer-logo">
-                        <a href="index.html" class="logo-button">
+                        <a href="index.php" class="logo-button">
                             <h3 class="logo-text">Stitch House</h3>
                         </a>
                     </div>
@@ -783,702 +895,977 @@
                 <div class="footer-section links">
                     <h3>Quick Links</h3>
                     <ul>
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="order.html">Shop Now</a></li>
-                        <li><a href="myorder.html">My Order</a></li>
-                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="index.php">Home</a></li>
+                        <li><a href="order.php">Shop Now</a></li>
+                        <li><a href="myorder.php">My Order</a></li>
+                        <li><a href="contact.php">Contact Us</a></li>
                     </ul>
                 </div>
                 <div class="footer-section contact">
                     <h3>Contact Info</h3>
-                    <p><i class="fas fa-map-marker-alt"></i> Main Gulberg, Lahore, Pakistan</p>
-                    <p><i class="fas fa-phone"></i> 0304-2292813</p>
+                    <p><i class="fas fa-map-marker-alt"></i> IUB Baghdad-ul-Jadeed Campus, Hasilpur Road, Bahawalpur 63100, Pakistan</p>
+                    <p><i class="fas fa-phone"></i> +0304-2292813</p>
                     <p><i class="fas fa-envelope"></i> info@stitchhouse.com</p>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2025 Stitch House. All Rights Reserved.</p>
+                <p>&copy; 2026 Stitch House. All Rights Reserved.</p>
             </div>
         </div>
     </footer>
 
-    <div class="back-to-top">
-        <i class="fas fa-arrow-up"></i>
-    </div>
-
     <script>
-    // Global cart variable
-    let cart = [];
+        // Global variables
+        let currentMeasurementIndex = null;
+        let mediaPipeMeasurement = null;
 
-    document.addEventListener('DOMContentLoaded', function() {
-        // Side navigation functionality
-        const sideNavToggle = document.querySelector('.menu-toggle');
-        const sideNav = document.querySelector('.side-nav');
-        const sideNavBackdrop = document.querySelector('.side-nav-backdrop');
-        const sideNavClose = document.querySelector('.close-sidenav');
-
-        if (sideNavToggle && sideNav) {
-            sideNavToggle.addEventListener('click', () => {
-                sideNav.classList.add('open');
-                sideNavBackdrop.classList.add('active');
-                document.body.classList.add('no-scroll');
-            });
-        }
-
-        function closeSideNav() {
-            if (sideNav) {
-                sideNav.classList.remove('open');
-                sideNavBackdrop.classList.remove('active');
-                document.body.classList.remove('no-scroll');
-            }
-        }
-
-        if (sideNavClose) sideNavClose.addEventListener('click', closeSideNav);
-        if (sideNavBackdrop) sideNavBackdrop.addEventListener('click', closeSideNav);
-
-        // Back to top button
-        const backToTopBtn = document.querySelector('.back-to-top');
-        window.addEventListener('scroll', () => {
-            if (window.pageYOffset > 300) {
-                backToTopBtn.classList.add('show');
-            } else {
-                backToTopBtn.classList.remove('show');
-            }
-        });
-        backToTopBtn.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-
-        // Close modals
-        document.querySelectorAll('.close-modal').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
-            });
-        });
-
-        // Close modal on backdrop click
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) modal.classList.remove('active');
-            });
-        });
-
-        // Check login status
-        checkLoginStatus();
-
-        // Load cart from localStorage
-        cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
-        displayCart();
-
-        // Clear cart button
-        document.querySelector('.btn-clear-cart').addEventListener('click', () => {
-            if (cart.length > 0 && confirm('Are you sure you want to clear all items?')) {
-                cart = [];
-                saveAndUpdateCart();
-            }
-        });
-    });
-
-    function checkLoginStatus() {
-        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-        const userName = localStorage.getItem('userName');
-        const loginLink = document.getElementById('login-link');
-        const userDropdown = document.getElementById('user-dropdown');
-
-        if (isLoggedIn && userName) {
-            if (loginLink) loginLink.style.display = 'none';
-            if (userDropdown) {
-                userDropdown.style.display = 'block';
-                userDropdown.querySelector('.user-name').textContent = userName;
-            }
-        } else {
-            if (loginLink) loginLink.style.display = 'block';
-            if (userDropdown) userDropdown.style.display = 'none';
-        }
-    }
-
-    function toggleUserDropdown() {
-        const dropdown = document.getElementById('user-dropdown');
-        dropdown.classList.toggle('active');
-    }
-
-    document.addEventListener('click', function(e) {
-        const dropdown = document.getElementById('user-dropdown');
-        if (dropdown && !dropdown.contains(e.target)) {
-            dropdown.classList.remove('active');
-        }
-    });
-
-    function handleLogout() {
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('userName');
-        localStorage.removeItem('userEmail');
-        localStorage.removeItem('userPhone');
-        localStorage.removeItem('shoppingCart');
-        localStorage.removeItem('finalCart');
-        window.location.href = 'index.html';
-    }
-
-    function showOrderHistory() {
-        const orders = JSON.parse(localStorage.getItem('orders')) || [];
-        const container = document.getElementById('order-history-content');
-
-        if (orders.length === 0) {
-            container.innerHTML = '<p style="text-align: center; color: #666;">No orders found.</p>';
-        } else {
-            let html = '';
-            orders.reverse().forEach((order, i) => {
-                html += `
-                    <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 15px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                            <strong>Order #${order.orderNumber}</strong>
-                            <span style="color: #666; font-size: 12px;">${new Date(order.date).toLocaleDateString()}</span>
-                        </div>
-                        <p style="margin: 5px 0; font-size: 14px;">Items: ${order.items.length}</p>
-                        <p style="margin: 5px 0; font-size: 14px; color: #28a745;">Status: Confirmed</p>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
-
-        document.getElementById('order-history-modal').classList.add('active');
-    }
-
-    function displayCart() {
-        const cartItemsContainer = document.querySelector('.cart-items-container');
-        const emptyCartMessage = document.querySelector('.empty-cart-message');
-        const orderContent = document.querySelector('.order-content');
-
-        updateCartCount();
-
-        if (cart.length === 0) {
-            emptyCartMessage.style.display = 'flex';
-            orderContent.style.display = 'none';
-            return;
-        }
-
-        emptyCartMessage.style.display = 'none';
-        orderContent.style.display = 'flex';
-        cartItemsContainer.innerHTML = '';
-
-        cart.forEach((item, index) => {
-            const itemTotal = item.price * item.quantity;
-            const hasDesign = item.design ? true : false;
-            const hasMeasurements = item.hasMeasurements ? true : false;
-            const canAddToCart = hasDesign && hasMeasurements;
-
-            const cartItemEl = document.createElement('div');
-            cartItemEl.classList.add('cart-item');
-            cartItemEl.innerHTML = `
-                <div class="cart-item-image">
-                    <img src="images/${item.image}" alt="${item.name}" onerror="this.src='images/placeholder.jpg'">
-                </div>
-                <div class="cart-item-details">
-                    <h3>${item.name}</h3>
-                    <p class="price">PKR. ${item.price.toLocaleString()}</p>
-                    ${item.design ? `
-                        <div style="background: linear-gradient(90deg, #d4edda, #f8fff8); padding: 8px 12px; border-radius: 5px; border-left: 3px solid #28a745; margin: 8px 0;">
-                            <span style="color: #28a745; font-size: 13px;"><i class="fas fa-check-circle"></i> ${item.design}</span>
-                        </div>
-                    ` : ''}
-                    ${item.hasMeasurements ? `
-                        <div style="background: linear-gradient(90deg, #e8f5e9, #f1f8f1); padding: 10px 12px; border-radius: 5px; border-left: 3px solid #4caf50; margin: 8px 0; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="color: #2e7d32; font-size: 13px;">
-                                <i class="fas fa-ruler"></i> <strong>Measurements Saved</strong>
-                                ${item.measurements ? `<span style="font-size: 11px; color: #666; margin-left: 8px;">(${item.measurements.notes === 'AI Webcam Measurement' ? 'AI Webcam' : 'Manual'})</span>` : ''}
-                            </span>
-                            <button onclick="openMeasurementModal(${index})" style="background: none; border: 1px solid #d4af37; color: #d4af37; cursor: pointer; font-size: 12px; padding: 4px 10px; border-radius: 4px; transition: all 0.3s;">
-                                <i class="fas fa-edit"></i> Edit
-                            </button>
-                        </div>
-                    ` : ''}
-                    <div class="design-btn-group">
-                        <button class="customize-item-btn" onclick="toggleDesignPanel(${index})">
-                            <i class="fas fa-tshirt"></i> ${item.design ? 'Edit Design' : 'Customize Design'}
-                        </button>
-                        <button class="measurement-btn" onclick="openMeasurementModal(${index})">
-                            <i class="fas fa-ruler"></i> ${item.hasMeasurements ? 'Edit' : 'Add'} Measurements
-                        </button>
-                    </div>
-                </div>
-                <div class="cart-item-quantity">
-                    <button class="quantity-btn decrease" onclick="updateQuantity(${index}, -1)">-</button>
-                    <span class="quantity">${item.quantity}</span>
-                    <button class="quantity-btn increase" onclick="updateQuantity(${index}, 1)">+</button>
-                </div>
-                <div class="cart-item-total">
-                    <p>PKR. ${itemTotal.toLocaleString()}</p>
-                    <button class="add-to-cart-btn ${canAddToCart ? '' : 'disabled'}" onclick="addToFinalCart(${index})" ${canAddToCart ? '' : 'disabled'}>
-                        <i class="fas fa-cart-plus"></i> Add to Cart
-                    </button>
-                </div>
-                <button class="remove-item" onclick="removeItem(${index})">
-                    <i class="fas fa-trash"></i>
-                </button>
-                <div class="item-design-container" id="design-container-${index}"></div>
+        // Utility Functions (Outside DOMContentLoaded)
+        function showCameraError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.style.cssText = `
+                position: fixed; top: 20px; right: 20px; background: #dc3545;
+                color: white; padding: 15px; border-radius: 8px; z-index: 9999;
+                box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
             `;
-
-            cartItemsContainer.appendChild(cartItemEl);
-        });
-    }
-
-    function updateQuantity(index, change) {
-        if (cart[index].quantity + change >= 1) {
-            cart[index].quantity += change;
-            saveAndUpdateCart();
-        }
-    }
-
-    function removeItem(index) {
-        cart.splice(index, 1);
-        saveAndUpdateCart();
-    }
-
-    function toggleDesignPanel(index) {
-        const container = document.getElementById(`design-container-${index}`);
-
-        if (container.innerHTML !== '') {
-            container.innerHTML = '';
-            return;
+            errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
+            document.body.appendChild(errorDiv);
+            
+            setTimeout(() => errorDiv.remove(), 5000);
         }
 
-        const item = cart[index];
-        const designOptions = item.designOptions || {};
-
-        container.innerHTML = `
-            <div class="item-design-options">
-                <div class="design-header">
-                    <h4>Customize Your Design</h4>
-                    <button class="close-design-btn" onclick="document.getElementById('design-container-${index}').innerHTML=''"><i class="fas fa-times"></i></button>
-                </div>
-
-                <div class="design-section">
-                    <h5>Collar Style</h5>
-                    <div class="design-options">
-                        <div class="design-option">
-                            <input type="radio" id="collar-band-${index}" name="collar-${index}" value="Band Collar" ${designOptions.collar === 'Band Collar' ? 'checked' : ''}>
-                            <label for="collar-band-${index}">Band Collar</label>
-                        </div>
-                        <div class="design-option">
-                            <input type="radio" id="collar-straight-${index}" name="collar-${index}" value="Straight Collar" ${designOptions.collar === 'Straight Collar' ? 'checked' : ''}>
-                            <label for="collar-straight-${index}">Straight Collar</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="design-section">
-                    <h5>Kameez Style</h5>
-                    <div class="design-options">
-                        <div class="design-option">
-                            <input type="radio" id="kurta-${index}" name="kurta-${index}" value="Kurta Style" ${designOptions.kurta === 'Kurta Style' ? 'checked' : ''}>
-                            <label for="kurta-${index}">Kurta Style</label>
-                        </div>
-                        <div class="design-option">
-                            <input type="radio" id="simple-${index}" name="kurta-${index}" value="Simple Kameez" ${designOptions.kurta === 'Simple Kameez' ? 'checked' : ''}>
-                            <label for="simple-${index}">Simple Kameez</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="design-section">
-                    <h5>Bottom Style</h5>
-                    <div class="design-options">
-                        <div class="design-option">
-                            <input type="radio" id="shalwar-${index}" name="bottom-${index}" value="Shalwar" ${designOptions.bottom === 'Shalwar' ? 'checked' : ''}>
-                            <label for="shalwar-${index}">Shalwar</label>
-                        </div>
-                        <div class="design-option">
-                            <input type="radio" id="trouser-${index}" name="bottom-${index}" value="Trouser" ${designOptions.bottom === 'Trouser' ? 'checked' : ''}>
-                            <label for="trouser-${index}">Trouser</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="design-section">
-                    <h5>Front Pocket</h5>
-                    <div class="design-options">
-                        <div class="design-option">
-                            <input type="radio" id="fp-yes-${index}" name="fp-${index}" value="With Front Pocket" ${designOptions.frontPocket === 'With Front Pocket' ? 'checked' : ''}>
-                            <label for="fp-yes-${index}">With Pocket</label>
-                        </div>
-                        <div class="design-option">
-                            <input type="radio" id="fp-no-${index}" name="fp-${index}" value="No Front Pocket" ${designOptions.frontPocket === 'No Front Pocket' ? 'checked' : ''}>
-                            <label for="fp-no-${index}">No Pocket</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="design-section">
-                    <h5>Side Pockets</h5>
-                    <div class="design-options">
-                        <div class="design-option">
-                            <input type="radio" id="sp-two-${index}" name="sp-${index}" value="Two Side Pockets" ${designOptions.sidePocket === 'Two Side Pockets' ? 'checked' : ''}>
-                            <label for="sp-two-${index}">Two Pockets</label>
-                        </div>
-                        <div class="design-option">
-                            <input type="radio" id="sp-one-${index}" name="sp-${index}" value="One Side Pocket" ${designOptions.sidePocket === 'One Side Pocket' ? 'checked' : ''}>
-                            <label for="sp-one-${index}">One Pocket</label>
-                        </div>
-                        <div class="design-option">
-                            <input type="radio" id="sp-none-${index}" name="sp-${index}" value="No Side Pockets" ${designOptions.sidePocket === 'No Side Pockets' ? 'checked' : ''}>
-                            <label for="sp-none-${index}">No Pockets</label>
-                        </div>
-                    </div>
-                </div>
-
-                <button class="btn-confirm-design" onclick="confirmDesign(${index})">Confirm Design</button>
-            </div>
-        `;
-    }
-
-    function confirmDesign(index) {
-        const collar = document.querySelector(`input[name="collar-${index}"]:checked`);
-        const kurta = document.querySelector(`input[name="kurta-${index}"]:checked`);
-        const bottom = document.querySelector(`input[name="bottom-${index}"]:checked`);
-        const frontPocket = document.querySelector(`input[name="fp-${index}"]:checked`);
-        const sidePocket = document.querySelector(`input[name="sp-${index}"]:checked`);
-
-        if (!collar || !kurta || !bottom || !frontPocket || !sidePocket) {
-            alert('Please select all design options');
-            return;
+        function disableWebcamOption(reason) {
+            const webcamOption = document.getElementById('webcam-measurement-option');
+            if (webcamOption) {
+                webcamOption.disabled = true;
+                webcamOption.innerHTML = '<i class="fas fa-exclamation-triangle"></i> AI Measurement Unavailable';
+                webcamOption.style.background = '#dc3545';
+                webcamOption.title = `Disabled: ${reason}`;
+            }
         }
 
-        const designDescription = `${kurta.value} with ${collar.value}, ${bottom.value}, ${frontPocket.value}, ${sidePocket.value}`;
+        function checkMediaPipeScripts() {
+            const requiredScripts = [
+                { name: 'Pose', check: () => typeof Pose !== 'undefined' },
+                { name: 'Camera', check: () => typeof Camera !== 'undefined' },
+                { name: 'MediaPipeMeasurement', check: () => typeof MediaPipeMeasurement !== 'undefined' }
+            ];
+            
+            const missing = requiredScripts.filter(script => !script.check());
+            
+            if (missing.length > 0) {
+                console.error('Missing MediaPipe components:', missing.map(s => s.name));
+                disableWebcamOption(`Missing components: ${missing.map(s => s.name).join(', ')}`);
+                return false;
+            }
+            
+            console.log('✅ All MediaPipe components loaded successfully');
+            return true;
+        }
 
-        cart[index].design = designDescription;
-        cart[index].designOptions = {
-            collar: collar.value,
-            kurta: kurta.value,
-            bottom: bottom.value,
-            frontPocket: frontPocket.value,
-            sidePocket: sidePocket.value
-        };
+        // Single MediaPipe Initialization Function
+        async function initializeMediaPipe() {
+            if (mediaPipeMeasurement) {
+                console.log('⚠️ MediaPipe already initialized');
+                return true;
+            }
 
-        saveAndUpdateCart();
-        showToast('Design saved successfully!');
-    }
+            try {
+                if (typeof Pose === 'undefined' || typeof Camera === 'undefined') {
+                    throw new Error('MediaPipe libraries not loaded');
+                }
+                
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    throw new Error('Camera not supported in this browser');
+                }
+                
+                if (window.MediaPipeMeasurement) {
+                    mediaPipeMeasurement = new MediaPipeMeasurement();
+                    
+                    try {
+                        const stream = await navigator.mediaDevices.getUserMedia({ 
+                            video: { width: 640, height: 480 } 
+                        });
+                        stream.getTracks().forEach(track => track.stop());
+                        
+                        await mediaPipeMeasurement.initialize();
+                        console.log('✅ MediaPipe initialized successfully');
+                        window.mediaPipeMeasurement = mediaPipeMeasurement;
+                        return true;
+                    } catch (cameraError) {
+                        console.warn('⚠️ Camera test failed:', cameraError);
+                        disableWebcamOption('Camera access failed');
+                        return false;
+                    }
+                } else {
+                    throw new Error('MediaPipeMeasurement class not found');
+                }
+            } catch (error) {
+                console.error('❌ MediaPipe initialization failed:', error);
+                disableWebcamOption(error.message);
+                return false;
+            }
+        }
 
-    function openMeasurementModal(index) {
-        // Store the index for later use
-        document.getElementById('options-measurement-index').value = index;
-        // Show measurement options modal first (AI Webcam or Manual)
-        document.getElementById('measurement-options-modal').classList.add('active');
-    }
+        async function checkCameraPermissions() {
+            try {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    throw new Error('Camera not supported on this device/browser');
+                }
+                
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
+                        facingMode: 'user'
+                    },
+                    audio: false
+                });
+                
+                stream.getTracks().forEach(track => track.stop());
+                console.log('✅ Camera permission granted');
+                return true;
+                
+            } catch (error) {
+                console.error('❌ Camera permission error:', error);
+                
+                if (error.name === 'NotAllowedError') {
+                    showCameraError('Camera permission denied. Please click "Allow" when prompted.');
+                } else if (error.name === 'NotFoundError') {
+                    showCameraError('No camera found. Please connect a camera.');
+                } else if (error.name === 'NotSupportedError') {
+                    showCameraError('Camera not supported on this browser.');
+                } else {
+                    showCameraError('Camera access error: ' + error.message);
+                }
+                
+                return false;
+            }
+        }
 
-    function openManualMeasurementModal(index) {
-        document.getElementById('measurement-item-index').value = index;
+        // Helper Functions for Design Panel
+        function addDesignPanelEventListeners(index) {
+            const designContainer = document.querySelector(`.item-design-container[data-index="${index}"]`);
+            if (!designContainer) return;
 
-        // Pre-fill existing measurements
-        const item = cart[index];
-        if (item.measurements) {
-            document.getElementById('m-chest').value = item.measurements.chest || '';
-            document.getElementById('m-waist').value = item.measurements.waist || '';
-            document.getElementById('m-hip').value = item.measurements.hip || '';
-            document.getElementById('m-shoulder').value = item.measurements.shoulder || '';
-            document.getElementById('m-sleeve').value = item.measurements.sleeve || '';
-            document.getElementById('m-kameez').value = item.measurements.kameez || '';
-            document.getElementById('m-trouser').value = item.measurements.trouser || '';
-            document.getElementById('m-neck').value = item.measurements.neck || '';
-            document.getElementById('m-notes').value = item.measurements.notes || '';
-        } else {
-            // Clear all fields
-            ['m-chest', 'm-waist', 'm-hip', 'm-shoulder', 'm-sleeve', 'm-kameez', 'm-trouser', 'm-neck', 'm-notes'].forEach(id => {
-                document.getElementById(id).value = '';
+            const closeBtn = designContainer.querySelector('.close-design-btn');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function() {
+                    designContainer.innerHTML = '';
+                });
+            }
+
+            // Wizard navigation (10 steps: 9 customization + 1 review)
+            const totalSteps = 10;
+            let currentStep = 1;
+            const steps = designContainer.querySelectorAll('.wizard-step');
+            const dots = designContainer.querySelectorAll('.wizard-step-dot');
+            const progressBar = designContainer.querySelector('.wizard-progress-bar');
+            const prevBtn = designContainer.querySelector('.wizard-prev');
+            const nextBtn = designContainer.querySelector('.wizard-next');
+
+            function goToStep(step) {
+                currentStep = step;
+                steps.forEach(s => s.classList.remove('active'));
+                dots.forEach(d => d.classList.remove('active'));
+
+                const activeStep = designContainer.querySelector(`.wizard-step[data-step="${step}"]`);
+                const activeDot = designContainer.querySelector(`.wizard-step-dot[data-step="${step}"]`);
+                if (activeStep) activeStep.classList.add('active');
+                if (activeDot) activeDot.classList.add('active');
+
+                // Mark completed dots
+                dots.forEach(d => {
+                    const dotStep = parseInt(d.dataset.step);
+                    if (dotStep < step) d.classList.add('completed');
+                    else d.classList.remove('completed');
+                });
+
+                // Update progress bar
+                if (progressBar) progressBar.style.width = ((step / totalSteps) * 100) + '%';
+
+                // Toggle buttons
+                if (prevBtn) prevBtn.disabled = step === 1;
+                if (nextBtn) nextBtn.style.display = step === totalSteps ? 'none' : 'inline-flex';
+
+                // Build review on last step
+                if (step === totalSteps) buildReview();
+            }
+
+            if (prevBtn) prevBtn.addEventListener('click', () => { if (currentStep > 1) goToStep(currentStep - 1); });
+            if (nextBtn) nextBtn.addEventListener('click', () => { if (currentStep < totalSteps) goToStep(currentStep + 1); });
+
+            // Click on dots to jump
+            dots.forEach(dot => {
+                dot.addEventListener('click', () => goToStep(parseInt(dot.dataset.step)));
+            });
+
+            // Auto-advance when option selected
+            designContainer.querySelectorAll('.design-option input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    setTimeout(() => { if (currentStep < totalSteps) goToStep(currentStep + 1); }, 300);
+                });
+            });
+
+            function buildReview() {
+                const reviewContainer = designContainer.querySelector('.wizard-review');
+                if (!reviewContainer) return;
+
+                const labels = {
+                    collar: 'Collar Design', kurta: 'Kameez Style', daman: 'Daman Style',
+                    cuff: 'Cuff Style', placket: 'Button / Placket', bottom: 'Shalwar / Trouser',
+                    front_pocket: 'Front Pocket', side_pocket: 'Side Pockets',
+                    fit_preference: 'Fit Preference'
+                };
+
+                let html = '';
+                Object.keys(labels).forEach(name => {
+                    const checked = designContainer.querySelector(`input[name="${name}"]:checked`);
+                    const value = checked ? checked.value : '<span style="color:var(--gold-color)">Not selected</span>';
+                    html += `<div class="wizard-review-item"><span class="wizard-review-label">${labels[name]}</span><span class="wizard-review-value">${value}</span></div>`;
+                });
+                reviewContainer.innerHTML = html;
+            }
+
+            // Form validation
+            const designForm = designContainer.querySelector('.design-form');
+            if (designForm) {
+                designForm.addEventListener('submit', function(e) {
+                    const requiredFields = ['collar', 'kurta', 'bottom', 'front_pocket', 'side_pocket', 'fit_preference'];
+                    const missingFields = [];
+                    requiredFields.forEach(field => {
+                        if (!designForm.querySelector(`input[name="${field}"]:checked`)) {
+                            missingFields.push(field.replace('_', ' '));
+                        }
+                    });
+                    if (missingFields.length > 0) {
+                        e.preventDefault();
+                        alert(`Please select: ${missingFields.join(', ')}`);
+                    }
+                });
+            }
+        }
+
+        function preSelectDesignOptions(index, designOptions) {
+            const designContainer = document.querySelector(`.item-design-container[data-index="${index}"]`);
+            if (!designContainer) return;
+            
+            Object.keys(designOptions).forEach(key => {
+                const input = designContainer.querySelector(`input[name="${key}"][value="${designOptions[key]}"]`);
+                if (input) {
+                    input.checked = true;
+                }
             });
         }
 
-        document.getElementById('measurement-modal').classList.add('active');
-    }
-
-    function saveMeasurements() {
-        const index = parseInt(document.getElementById('measurement-item-index').value);
-
-        const chest = document.getElementById('m-chest').value;
-        const waist = document.getElementById('m-waist').value;
-        const hip = document.getElementById('m-hip').value;
-
-        // Require at least 3 measurements
-        let filledCount = 0;
-        ['m-chest', 'm-waist', 'm-hip', 'm-shoulder', 'm-sleeve', 'm-kameez', 'm-trouser', 'm-neck'].forEach(id => {
-            if (document.getElementById(id).value) filledCount++;
-        });
-
-        if (filledCount < 3) {
-            alert('Please enter at least 3 measurements');
-            return;
+        function showSuccessMessage(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message';
+            successDiv.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+            
+            const container = document.querySelector('.order-container');
+            if (container) {
+                container.insertBefore(successDiv, container.firstChild);
+            }
+            
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 5000);
         }
 
-        cart[index].measurements = {
-            chest: document.getElementById('m-chest').value,
-            waist: document.getElementById('m-waist').value,
-            hip: document.getElementById('m-hip').value,
-            shoulder: document.getElementById('m-shoulder').value,
-            sleeve: document.getElementById('m-sleeve').value,
-            kameez: document.getElementById('m-kameez').value,
-            trouser: document.getElementById('m-trouser').value,
-            neck: document.getElementById('m-neck').value,
-            notes: document.getElementById('m-notes').value
-        };
-        cart[index].hasMeasurements = true;
-
-        saveAndUpdateCart();
-        document.getElementById('measurement-modal').classList.remove('active');
-        showToast('Measurements saved successfully!');
-    }
-
-    function addToFinalCart(index) {
-        const item = cart[index];
-
-        if (!item.design || !item.hasMeasurements) {
-            alert('Please complete both design and measurements before adding to cart.');
-            return;
+        function showMeasurementSuccessNotification(message, accuracy) {
+            const notification = document.createElement('div');
+            notification.className = 'measurement-success-notification';
+            notification.innerHTML = `
+                <div style="font-weight: 600;">
+                    <i class="fas fa-check-circle"></i> ${message}
+                </div>
+                ${accuracy ? `<div style="font-size: 12px; margin-top: 5px;">Accuracy: ${accuracy}%</div>` : ''}
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease-in';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
         }
 
-        // Get or create final cart
-        let finalCart = JSON.parse(localStorage.getItem('finalCart')) || [];
-
-        // Check if item already exists in final cart
-        const existingIndex = finalCart.findIndex(ci => ci.id === item.id && ci.design === item.design);
-
-        if (existingIndex >= 0) {
-            finalCart[existingIndex].quantity += item.quantity;
-        } else {
-            finalCart.push({...item});
+        function displayWebcamMeasurements(measurements) {
+            const resultsDiv = document.getElementById('webcam-results');
+            if (!resultsDiv) {
+                console.error('❌ Webcam results div not found');
+                return;
+            }
+            
+            console.log('📊 Displaying measurements:', measurements);
+            
+            // Fill measurement inputs
+            Object.entries(measurements).forEach(([key, data]) => {
+                const input = document.getElementById(`webcam-${key}`);
+                if (input && data && data.value) {
+                    input.value = data.value.toFixed(1);
+                    console.log(`✅ Set ${key}: ${data.value.toFixed(1)}`);
+                }
+            });
+            
+            resultsDiv.style.display = 'block';
+            
+            // Remove existing save button to avoid duplicates
+            const existingBtn = document.getElementById('save-webcam-measurements-btn');
+            if (existingBtn) {
+                existingBtn.remove();
+            }
+            
+            // Add new save button
+            const saveBtn = document.createElement('button');
+            saveBtn.id = 'save-webcam-measurements-btn';
+            saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Measurements';
+            saveBtn.style.cssText = `
+                background: linear-gradient(135deg, var(--gold-color) 0%, #A68B52 100%);
+                color: white;
+                border: none;
+                padding: 12px 20px;
+                border-radius: 8px;
+                cursor: pointer;
+                margin: 15px auto;
+                display: block;
+                font-size: 16px;
+                transition: all 0.3s ease;
+            `;
+            saveBtn.onclick = () => saveWebcamMeasurements(measurements);
+            resultsDiv.appendChild(saveBtn);
         }
 
-        // Save final cart
-        localStorage.setItem('finalCart', JSON.stringify(finalCart));
+        function saveWebcamMeasurements(measurements) {
+            console.log('💾 Starting save process...');
+            
+            if (!measurements || typeof measurements !== 'object') {
+                alert('No valid measurements to save');
+                return;
+            }
+            
+            if (!currentMeasurementIndex && currentMeasurementIndex !== 0) {
+                alert('Error: No item selected for measurements');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('action', 'save_measurements');
+            formData.append('index', currentMeasurementIndex);
+            formData.append('source', 'ai_webcam');
+            formData.append('csrf_token', 'c1830a8216de6bba7598e19ce5c97008de0e428e3fc4443b257914a8268fe6bb');
+            
+            let validMeasurementCount = 0;
+            
+            // FIXED: Extract individual values from measurement objects
+            Object.entries(measurements).forEach(([key, data]) => {
+                if (data && typeof data === 'object' && data.value && data.value > 0) {
+                    // Send only the value, not the entire object
+                    formData.append(key, data.value.toString());
+                    formData.append(`${key}_confidence`, (data.confidence || 0.8).toString());
+                    validMeasurementCount++;
+                }
+            });
+            
+            if (validMeasurementCount < 3) {
+                alert(`Only ${validMeasurementCount} valid measurements found. At least 3 required.`);
+                return;
+            }
+            
+            const saveBtn = document.getElementById('save-webcam-measurements-btn');
+            if (saveBtn) {
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            }
+            
+            fetch(window.location.href, {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => response.text())
+            .then(responseText => {
+                try {
+                    const data = JSON.parse(responseText.trim());
+                    if (data.success) {
+                        alert('AI measurements saved successfully!');
+                        document.getElementById('webcam-measurement-modal').style.display = 'none';
+                        location.reload();
+                    } else {
+                        alert('Save failed: ' + (data.message || 'Unknown error'));
+                    }
+                } catch (error) {
+                    console.error('JSON Parse Error:', error);
+                    alert('Server error. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Request failed:', error);
+                alert('Failed to save measurements: ' + error.message);
+            })
+            .finally(() => {
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Measurements';
+                }
+            });
+        }
 
-        // Remove from shopping cart
-        cart.splice(index, 1);
-        saveAndUpdateCart();
+        // DOM Content Loaded Event (Main Initialization)
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 DOM Content Loaded - Starting initialization...');
+            
+            // Single MediaPipe initialization with delay
+            setTimeout(() => {
+                console.log('⏰ Starting MediaPipe check and init...');
+                if (checkMediaPipeScripts()) {
+                    initializeMediaPipe();
+                }
+            }, 2000);
+            
+            // Side navigation functionality
+            const sideNavToggle = document.querySelector('.menu-toggle');
+            const sideNav = document.querySelector('.side-nav');
+            const sideNavBackdrop = document.querySelector('.side-nav-backdrop');
+            const sideNavClose = document.querySelector('.close-sidenav');
+            
+            // Get design template
+            const designOptionsTemplate = document.getElementById('design-options-template');
+            let designTemplateHTML = '';
+            if (designOptionsTemplate) {
+                designTemplateHTML = designOptionsTemplate.innerHTML;
+            }
+            
+            // Quantity buttons
+            document.querySelectorAll('.quantity-btn.decrease').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = this.dataset.index;
+                    const form = document.getElementById(`decrease-form-${index}`);
+                    if (form) form.submit();
+                });
+            });
+            
+            document.querySelectorAll('.quantity-btn.increase').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = this.dataset.index;
+                    const form = document.getElementById(`increase-form-${index}`);
+                    if (form) form.submit();
+                });
+            });
+            
+            // Customize item buttons
+            document.querySelectorAll('.customize-item-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const index = parseInt(btn.dataset.index);
+                    const itemContainer = document.querySelector(`.item-design-container[data-index="${index}"]`);
+                    
+                    if (!itemContainer) {
+                        console.error('Design container not found for index:', index);
+                        return;
+                    }
+                    
+                    const existingPanel = itemContainer.querySelector('.item-design-options');
+                    if (existingPanel) {
+                        existingPanel.style.display = existingPanel.style.display === 'none' ? 'block' : 'none';
+                    } else {
+                        if (designTemplateHTML) {
+                            let designPanel = designTemplateHTML.replace(/ITEMID/g, index);
+                            itemContainer.innerHTML = designPanel;
+                            
+                            addDesignPanelEventListeners(index);
+                            
+                                                    }
+                    }
+                });
+            });
 
-        showToast(`${item.name} added to cart!`);
-    }
-
-    function saveAndUpdateCart() {
-        localStorage.setItem('shoppingCart', JSON.stringify(cart));
-        displayCart();
-    }
-
-    function updateCartCount() {
-        const cartCountEl = document.querySelector('.cart-count');
-        const myorderCountEl = document.querySelector('.myorder-count');
-        const shoppingCart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
-        const finalCart = JSON.parse(localStorage.getItem('finalCart')) || [];
-
-        // My Order count - items waiting for customization
-        let myOrderTotal = 0;
-        shoppingCart.forEach(item => myOrderTotal += item.quantity || 1);
-        if (myorderCountEl) myorderCountEl.textContent = myOrderTotal;
-
-        // Cart count - only customized items ready for checkout
-        let cartTotal = 0;
-        finalCart.forEach(item => cartTotal += item.quantity || 1);
-        if (cartCountEl) cartCountEl.textContent = cartTotal;
-    }
-
-    function showToast(message) {
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    }
-
-    // ===== MediaPipe Webcam Measurement Functionality =====
-    let mediaPipeMeasurement = null;
-    let userHeightInches = 66; // Default 5'6"
-
-    // Initialize MediaPipe event listeners
-    document.addEventListener('DOMContentLoaded', function() {
-        // Webcam measurement option click
-        document.getElementById('webcam-measurement-option').addEventListener('click', function() {
-            const index = document.getElementById('options-measurement-index').value;
-            document.getElementById('webcam-measurement-item-index').value = index;
-            document.getElementById('measurement-options-modal').classList.remove('active');
-            document.getElementById('webcam-measurement-modal').classList.add('active');
-
-            // Reset webcam modal state
-            resetWebcamModal();
-        });
-
-        // Manual measurement option click
-        document.getElementById('manual-measurement-option').addEventListener('click', function() {
-            const index = document.getElementById('options-measurement-index').value;
-            document.getElementById('measurement-options-modal').classList.remove('active');
-            openManualMeasurementModal(parseInt(index));
-        });
-
-        // Set height button
-        document.getElementById('set-height-btn').addEventListener('click', function() {
-            const feet = parseInt(document.getElementById('height-feet').value);
-            const inches = parseInt(document.getElementById('height-inches').value);
-            userHeightInches = (feet * 12) + inches;
-
-            if (mediaPipeMeasurement) {
-                mediaPipeMeasurement.setUserHeight(userHeightInches);
+            // Measurement modal functionality
+            const measurementOptionsModal = document.getElementById('measurement-options-modal');
+            const manualMeasurementModal = document.getElementById('manual-measurement-modal');
+            const webcamMeasurementModal = document.getElementById('webcam-measurement-modal');
+            
+            // Open measurement options
+            document.querySelectorAll('.measurement-btn, .edit-measurements').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    currentMeasurementIndex = this.getAttribute('data-index');
+                    console.log('📏 Opening measurement modal for index:', currentMeasurementIndex);
+                    
+                    if (measurementOptionsModal) {
+                        measurementOptionsModal.style.display = 'flex';
+                    }
+                });
+            });
+            
+            // Manual measurement option
+            const manualMeasurementOption = document.getElementById('manual-measurement-option');
+            if (manualMeasurementOption) {
+                manualMeasurementOption.addEventListener('click', function() {
+                    if (measurementOptionsModal) measurementOptionsModal.style.display = 'none';
+                    if (manualMeasurementModal) {
+                        manualMeasurementModal.style.display = 'flex';
+                        
+                        const itemIndexField = document.getElementById('measurement-item-index');
+                        const formIndexField = document.getElementById('measurement-form-index');
+                        
+                        if (itemIndexField) itemIndexField.value = currentMeasurementIndex;
+                        if (formIndexField) formIndexField.value = currentMeasurementIndex;
+                        
+                                            }
+                });
+            }
+            
+            // Webcam measurement option
+            const webcamMeasurementOption = document.getElementById('webcam-measurement-option');
+            if (webcamMeasurementOption) {
+                webcamMeasurementOption.addEventListener('click', async function() {
+                    const originalHTML = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                    this.disabled = true;
+                    
+                    try {
+                        console.log('📷 Starting webcam measurement process...');
+                        
+                        const hasPermission = await checkCameraPermissions();
+                        if (!hasPermission) {
+                            throw new Error('Camera permission denied');
+                        }
+                        
+                        if (measurementOptionsModal) {
+                            measurementOptionsModal.style.display = 'none';
+                        }
+                        
+                        if (webcamMeasurementModal) {
+                            webcamMeasurementModal.style.display = 'flex';
+                            
+                            const webcamIndexField = document.getElementById('webcam-measurement-item-index');
+                            if (webcamIndexField) {
+                                webcamIndexField.value = currentMeasurementIndex;
+                                console.log('📏 Set webcam measurement index:', currentMeasurementIndex);
+                            }
+                            
+                            if (!mediaPipeMeasurement) {
+                                console.log('🔄 Initializing MediaPipe for webcam...');
+                                mediaPipeMeasurement = new MediaPipeMeasurement();
+                                await mediaPipeMeasurement.initialize();
+                            }
+                            
+                            console.log('✅ Webcam modal opened successfully');
+                        }
+                    } catch (error) {
+                        console.error('❌ Error opening webcam modal:', error);
+                        showCameraError('Failed to initialize camera: ' + error.message);
+                    } finally {
+                        this.innerHTML = originalHTML;
+                        this.disabled = false;
+                    }
+                });
             }
 
-            showToast(`Height set to ${feet}' ${inches}"`);
-        });
-
-        // Start camera button
-        document.getElementById('start-camera-btn').addEventListener('click', async function() {
+            // Preload last-used height from localStorage so repeat users don't re-enter
             try {
-                // Initialize MediaPipe if not already done
-                if (!mediaPipeMeasurement) {
-                    mediaPipeMeasurement = new MediaPipeMeasurement();
+                const savedHeight = parseInt(localStorage.getItem('userHeightInches') || '0', 10);
+                if (savedHeight >= 48 && savedHeight <= 84) {
+                    document.getElementById('user-height-feet').value = Math.floor(savedHeight / 12);
+                    document.getElementById('user-height-inches').value = savedHeight % 12;
+                }
+            } catch (_) {}
+
+            // Camera control buttons
+            document.getElementById('start-camera-btn')?.addEventListener('click', async function() {
+                try {
+                    // Read and validate user height before starting
+                    const ft = parseInt(document.getElementById('user-height-feet').value, 10);
+                    const inch = parseInt(document.getElementById('user-height-inches').value, 10);
+                    if (isNaN(ft) || ft < 4 || ft > 7 || isNaN(inch) || inch < 0 || inch > 11) {
+                        alert('Please enter a valid height between 4\'0" and 7\'11".');
+                        return;
+                    }
+                    const userHeightInches = ft * 12 + inch;
+                    try { localStorage.setItem('userHeightInches', String(userHeightInches)); } catch (_) {}
+
+                    this.disabled = true;
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Starting Camera...';
+
+                    console.log('📹 Starting camera... (user height: ' + userHeightInches + ' inches)');
+
+                    const hasPermission = await checkCameraPermissions();
+                    if (!hasPermission) {
+                        throw new Error('Camera permission denied');
+                    }
+
+                    if (!mediaPipeMeasurement) {
+                        console.log('🔄 Creating new MediaPipe instance...');
+                        mediaPipeMeasurement = new MediaPipeMeasurement();
+                        await mediaPipeMeasurement.initialize();
+                    }
+
+                    // Apply the real user height BEFORE camera starts (calibration depends on this)
                     mediaPipeMeasurement.setUserHeight(userHeightInches);
-                    await mediaPipeMeasurement.initialize();
+
+                    await mediaPipeMeasurement.startCamera('webcam-video');
+
+                    this.style.display = 'none';
+                    document.getElementById('stop-camera-btn').style.display = 'inline-flex';
+                    document.getElementById('capture-measurement-btn').style.display = 'inline-flex';
+                    document.getElementById('countdown-capture-btn').style.display = 'inline-flex';
+
+                    // Start background auto-capture monitor (fires once when measurements stable)
+                    startAutoCaptureMonitor();
+
+                    console.log('✅ Camera started successfully');
+                    
+                } catch (error) {
+                    console.error('❌ Camera start failed:', error);
+                    
+                    if (error.message.includes('permission') || error.name === 'NotAllowedError') {
+                        showCameraError('Camera access denied. Please allow camera permissions and refresh the page.');
+                    } else if (error.name === 'NotFoundError') {
+                        showCameraError('No camera found. Please connect a camera and try again.');
+                    } else if (error.name === 'NotSupportedError') {
+                        showCameraError('Camera not supported on this browser. Please try Chrome or Firefox.');
+                    } else {
+                        showCameraError('Camera error: ' + error.message);
+                    }
+                    
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fas fa-camera"></i> Start Camera';
                 }
+            });
 
-                // Start camera with video element ID
-                await mediaPipeMeasurement.startCamera('webcam-video');
+            document.getElementById('stop-camera-btn')?.addEventListener('click', function() {
+                console.log('🛑 Stopping camera...');
 
-                // Update button visibility
-                document.getElementById('start-camera-btn').style.display = 'none';
-                document.getElementById('stop-camera-btn').style.display = 'inline-flex';
-                document.getElementById('capture-measurement-btn').style.display = 'inline-flex';
+                // Clean up timers first
+                stopAutoCaptureMonitor();
+                cancelCountdown();
 
-            } catch (error) {
-                console.error('Camera error:', error);
-                showToast('Error accessing camera. Please check permissions.');
-            }
-        });
-
-        // Stop camera button
-        document.getElementById('stop-camera-btn').addEventListener('click', function() {
-            if (mediaPipeMeasurement) {
-                mediaPipeMeasurement.stopCamera();
-            }
-
-            document.getElementById('start-camera-btn').style.display = 'inline-flex';
-            document.getElementById('stop-camera-btn').style.display = 'none';
-            document.getElementById('capture-measurement-btn').style.display = 'none';
-            document.getElementById('pose-indicator').textContent = 'Camera stopped';
-        });
-
-        // Capture measurement button
-        document.getElementById('capture-measurement-btn').addEventListener('click', function() {
-            if (mediaPipeMeasurement && mediaPipeMeasurement.isCalibrated) {
-                const measurements = mediaPipeMeasurement.getSimpleMeasurements();
-
-                if (Object.keys(measurements).length > 0) {
-                    displayWebcamMeasurements(measurements);
-
-                    // Stop camera after capture
+                if (mediaPipeMeasurement) {
                     mediaPipeMeasurement.stopCamera();
-
-                    // Update buttons
-                    document.getElementById('start-camera-btn').style.display = 'none';
-                    document.getElementById('stop-camera-btn').style.display = 'none';
-                    document.getElementById('capture-measurement-btn').style.display = 'none';
-                    document.getElementById('retake-measurement-btn').style.display = 'inline-flex';
-
-                    // Show results
-                    document.getElementById('webcam-results').style.display = 'block';
-                } else {
-                    showToast('No measurements detected yet. Please wait for calibration.');
                 }
-            } else {
-                showToast('Please wait for calibration to complete');
+
+                document.getElementById('start-camera-btn').style.display = 'inline-flex';
+                document.getElementById('start-camera-btn').disabled = false;
+                document.getElementById('start-camera-btn').innerHTML = '<i class="fas fa-camera"></i> Start Camera';
+
+                this.style.display = 'none';
+                document.getElementById('capture-measurement-btn').style.display = 'none';
+                document.getElementById('countdown-capture-btn').style.display = 'none';
+                document.getElementById('retake-measurement-btn').style.display = 'none';
+                
+                const resultsDiv = document.getElementById('webcam-results');
+                if (resultsDiv) {
+                    resultsDiv.style.display = 'none';
+                }
+                
+                console.log('✅ Camera stopped and UI reset');
+            });
+
+            // ===== Auto-capture + Countdown helpers =====
+            let autoCaptureMonitor = null;
+            let autoCaptureFired = false;
+            let stableSince = null;
+            let lastSnapshot = null;
+            let countdownTimer = null;
+
+            // Short beep using Web Audio API (no asset file needed)
+            function beep(freq = 880, durationMs = 150) {
+                try {
+                    const Ctx = window.AudioContext || window.webkitAudioContext;
+                    if (!Ctx) return;
+                    const ctx = new Ctx();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+                    gain.gain.value = 0.15;
+                    osc.connect(gain).connect(ctx.destination);
+                    osc.start();
+                    setTimeout(() => { osc.stop(); ctx.close(); }, durationMs);
+                } catch (_) {}
             }
-        });
 
-        // Retake measurement button
-        document.getElementById('retake-measurement-btn').addEventListener('click', async function() {
-            document.getElementById('webcam-results').style.display = 'none';
-            document.getElementById('retake-measurement-btn').style.display = 'none';
-            document.getElementById('start-camera-btn').style.display = 'inline-flex';
-
-            // Reset MediaPipe for new measurement
-            if (mediaPipeMeasurement) {
-                mediaPipeMeasurement = null;
+            // Compare two measurement snapshots — are they within 0.3" of each other on every field?
+            function measurementsStable(a, b) {
+                if (!a || !b) return false;
+                const keys = ['shoulder','chest','hip','waist','sleeve_length','kameez_length','trouser_length','neck'];
+                for (const k of keys) {
+                    const av = a[k]?.value ?? null;
+                    const bv = b[k]?.value ?? null;
+                    if (av === null || bv === null) return false;
+                    if (Math.abs(av - bv) > 0.3) return false;
+                }
+                return true;
             }
-        });
 
-        // Save webcam measurements button
-        document.getElementById('save-webcam-measurements-btn').addEventListener('click', function() {
-            saveWebcamMeasurements();
-        });
+            // Perform the actual capture — fills input fields, does NOT save
+            function performCapture() {
+                if (!mediaPipeMeasurement || !mediaPipeMeasurement.isCalibrated) return false;
+                const measurements = mediaPipeMeasurement.getCurrentMeasurements();
+                const valid = Object.entries(measurements).filter(([k, d]) => d && d.value > 0);
+                if (valid.length < 3) return false;
 
-        // Close webcam modal - stop camera
-        document.getElementById('close-webcam-modal').addEventListener('click', function() {
-            if (mediaPipeMeasurement) {
-                mediaPipeMeasurement.stopCamera();
-                mediaPipeMeasurement = null;
+                displayWebcamMeasurements(measurements);
+                beep(1200, 200); // success tone
+                stopAutoCaptureMonitor();
+
+                // Toggle UI — hide the capture buttons, show Retake
+                document.getElementById('capture-measurement-btn').style.display = 'none';
+                document.getElementById('countdown-capture-btn').style.display = 'none';
+                document.getElementById('auto-capture-status').style.display = 'none';
+                document.getElementById('retake-measurement-btn').style.display = 'inline-flex';
+                return true;
             }
-            document.getElementById('webcam-measurement-modal').classList.remove('active');
-            resetWebcamModal();
+
+            function startAutoCaptureMonitor() {
+                stopAutoCaptureMonitor();
+                autoCaptureFired = false;
+                stableSince = null;
+                lastSnapshot = null;
+
+                const statusEl = document.getElementById('auto-capture-status');
+                const countdownEl = document.getElementById('auto-capture-countdown');
+
+                autoCaptureMonitor = setInterval(() => {
+                    if (autoCaptureFired || !mediaPipeMeasurement || !mediaPipeMeasurement.isCalibrated) return;
+                    const current = mediaPipeMeasurement.getCurrentMeasurements();
+                    if (!current || Object.keys(current).length < 8) return;
+
+                    if (measurementsStable(lastSnapshot, current)) {
+                        if (stableSince === null) stableSince = Date.now();
+                        const elapsed = (Date.now() - stableSince) / 1000;
+                        const remaining = Math.max(0, Math.ceil(3 - elapsed));
+
+                        statusEl.style.display = 'block';
+                        countdownEl.textContent = remaining;
+
+                        if (elapsed >= 3) {
+                            autoCaptureFired = true;
+                            performCapture();
+                        }
+                    } else {
+                        stableSince = null;
+                        statusEl.style.display = 'none';
+                    }
+                    lastSnapshot = current;
+                }, 500);
+            }
+
+            function stopAutoCaptureMonitor() {
+                if (autoCaptureMonitor) { clearInterval(autoCaptureMonitor); autoCaptureMonitor = null; }
+                document.getElementById('auto-capture-status').style.display = 'none';
+            }
+
+            // 10-second countdown capture (user steps back after clicking)
+            function startCountdownCapture() {
+                if (countdownTimer) return;
+                if (!mediaPipeMeasurement || !mediaPipeMeasurement.isCalibrated) {
+                    alert('Wait for calibration to complete first (hold still ~5 seconds).');
+                    return;
+                }
+                const overlay = document.getElementById('countdown-overlay');
+                const numEl = document.getElementById('countdown-number');
+                let n = 10;
+                overlay.style.display = 'block';
+                numEl.textContent = n;
+                beep(600, 120);
+
+                countdownTimer = setInterval(() => {
+                    n -= 1;
+                    if (n <= 0) {
+                        clearInterval(countdownTimer); countdownTimer = null;
+                        overlay.style.display = 'none';
+                        performCapture();
+                        return;
+                    }
+                    numEl.textContent = n;
+                    beep(n <= 3 ? 1000 : 600, n <= 3 ? 180 : 100);
+                }, 1000);
+            }
+
+            function cancelCountdown() {
+                if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+                document.getElementById('countdown-overlay').style.display = 'none';
+            }
+
+            document.getElementById('countdown-capture-btn')?.addEventListener('click', startCountdownCapture);
+            document.getElementById('cancel-countdown-btn')?.addEventListener('click', cancelCountdown);
+
+            document.getElementById('capture-measurement-btn')?.addEventListener('click', function() {
+                console.log('📸 Capture button clicked');
+
+                if (!mediaPipeMeasurement) {
+                    alert('AI system not initialized. Please restart camera.');
+                    return;
+                }
+
+                if (!mediaPipeMeasurement.isCalibrated) {
+                    alert('Please wait for calibration to complete. Stand still in front of camera for 5 seconds.');
+                    return;
+                }
+
+                const measurements = mediaPipeMeasurement.getCurrentMeasurements();
+
+                if (measurements && Object.keys(measurements).length > 0) {
+                    const validMeasurements = Object.entries(measurements).filter(([key, data]) =>
+                        data && data.value && data.value > 0
+                    );
+
+                    if (validMeasurements.length >= 3) {
+                        performCapture();
+                    } else {
+                        alert(`Only ${validMeasurements.length} valid measurements detected. Please ensure proper pose and try again.`);
+                    }
+                } else {
+                    alert('No measurements detected. Please ensure proper pose, good lighting, and stand still.');
+                }
+            });
+
+            document.getElementById('retake-measurement-btn')?.addEventListener('click', function() {
+                console.log('🔄 Retaking measurements...');
+                document.getElementById('webcam-results').style.display = 'none';
+                document.getElementById('capture-measurement-btn').style.display = 'inline-flex';
+                document.getElementById('countdown-capture-btn').style.display = 'inline-flex';
+                this.style.display = 'none';
+                // Restart auto-capture monitor for the retake
+                startAutoCaptureMonitor();
+            });
+
+            // Close modal functionality
+            document.querySelectorAll('.close-modal').forEach(closeBtn => {
+                closeBtn.addEventListener('click', function() {
+                    const modal = this.closest('.modal');
+                    if (modal) {
+                        if (mediaPipeMeasurement) {
+                            mediaPipeMeasurement.stopCamera();
+                        }
+                        modal.style.display = 'none';
+                    }
+                });
+            });
+
+            // Manual measurement form submission
+            const measurementForm = document.getElementById('measurement-form');
+            // Manual measurement form submission
+            if (measurementForm) {
+                measurementForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    console.log('📝 Submitting manual measurements...');
+                    
+                    const formData = new FormData(this);
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                    }
+                    
+                    fetch(window.location.href, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        }
+                        return response.text();
+                    })
+                    .then(responseText => {
+                        try {
+                            const data = JSON.parse(responseText.trim());
+                            
+                            if (data.success) {
+                                showMeasurementSuccessNotification(data.message, data.accuracy);
+                                manualMeasurementModal.style.display = 'none';
+                                setTimeout(() => location.reload(), 1500);
+                            } else {
+                                alert(data.message || 'Error saving measurements');
+                            }
+                        } catch (jsonError) {
+                            console.error('JSON Parse Error:', jsonError);
+                            alert('Server error. Please try again.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error saving measurements:', error);
+                        alert('Failed to save measurements. Please try again.');
+                    })
+                    .finally(() => {
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Measurements';
+                        }
+                    });
+                });
+            }
+
+            // Add to cart functionality
+            document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = this.dataset.index;
+                    const hasDesign = !this.classList.contains('disabled');
+                    
+                    if (!hasDesign) {
+                        alert('Please complete both design and measurements before adding to cart.');
+                        return;
+                    }
+                    
+                    const formData = new FormData();
+                    formData.append('action', 'add_to_final_cart');
+                    formData.append('index', index);
+                    
+                    fetch(window.location.href, {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showSuccessMessage(data.message);
+                            const cartCountElement = document.querySelector('.cart-count');
+                            if (cartCountElement) {
+                                cartCountElement.textContent = data.cartCount;
+                            }
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            alert(data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error adding to cart:', error);
+                        alert('Failed to add item to cart');
+                    });
+                });
+            });
+
+            // Back to top functionality
+            const backToTopBtn = document.querySelector('.back-to-top');
+            if (backToTopBtn) {
+                window.addEventListener('scroll', function() {
+                    if (window.pageYOffset > 300) {
+                        backToTopBtn.classList.add('show');
+                    } else {
+                        backToTopBtn.classList.remove('show');
+                    }
+                });
+                
+                backToTopBtn.addEventListener('click', function() {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
+            }
+
+            console.log('✅ All event listeners initialized successfully');
         });
-    });
-
-    function displayWebcamMeasurements(measurements) {
-        document.getElementById('webcam-shoulder').value = measurements.shoulder || '';
-        document.getElementById('webcam-chest').value = measurements.chest || '';
-        document.getElementById('webcam-waist').value = measurements.waist || '';
-        document.getElementById('webcam-hip').value = measurements.hip || '';
-        document.getElementById('webcam-sleeve_length').value = measurements.sleeve_length || '';
-        document.getElementById('webcam-kameez_length').value = measurements.kameez_length || '';
-        document.getElementById('webcam-trouser_length').value = measurements.trouser_length || '';
-        document.getElementById('webcam-neck').value = measurements.neck || '';
-    }
-
-    function saveWebcamMeasurements() {
-        const index = parseInt(document.getElementById('webcam-measurement-item-index').value);
-
-        if (isNaN(index) || !cart[index]) {
-            showToast('Error: Item not found');
-            return;
-        }
-
-        // Get measurements from webcam results
-        const measurements = {
-            shoulder: document.getElementById('webcam-shoulder').value,
-            chest: document.getElementById('webcam-chest').value,
-            waist: document.getElementById('webcam-waist').value,
-            hip: document.getElementById('webcam-hip').value,
-            sleeve: document.getElementById('webcam-sleeve_length').value,
-            kameez: document.getElementById('webcam-kameez_length').value,
-            trouser: document.getElementById('webcam-trouser_length').value,
-            neck: document.getElementById('webcam-neck').value,
-            notes: 'AI Webcam Measurement'
-        };
-
-        // Save to cart item
-        cart[index].measurements = measurements;
-        cart[index].hasMeasurements = true;
-
-        saveAndUpdateCart();
-
-        // Close modal and reset
-        document.getElementById('webcam-measurement-modal').classList.remove('active');
-        resetWebcamModal();
-
-        showToast('AI Measurements saved successfully!');
-    }
-
-    function resetWebcamModal() {
-        // Reset buttons
-        document.getElementById('start-camera-btn').style.display = 'inline-flex';
-        document.getElementById('stop-camera-btn').style.display = 'none';
-        document.getElementById('capture-measurement-btn').style.display = 'none';
-        document.getElementById('capture-measurement-btn').disabled = true;
-        document.getElementById('capture-measurement-btn').style.background = 'linear-gradient(135deg, #6c757d 0%, #5a6268 100%)';
-        document.getElementById('retake-measurement-btn').style.display = 'none';
-
-        // Reset results
-        document.getElementById('webcam-results').style.display = 'none';
-
-        // Reset status
-        document.getElementById('pose-indicator').textContent = 'Click Start Camera to begin';
-        document.getElementById('distance-fill').style.width = '0%';
-        document.getElementById('distance-text').textContent = 'Waiting...';
-
-        currentWebcamMeasurements = null;
-    }
     </script>
 </body>
 </html>

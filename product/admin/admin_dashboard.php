@@ -2,52 +2,49 @@
 <?php
 require_once '../db_connection.php';
 session_start();
+require_once 'admin_auth.php';
+requireAdmin(); // any logged-in admin may see the dashboard; role filters menu items below
 
-// Check if user is logged in as admin
-if (!isset($_SESSION['admin_id'])) {
-    header("Location: ../admin_login.php");
-    exit();
-}
-
-// Get admin data
 $admin_id = $_SESSION['admin_id'];
 $admin_username = $_SESSION['admin_username'];
 
-// Get overall statistics
-$totalOrders = 0;
-$totalProducts = 0;
-$totalCustomers = 0;
+// Aggregate stats — single query batch for dashboard cards
+$stats = [
+    'total_products'  => 0,
+    'total_customers' => 0,
+    'total_orders'    => 0,
+    'pending_orders'  => 0,
+    'open_tickets'    => 0,
+    'revenue'         => 0.0,
+];
+
+if ($r = $conn->query("SELECT COUNT(*) AS c FROM products")->fetch_assoc()) {
+    $stats['total_products'] = (int)$r['c'];
+}
+if ($r = $conn->query("SELECT COUNT(*) AS c FROM users")->fetch_assoc()) {
+    $stats['total_customers'] = (int)$r['c'];
+}
+if ($r = $conn->query("SELECT COUNT(*) AS c FROM orders")->fetch_assoc()) {
+    $stats['total_orders'] = (int)$r['c'];
+}
+if ($r = $conn->query("SELECT COUNT(*) AS c FROM orders WHERE status = 'pending'")->fetch_assoc()) {
+    $stats['pending_orders'] = (int)$r['c'];
+}
+if ($r = $conn->query("SELECT COUNT(*) AS c FROM contact_messages WHERE status IN ('open','in_progress')")->fetch_assoc()) {
+    $stats['open_tickets'] = (int)$r['c'];
+}
+// Revenue = sum of non-cancelled orders
+if ($r = $conn->query("SELECT COALESCE(SUM(total_amount),0) AS s FROM orders WHERE status <> 'cancelled'")->fetch_assoc()) {
+    $stats['revenue'] = (float)$r['s'];
+}
+
+// Recent orders (guard against null user_id — guest checkout)
 $recentOrders = [];
-
-// Get total products count
-$sql = "SELECT COUNT(*) AS total FROM products";
-$result = $conn->query($sql);
-if ($result) {
-    $row = $result->fetch_assoc();
-    $totalProducts = $row['total'];
-}
-
-// Get total customers count
-$sql = "SELECT COUNT(*) AS total FROM users";
-$result = $conn->query($sql);
-if ($result) {
-    $row = $result->fetch_assoc();
-    $totalCustomers = $row['total'];
-}
-
-// Get total orders count
-$sql = "SELECT COUNT(*) AS total FROM orders";
-$result = $conn->query($sql);
-if ($result) {
-    $row = $result->fetch_assoc();
-    $totalOrders = $row['total'];
-}
-
-// Get recent orders
-$sql = "SELECT o.id, o.order_date, o.total_amount, o.status, u.name as customer_name 
-        FROM orders o 
-        JOIN users u ON o.user_id = u.id 
-        ORDER BY o.order_date DESC 
+$sql = "SELECT o.id, o.order_date, o.total_amount, o.status,
+               COALESCE(u.name, o.name) AS customer_name
+        FROM orders o
+        LEFT JOIN users u ON o.user_id = u.id
+        ORDER BY o.order_date DESC
         LIMIT 5";
 $result = $conn->query($sql);
 if ($result) {
@@ -63,6 +60,7 @@ if ($result) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Stitch House</title>
+    <link rel="stylesheet" href="../variables.css">
     <link rel="stylesheet" href="../admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;500;600;700&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
@@ -81,6 +79,7 @@ if ($result) {
                         <span>Dashboard</span>
                     </a>
                 </div>
+                <?php if (adminHasRole(['order_manager'])): ?>
                 <div class="admin-menu-item">
                     <a href="admin_products.php">
                         <i class="fas fa-box"></i>
@@ -99,12 +98,23 @@ if ($result) {
                         <span>Customers</span>
                     </a>
                 </div>
+                <?php endif; ?>
+                <?php if (adminHasRole(['support'])): ?>
+                <div class="admin-menu-item">
+                    <a href="admin_tickets.php">
+                        <i class="fas fa-life-ring"></i>
+                        <span>Support Tickets</span>
+                    </a>
+                </div>
+                <?php endif; ?>
+                <?php if (adminHasRole([])): // super only ?>
                 <div class="admin-menu-item">
                     <a href="admin_settings.php">
                         <i class="fas fa-cog"></i>
                         <span>Settings</span>
                     </a>
                 </div>
+                <?php endif; ?>
                 <div class="admin-menu-item">
                     <a href="../admin_logout.php">
                         <i class="fas fa-sign-out-alt"></i>
@@ -133,44 +143,66 @@ if ($result) {
             <!-- Stats Cards -->
             <div class="stats-container">
                 <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-shopping-bag"></i>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-shopping-bag"></i></div>
                     <div class="stat-info">
                         <h3>Total Products</h3>
-                        <p><?php echo $totalProducts; ?></p>
+                        <p><?php echo $stats['total_products']; ?></p>
                     </div>
                 </div>
 
                 <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-shopping-cart"></i>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
                     <div class="stat-info">
                         <h3>Total Orders</h3>
-                        <p><?php echo $totalOrders; ?></p>
+                        <p><?php echo $stats['total_orders']; ?></p>
                     </div>
                 </div>
 
                 <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
                     <div class="stat-info">
                         <h3>Total Customers</h3>
-                        <p><?php echo $totalCustomers; ?></p>
+                        <p><?php echo $stats['total_customers']; ?></p>
                     </div>
                 </div>
 
                 <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-money-bill-wave"></i>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div>
                     <div class="stat-info">
                         <h3>Revenue</h3>
-                        <p>₨ <?php echo number_format(15000, 0); ?></p>
+                        <p>PKR <?php echo number_format($stats['revenue'], 0); ?></p>
                     </div>
                 </div>
+
+                <?php if (adminHasRole(['order_manager'])): ?>
+                <div class="stat-card" style="border-left: 4px solid #8B6914;">
+                    <div class="stat-icon" style="background: #8B6914;"><i class="fas fa-clock"></i></div>
+                    <div class="stat-info">
+                        <h3>Pending Orders</h3>
+                        <p>
+                            <?php echo $stats['pending_orders']; ?>
+                            <?php if ($stats['pending_orders'] > 0): ?>
+                                <a href="admin_orders.php?status=pending" style="font-size:12px; color:#8B6914; display:block; margin-top:4px;">View →</a>
+                            <?php endif; ?>
+                        </p>
+                    </div>
+                </div>
+                <?php endif; ?>
+
+                <?php if (adminHasRole(['support'])): ?>
+                <div class="stat-card" style="border-left: 4px solid #8B1538;">
+                    <div class="stat-icon" style="background: #8B1538;"><i class="fas fa-life-ring"></i></div>
+                    <div class="stat-info">
+                        <h3>Open Tickets</h3>
+                        <p>
+                            <?php echo $stats['open_tickets']; ?>
+                            <?php if ($stats['open_tickets'] > 0): ?>
+                                <a href="admin_tickets.php?status=open" style="font-size:12px; color:#8B1538; display:block; margin-top:4px;">View →</a>
+                            <?php endif; ?>
+                        </p>
+                    </div>
+                </div>
+                <?php endif; ?>
             </div>
 
             <!-- Recent Orders -->

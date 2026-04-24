@@ -1,6 +1,7 @@
 
 <?php
 require_once 'db_connection.php';
+require_once 'includes/functions.php';
 session_start();
 
 // Check if already logged in as admin
@@ -12,32 +13,33 @@ if (isset($_SESSION['admin_id'])) {
 // Process login form
 $error = '';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = mysqli_real_escape_string($conn, $_POST['username']);
-    $password = $_POST['password'];
-    
-    // Query to check admin credentials
-    $sql = "SELECT id, username, password FROM admins WHERE username = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    if ($result->num_rows === 1) {
-        $row = $result->fetch_assoc();
-        // Verify password hash
-        if (password_verify($password, $row['password'])) {
-            // Password is correct, create session
-            $_SESSION['admin_id'] = $row['id'];
-            $_SESSION['admin_username'] = $row['username'];
-            
-            // Redirect to admin dashboard
-            header("Location: admin/admin_dashboard.php");
-            exit();
-        } else {
-            $error = "Invalid password";
-        }
+    if (!csrfVerify()) {
+        $error = 'Invalid request. Please refresh and try again.';
     } else {
-        $error = "Invalid username";
+        $username = trim($_POST['username'] ?? '');
+        $password = $_POST['password'] ?? '';
+
+        // Query to check admin credentials (include role per SRS §3.4)
+        $stmt = $conn->prepare("SELECT id, username, password, role FROM admins WHERE username = ?");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows === 1) {
+            $row = $result->fetch_assoc();
+            if (password_verify($password, $row['password'])) {
+                sessionRegenerate(); // prevent session fixation
+                $_SESSION['admin_id'] = $row['id'];
+                $_SESSION['admin_username'] = $row['username'];
+                $_SESSION['admin_role'] = $row['role'] ?? 'super';
+                header("Location: admin/admin_dashboard.php");
+                exit();
+            } else {
+                $error = "Invalid credentials";
+            }
+        } else {
+            $error = "Invalid credentials";
+        }
     }
 }
 ?>
@@ -66,6 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <?php endif; ?>
         
         <form class="login-form" method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+            <?php echo csrfField(); ?>
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" required>

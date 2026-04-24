@@ -9,7 +9,7 @@
 
 body {
     font-family: 'Montserrat', sans-serif;
-    color: #333;
+    color: var(--accent-color);
     background-color: #f9f9f9;
 }
 
@@ -71,7 +71,7 @@ h1 {
     margin-bottom: 20px;
     padding-bottom: 15px;
     border-bottom: 1px solid #eee;
-    color: #222;
+    color: var(--text-color);
 }
 
 .form-group {
@@ -80,7 +80,7 @@ h1 {
 
 .checkout-form label {
     font-weight: 600;
-    color: #333;
+    color: var(--accent-color);
     margin-bottom: 8px;
     display: block;
     font-size: 15px;
@@ -99,7 +99,7 @@ h1 {
 
 .checkout-form input:focus,
 .checkout-form textarea:focus {
-    border-color: #d4af37;
+    border-color: var(--gold-color);
     box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
     outline: none;
 }
@@ -128,11 +128,11 @@ h1 {
 }
 
 .payment-method:hover {
-    background-color: #f5f5f5;
+    background-color: var(--bg-gray);
 }
 
 .payment-method.selected {
-    border-color: #d4af37;
+    border-color: var(--gold-color);
     background-color: rgba(212, 175, 55, 0.05);
 }
 
@@ -140,7 +140,7 @@ h1 {
     margin-right: 12px;
     width: 18px;
     height: 18px;
-    accent-color: #d4af37;
+    accent-color: var(--gold-color);
 }
 
 .payment-method label {
@@ -168,7 +168,7 @@ h1 {
 }
 
 .terms-checkbox a {
-    color: #d4af37;
+    color: var(--gold-color);
     text-decoration: none;
     font-weight: 600;
 }
@@ -181,7 +181,7 @@ h1 {
 .btn-primary {
     width: 100%;
     padding: 16px;
-    background-color: #d4af37;
+    background-color: var(--gold-color);
     color: white;
     border: none;
     border-radius: 6px;
@@ -209,7 +209,7 @@ h1 {
     margin-bottom: 20px;
     padding-bottom: 15px;
     border-bottom: 1px solid #eee;
-    color: #222;
+    color: var(--text-color);
 }
 
 /* Cart Items in Summary */
@@ -260,7 +260,7 @@ h1 {
     overflow: hidden;
     margin-right: 15px;
     flex-shrink: 0;
-    background-color: #f8f9fa;
+    background-color: var(--bg-gray);
 }
 
 .item-image img {
@@ -285,14 +285,14 @@ h1 {
 
 .item-details p {
     font-size: 14px;
-    color: #666;
+    color: var(--text-muted);
     margin: 3px 0;
 }
 
 /* Design options display */
 p.design {
     font-size: 12px;
-    color: #666;
+    color: var(--text-muted);
     background-color: #f0f0f0;
     padding: 5px 8px;
     border-radius: 4px;
@@ -326,7 +326,7 @@ p.design {
 .summary-row.total {
     font-weight: 700;
     font-size: 20px;
-    color: #000;
+    color: var(--primary-color);
     border-top: 2px solid #eee;
     padding-top: 15px;
     margin-top: 10px;
@@ -368,7 +368,7 @@ p.design {
 
 .empty-cart-message p {
     margin-bottom: 25px;
-    color: #666;
+    color: var(--text-muted);
 }
 
 .empty-cart-message .btn-primary {
@@ -381,19 +381,19 @@ p.design {
 .design-summary, .measurements-summary {
     margin: 8px 0;
     padding: 8px;
-    background-color: #f8f9fa;
+    background-color: var(--bg-gray);
     border-radius: 4px;
     font-size: 12px;
 }
 
 .design-summary strong, .measurements-summary strong {
-    color: #333;
+    color: var(--accent-color);
     display: block;
     margin-bottom: 4px;
 }
 
 .design-details, .measurements-grid {
-    color: #666;
+    color: var(--text-muted);
     line-height: 1.4;
 }
 
@@ -410,7 +410,7 @@ p.design {
 .item-price {
     margin: 0 0 5px 0;
     font-weight: 500;
-    color: #d4af37;
+    color: var(--gold-color);
 }
 
 /* Scrollbar styling for measurements */

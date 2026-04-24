@@ -8,6 +8,7 @@
 $logged_in = isLoggedIn();
 $user_name = getUserName();
 $cartCount = getCartCount();
+$myOrderCount = getMyOrderCount();
 ?>
 <!-- Side Navigation -->
 <div class="side-nav">
@@ -73,21 +74,78 @@ $cartCount = getCartCount();
             </div>
             <?php endif; ?>
 
-            <div class="cart-link">
-                <a href="cart.php">
+            <div class="myorder-link">
+                <a href="myorder.php" title="My Order">
+                    <i class="fas fa-cut"></i>
+                    <span class="myorder-count"><?php echo $myOrderCount; ?></span>
+                </a>
+            </div>
+
+            <div class="cart-link" id="cart-drawer-trigger">
+                <a href="cart.php" title="Cart">
                     <i class="fas fa-shopping-cart"></i>
                     <span class="cart-count"><?php echo $cartCount; ?></span>
                 </a>
             </div>
 
             <?php if ($logged_in): ?>
-            <div class="user-info">
-                <span class="user-name"><?php echo e($user_name); ?></span>
-                <a href="logout.php" class="logout-link">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </a>
+            <div class="user-dropdown">
+                <button class="user-dropdown-btn" onclick="toggleUserDropdown(this)">
+                    <i class="fas fa-user-circle"></i>
+                    <span class="user-name"><?php echo e($user_name); ?></span>
+                    <i class="fas fa-chevron-down dropdown-arrow"></i>
+                </button>
+                <div class="user-dropdown-content">
+                    <a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> My Account</a>
+                    <a href="dashboard.php?tab=orders"><i class="fas fa-box"></i> Order History</a>
+                    <a href="dashboard.php?tab=measurements"><i class="fas fa-ruler"></i> My Measurements</a>
+                    <a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
             </div>
             <?php endif; ?>
         </div>
     </div>
 </header>
+
+<!-- Cart Drawer -->
+<div class="cart-drawer-backdrop" id="cart-drawer-backdrop"></div>
+<div class="cart-drawer" id="cart-drawer">
+    <div class="cart-drawer-header">
+        <h3>Your Cart <span class="cart-drawer-count">(<?php echo $cartCount; ?> items)</span></h3>
+        <button class="cart-drawer-close" id="cart-drawer-close">&times;</button>
+    </div>
+    <div class="cart-drawer-items" id="cart-drawer-items">
+        <?php if (empty($_SESSION['finalCart'])): ?>
+        <div class="cart-drawer-empty">
+            <i class="fas fa-shopping-cart"></i>
+            <p>Your cart is empty</p>
+        </div>
+        <?php else: ?>
+        <?php foreach ($_SESSION['finalCart'] as $index => $item): ?>
+        <div class="cart-drawer-item" data-index="<?php echo $index; ?>">
+            <img src="<?php echo e(getImagePath($item['image'])); ?>" alt="<?php echo e($item['name']); ?>" class="cart-drawer-item-img" onerror="this.src='images/placeholder.jpg'">
+            <div class="cart-drawer-item-info">
+                <h4><?php echo e($item['name']); ?></h4>
+                <span class="drawer-item-price"><?php echo formatPrice($item['price']); ?></span>
+                <div class="cart-drawer-item-qty">
+                    <button onclick="updateDrawerQty(<?php echo $index; ?>, -1)">-</button>
+                    <span><?php echo $item['quantity']; ?></span>
+                    <button onclick="updateDrawerQty(<?php echo $index; ?>, 1)">+</button>
+                </div>
+            </div>
+            <button class="cart-drawer-item-remove" onclick="removeDrawerItem(<?php echo $index; ?>)">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </div>
+        <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
+    <div class="cart-drawer-footer">
+        <div class="cart-drawer-total">
+            <span>Subtotal</span>
+            <span class="total-amount"><?php echo formatPrice(getCartSubtotal()); ?></span>
+        </div>
+        <a href="cart.php" class="cart-drawer-btn checkout">View Cart & Checkout</a>
+        <button class="cart-drawer-btn continue" id="cart-drawer-continue">Continue Shopping</button>
+    </div>
+</div>

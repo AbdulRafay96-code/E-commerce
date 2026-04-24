@@ -12,14 +12,19 @@ $pageStyles = ['contact.css'];
 
 $message = '';
 $messageType = '';
+$ticketNumber = '';
 
-// Process contact form submission
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+// Process contact form submission (SRS §3.2.7 — support ticket)
+if ($_SERVER["REQUEST_METHOD"] == "POST" && !csrfVerify()) {
+    $message = "Invalid request token. Please refresh and try again.";
+    $messageType = "error";
+} elseif ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
     $phone = filter_input(INPUT_POST, 'phone', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $subject = filter_input(INPUT_POST, 'subject', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $userMessage = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $userId = isLoggedIn() ? $_SESSION['user_id'] : null;
 
     if (empty($name) || empty($email) || empty($subject) || empty($userMessage)) {
         $message = "Please fill in all required fields.";
@@ -28,11 +33,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $message = "Please enter a valid email address.";
         $messageType = "error";
     } else {
-        $stmt = $conn->prepare("INSERT INTO contact_messages (name, email, phone, subject, message) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("sssss", $name, $email, $phone, $subject, $userMessage);
+        $stmt = $conn->prepare(
+            "INSERT INTO contact_messages (user_id, name, email, phone, subject, message)
+             VALUES (?, ?, ?, ?, ?, ?)"
+        );
+        $stmt->bind_param("isssss", $userId, $name, $email, $phone, $subject, $userMessage);
 
         if ($stmt->execute()) {
-            $message = "Thank you for your message! We'll get back to you soon.";
+            $newId = $conn->insert_id;
+            $ticketNumber = 'TKT-' . str_pad($newId, 6, '0', STR_PAD_LEFT);
+
+            $updateStmt = $conn->prepare("UPDATE contact_messages SET ticket_number = ? WHERE id = ?");
+            $updateStmt->bind_param("si", $ticketNumber, $newId);
+            $updateStmt->execute();
+
+            $message = "Thank you for your message! Your support ticket has been created.";
             $messageType = "success";
             $name = $email = $phone = $subject = $userMessage = "";
         } else {
@@ -69,7 +84,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <section class="contact-section">
         <div class="container">
             <div class="contact-container">
-                <div class="contact-info">
+                <div class="contact-info reveal">
                     <h2>Get in Touch</h2>
                     <p>Have questions about our fabrics or services? We'd love to hear from you.</p>
 
@@ -77,7 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <div class="icon"><i class="fas fa-map-marker-alt"></i></div>
                         <div class="details">
                             <h3>Our Location</h3>
-                            <p>Main Gulberg, Lahore, Pakistan</p>
+                            <p>IUB Baghdad-ul-Jadeed Campus,<br>Hasilpur Road, Bahawalpur 63100, Pakistan</p>
                         </div>
                     </div>
 
@@ -117,14 +132,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
                 </div>
 
-                <div class="contact-form">
+                <div class="contact-form reveal reveal-delay-1">
                     <h2>Send us a Message</h2>
 
                     <?php if (!empty($message)): ?>
-                    <div class="alert alert-<?php echo $messageType; ?>"><?php echo e($message); ?></div>
+                    <div class="alert alert-<?php echo $messageType; ?>">
+                        <?php echo e($message); ?>
+                        <?php if ($ticketNumber): ?>
+                            <br><strong>Ticket #: <?php echo e($ticketNumber); ?></strong>
+                            <br>Please keep this ticket number for future reference.
+                        <?php endif; ?>
+                    </div>
                     <?php endif; ?>
 
                     <form method="post">
+                        <?php echo csrfField(); ?>
                         <div class="form-group">
                             <label for="name">Your Name</label>
                             <input type="text" id="name" name="name" value="<?php echo e($name ?? ''); ?>" required>
@@ -153,10 +175,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </section>
 
     <!-- Map Section -->
-    <section class="map-section">
+    <section class="map-section reveal">
         <div class="map-container">
             <iframe width="100%" height="450" frameborder="0" scrolling="no"
-                src="https://maps.google.com/maps?width=100%25&amp;height=450&amp;hl=en&amp;q=The%20University%20of%20Lahore,%20Defence%20Road,%20Lahore+(Stitch%20House)&amp;t=&amp;z=15&amp;ie=UTF8&amp;iwloc=B&amp;output=embed">
+                src="https://maps.google.com/maps?width=100%25&amp;height=450&amp;hl=en&amp;q=Islamia%20University%20of%20Bahawalpur%20Baghdad-ul-Jadeed%20Campus,%20Hasilpur%20Road,%20Bahawalpur%2063100+(Stitch%20House)&amp;t=&amp;z=15&amp;ie=UTF8&amp;iwloc=B&amp;output=embed">
             </iframe>
         </div>
     </section>

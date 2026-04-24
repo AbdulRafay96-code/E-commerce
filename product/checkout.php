@@ -18,7 +18,9 @@ $total = $subtotal + $shipping;
 $error = null;
 
 // Process checkout form
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER["REQUEST_METHOD"] == "POST" && !csrfVerify()) {
+    $error = "Invalid request token. Please refresh and try again.";
+} elseif ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
     $phone = filter_input(INPUT_POST, 'phone', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -47,12 +49,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // Insert order items
             foreach ($_SESSION['finalCart'] as $item) {
+                // Revalidate stock before committing (SRS §3.2.3.5)
+                if (!hasStock($item['id'], $item['quantity'])) {
+                    throw new Exception("'" . $item['name'] . "' is out of stock.");
+                }
+
                 $itemTotal = $item['price'] * $item['quantity'];
                 $itemStmt = $conn->prepare("INSERT INTO order_items (order_id, product_id, quantity, price, total) VALUES (?, ?, ?, ?, ?)");
                 $itemStmt->bind_param("isids", $orderId, $item['id'], $item['quantity'], $item['price'], $itemTotal);
                 $itemStmt->execute();
 
                 $orderItemId = $conn->insert_id;
+
+                // Decrement inventory
+                decrementStock($item['id'], $item['quantity']);
 
                 // Save measurements if present
                 if (isset($item['measurements']) && is_array($item['measurements'])) {
@@ -72,6 +82,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $measurementStmt->bind_param("isssssssss", $orderItemId, $chest, $waist, $hip, $shoulder, $sleeve, $trouser, $kameez, $neck, $notes);
                     $measurementStmt->execute();
                 }
+
+                // Save customization details (SRS §3.4 Customization class)
+                if (isset($item['designOptions']) && is_array($item['designOptions'])) {
+                    $opts = $item['designOptions'];
+                    $fabricType    = $item['name']            ?? null; // product name doubles as fabric label
+                    $collarStyle   = $opts['collar']          ?? null;
+                    $cuffStyle     = $opts['cuff']            ?? null;
+                    $fitPreference = $opts['fit_preference']  ?? 'regular';
+                    $unitPrice     = $item['price']           ?? 0;
+
+                    $customStmt = $conn->prepare(
+                        "INSERT INTO customization (order_id, order_item_id, fabric_type, collar_style, cuff_style, fit_preference, unit_price)
+                         VALUES (?, ?, ?, ?, ?, ?, ?)"
+                    );
+                    $customStmt->bind_param(
+                        "iissssd",
+                        $orderId, $orderItemId, $fabricType, $collarStyle, $cuffStyle, $fitPreference, $unitPrice
+                    );
+                    $customStmt->execute();
+                }
             }
 
             // Create user account for guests
@@ -85,18 +115,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $tempPassword = bin2hex(random_bytes(8));
                     $hashedPassword = password_hash($tempPassword, PASSWORD_DEFAULT);
 
-                    $userStmt = $conn->prepare("INSERT INTO users (name, email, phone, password) VALUES (?, ?, ?, ?)");
-                    $userStmt->bind_param("ssss", $name, $email, $phone, $hashedPassword);
+                    $userStmt = $conn->prepare("INSERT INTO users (name, email, phone, address, password) VALUES (?, ?, ?, ?, ?)");
+                    $userStmt->bind_param("sssss", $name, $email, $phone, $address, $hashedPassword);
                     $userStmt->execute();
                     $userId = $conn->insert_id;
                     $_SESSION['temp_password'] = $tempPassword;
                 } else {
                     $userId = $result->fetch_assoc()['id'];
+                    // Refresh the saved address for returning guest-order users
+                    $addrStmt = $conn->prepare("UPDATE users SET address = ? WHERE id = ?");
+                    $addrStmt->bind_param("si", $address, $userId);
+                    $addrStmt->execute();
                 }
 
                 $updateStmt = $conn->prepare("UPDATE orders SET user_id = ? WHERE id = ?");
                 $updateStmt->bind_param("ii", $userId, $orderId);
                 $updateStmt->execute();
+            } else {
+                // Logged-in user: keep their saved address in sync
+                $addrStmt = $conn->prepare("UPDATE users SET address = ? WHERE id = ?");
+                $addrStmt->bind_param("si", $address, $userId);
+                $addrStmt->execute();
             }
 
             $conn->commit();
@@ -135,17 +174,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <?php if (empty($_SESSION['finalCart'])): ?>
             <div class="empty-cart-message">
-                <i class="fas fa-shopping-cart"></i>
-                <h2>Your cart is empty</h2>
-                <p>Browse our collection and add some fabrics to your cart</p>
-                <a href="order.php" class="btn-primary">Shop Now</a>
+                <i class="fas fa-receipt"></i>
+                <h2>Nothing ready to checkout</h2>
+                <p>Your cart is empty. Add fabrics, customize them in My Order, then come back here to place your order.</p>
+                <a href="order.php" class="btn-primary"><i class="fas fa-shopping-bag"></i> Browse Fabrics</a>
             </div>
             <?php else: ?>
 
             <div class="checkout-container">
                 <div class="checkout-form">
-                    <h2>Shipping Information</h2>
+                    <h2 class="reveal">Shipping Information</h2>
                     <form method="post">
+                        <?php echo csrfField(); ?>
                         <div class="form-group">
                             <label for="name">Full Name</label>
                             <input type="text" id="name" name="name" required
@@ -169,7 +209,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <input type="text" id="city" name="city" required>
                         </div>
 
-                        <h2>Payment Method</h2>
+                        <h2 class="reveal">Payment Method</h2>
                         <div class="payment-methods">
                             <div class="payment-method">
                                 <input type="radio" id="cash_on_delivery" name="payment_method" value="cash_on_delivery" checked>
@@ -187,7 +227,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                         <div class="form-group terms-checkbox">
                             <input type="checkbox" id="terms" name="terms" required>
-                            <label for="terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+                            <label for="terms">I agree to the <a href="terms.php" target="_blank">Terms of Service</a> and <a href="privacy.php" target="_blank">Privacy Policy</a></label>
                         </div>
 
                         <button type="submit" class="btn-primary">Place Order</button>
@@ -195,7 +235,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
 
                 <div class="order-summary">
-                    <h2>Order Summary</h2>
+                    <h2 class="reveal">Order Summary</h2>
                     <div class="cart-items">
                         <?php foreach ($_SESSION['finalCart'] as $item): ?>
                         <div class="summary-item">

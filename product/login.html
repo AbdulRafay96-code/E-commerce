@@ -2,135 +2,136 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Stitch House</title>
-    <link rel="stylesheet" href="variables.css">
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="login.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;500;600;700&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
-    <style>
-        /* My Order Link Styles */
-        .myorder-link {
-            position: relative;
-            margin-right: 15px;
-        }
-        .myorder-link a {
-            color: var(--text-color, #333);
-            font-size: 20px;
-            transition: color 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .myorder-link a:hover { color: var(--gold-color, #d4af37); }
-        .myorder-count {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background-color: #d4af37;
-            color: white;
-            font-size: 10px;
-            min-width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-    </style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#F5F0E8">
+<title>Login - Stitch House</title>
+<style>html,body{background-color:#F5F0E8;margin:0;}</style>
+<link rel="stylesheet" href="variables.css?v=1776672380">
+<link rel="stylesheet" href="styles.css?v=1777057551">
+<link rel="stylesheet" href="login.css?v=1777057795">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;500;600;700&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="3d-effects.css?v=1776672380">
 </head>
 <body>
     <!-- Side Navigation -->
-    <div class="side-nav">
-        <div class="side-nav-content">
-            <div class="side-nav-header">
-                <div class="logo-container">
-                    <h2 class="logo-text">Stitch House</h2>
-                </div>
-                <button class="close-sidenav">
-                    <i class="fas fa-times"></i>
-                </button>
+<div class="side-nav">
+    <div class="side-nav-content">
+        <div class="side-nav-header">
+            <div class="logo-container">
+                <h2 class="logo-text">Stitch House</h2>
             </div>
-            <div class="side-nav-links">
-                <ul>
-                    <li><a href="index.html"><i class="fas fa-home"></i>Home</a></li>
-                    <li><a href="order.html"><i class="fas fa-shopping-bag"></i>Shop Now</a></li>
-                    <li><a href="myorder.html"><i class="fas fa-shopping-cart"></i>My Order</a></li>
-                    <li><a href="contact.html"><i class="fas fa-envelope"></i>Contact Us</a></li>
-                </ul>
-            </div>
-            <div class="side-nav-footer">
-                <div class="social-icons">
-                    <a href="#" class="facebook"><i class="fab fa-facebook"></i></a>
-                    <a href="#" class="instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="#" class="twitter"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="pinterest"><i class="fab fa-pinterest"></i></a>
-                    <a href="#" class="youtube"><i class="fab fa-youtube"></i></a>
-                </div>
+            <button class="close-sidenav">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="side-nav-links">
+            <ul>
+                <li><a href="order.php" class="shop-link"><i class="fas fa-shopping-bag"></i>Shop Now</a></li>
+                <li><a href="order.php#cotton-section"><i class="fas fa-tshirt"></i>Cotton Fabrics</a></li>
+                <li><a href="order.php#lattha-section"><i class="fas fa-scroll"></i>Lattha Fabrics</a></li>
+                <li><a href="order.php#karandi-section"><i class="fas fa-layer-group"></i>Karandi Fabrics</a></li>
+                <li><a href="order.php#boski-section"><i class="fas fa-square"></i>Boski Fabrics</a></li>
+                <li><a href="order.php#linen-section"><i class="fas fa-wind"></i>Linen Fabrics</a></li>
+                <li><a href="order.php#washandwear-section"><i class="fas fa-tshirt"></i>Wash and Wear</a></li>
+                <li><a href="order.php#silk-section"><i class="fas fa-stream"></i>Silk Fabrics</a></li>
+                <li><a href="order.php#khaddar-section"><i class="fas fa-border-all"></i>Khaddar Fabrics</a></li>
+            </ul>
+        </div>
+        <div class="side-nav-footer">
+            <div class="social-icons">
+                <a href="#" class="facebook"><i class="fab fa-facebook"></i></a>
+                <a href="#" class="instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="pinterest"><i class="fab fa-pinterest"></i></a>
+                <a href="#" class="youtube"><i class="fab fa-youtube"></i></a>
             </div>
         </div>
     </div>
-    <div class="side-nav-backdrop"></div>
+</div>
+<div class="side-nav-backdrop"></div>
 
-    <header>
-        <div class="container">
-            <div class="menu-toggle">
-                <i class="fas fa-bars"></i>
-            </div>
-            <div class="site-title">
-                <a href="index.html">
-                    <h1 class="logo-text">Stitch House</h1>
+<header>
+    <div class="container">
+        <div class="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+        <div class="site-title">
+            <a href="index.php">
+                <h1 class="logo-text">Stitch House</h1>
+            </a>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.php" class="nav-link">Home</a></li>
+                <li><a href="order.php" class="nav-link">Shop Now</a></li>
+                <li><a href="myorder.php" class="nav-link">My Order</a></li>
+                <li><a href="contact.php" class="nav-link">Contact Us</a></li>
+            </ul>
+        </nav>
+        <div class="header-actions">
+                        <div class="login-link">
+                <a href="login.php">
+                    <i class="fas fa-user"></i>
                 </a>
             </div>
-            <nav>
-                <ul>
-                    <li><a href="index.html" class="nav-link">Home</a></li>
-                    <li><a href="order.html" class="nav-link">Shop Now</a></li>
-                    <li><a href="myorder.html" class="nav-link">My Order</a></li>
-                    <li><a href="contact.html" class="nav-link">Contact Us</a></li>
-                </ul>
-            </nav>
-            <div class="header-actions">
-                <div class="login-link">
-                    <a href="login.html" class="active">
-                        <i class="fas fa-user"></i>
-                    </a>
-                </div>
-                <div class="myorder-link">
-                    <a href="myorder.html" title="My Order">
-                        <i class="fas fa-cut"></i>
-                        <span class="myorder-count">0</span>
-                    </a>
-                </div>
-                <div class="cart-link">
-                    <a href="cart.html" title="Cart">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="cart-count">0</span>
-                    </a>
-                </div>
+            
+            <div class="myorder-link">
+                <a href="myorder.php" title="My Order">
+                    <i class="fas fa-cut"></i>
+                    <span class="myorder-count">0</span>
+                </a>
             </div>
-        </div>
-    </header>
 
-    <!-- Page Banner -->
+            <div class="cart-link" id="cart-drawer-trigger">
+                <a href="cart.php" title="Cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </a>
+            </div>
+
+                    </div>
+    </div>
+</header>
+
+<!-- Cart Drawer -->
+<div class="cart-drawer-backdrop" id="cart-drawer-backdrop"></div>
+<div class="cart-drawer" id="cart-drawer">
+    <div class="cart-drawer-header">
+        <h3>Your Cart <span class="cart-drawer-count">(0 items)</span></h3>
+        <button class="cart-drawer-close" id="cart-drawer-close">&times;</button>
+    </div>
+    <div class="cart-drawer-items" id="cart-drawer-items">
+                <div class="cart-drawer-empty">
+            <i class="fas fa-shopping-cart"></i>
+            <p>Your cart is empty</p>
+        </div>
+            </div>
+    <div class="cart-drawer-footer">
+        <div class="cart-drawer-total">
+            <span>Subtotal</span>
+            <span class="total-amount">PKR 0</span>
+        </div>
+        <a href="cart.php" class="cart-drawer-btn checkout">View Cart & Checkout</a>
+        <button class="cart-drawer-btn continue" id="cart-drawer-continue">Continue Shopping</button>
+    </div>
+</div>
+
     <section class="page-banner">
         <div class="container">
             <h1>Account Access</h1>
             <div class="breadcrumb">
-                <a href="index.html">Home</a> / <span>Sign In</span>
+                <a href="index.php">Home</a> / <span>Sign In</span>
             </div>
         </div>
     </section>
 
-    <!-- Login Section -->
     <section class="login-section">
         <div class="container">
-            <div class="login-container">
+            <div class="login-container reveal">
                 <div class="form-tabs">
                     <button class="tab-btn active" data-tab="login">Sign In</button>
-                    <button class="tab-btn" data-tab="register">Register</button>
+                    <button class="tab-btn " data-tab="register">Register</button>
                 </div>
 
                 <div class="form-content">
@@ -139,7 +140,10 @@
                         <h2>Welcome Back</h2>
                         <p class="form-intro">Sign in to your account to continue shopping.</p>
 
-                        <form id="login-form-element" onsubmit="return handleLogin(event)">
+                        
+                        
+                        <form method="post">
+                            <input type="hidden" name="_csrf" value="974a358851b19be27828d7f9356ff3bfcb98c7438805f9fa82f8396a74171cee">                            <input type="hidden" name="form_type" value="login">
                             <div class="form-group">
                                 <label for="login-email">Email Address</label>
                                 <div class="input-icon-wrapper">
@@ -147,18 +151,14 @@
                                     <input type="email" id="login-email" name="email" required placeholder="Enter your email">
                                 </div>
                             </div>
-
                             <div class="form-group">
                                 <label for="login-password">Password</label>
                                 <div class="input-icon-wrapper">
                                     <i class="fas fa-lock"></i>
                                     <input type="password" id="login-password" name="password" required placeholder="Enter your password">
-                                    <button type="button" class="toggle-password" tabindex="-1">
-                                        <i class="far fa-eye"></i>
-                                    </button>
+                                    <button type="button" class="toggle-password"><i class="far fa-eye"></i></button>
                                 </div>
                             </div>
-
                             <div class="form-options">
                                 <div class="remember-me">
                                     <input type="checkbox" id="remember-me" name="remember">
@@ -166,7 +166,6 @@
                                 </div>
                                 <a href="#" class="forgot-password">Forgot password?</a>
                             </div>
-
                             <button type="submit" class="btn-primary btn-login">
                                 <i class="fas fa-sign-in-alt"></i> Sign In
                             </button>
@@ -174,11 +173,13 @@
                     </div>
 
                     <!-- Register Form -->
-                    <div id="register-form" class="form-panel">
+                    <div id="register-form" class="form-panel ">
                         <h2>Create an Account</h2>
                         <p class="form-intro">Register for personalized shopping experience.</p>
 
-                        <form id="register-form-element" onsubmit="return handleRegister(event)">
+                        
+                        <form method="post">
+                            <input type="hidden" name="_csrf" value="974a358851b19be27828d7f9356ff3bfcb98c7438805f9fa82f8396a74171cee">                            <input type="hidden" name="form_type" value="register">
                             <div class="form-group">
                                 <label for="register-name">Full Name</label>
                                 <div class="input-icon-wrapper">
@@ -186,7 +187,6 @@
                                     <input type="text" id="register-name" name="name" required placeholder="Enter your full name">
                                 </div>
                             </div>
-
                             <div class="form-group">
                                 <label for="register-email">Email Address</label>
                                 <div class="input-icon-wrapper">
@@ -194,7 +194,6 @@
                                     <input type="email" id="register-email" name="email" required placeholder="Enter your email">
                                 </div>
                             </div>
-
                             <div class="form-group">
                                 <label for="register-phone">Phone Number</label>
                                 <div class="input-icon-wrapper">
@@ -202,24 +201,14 @@
                                     <input type="tel" id="register-phone" name="phone" required placeholder="Enter your phone number">
                                 </div>
                             </div>
-
                             <div class="form-group">
                                 <label for="register-password">Password</label>
                                 <div class="input-icon-wrapper">
                                     <i class="fas fa-lock"></i>
                                     <input type="password" id="register-password" name="password" required placeholder="Create a password" minlength="8">
-                                    <button type="button" class="toggle-password" tabindex="-1">
-                                        <i class="far fa-eye"></i>
-                                    </button>
-                                </div>
-                                <div class="password-strength">
-                                    <span class="strength-label">Password strength:</span>
-                                    <div class="strength-meter">
-                                        <div class="strength-bar"></div>
-                                    </div>
+                                    <button type="button" class="toggle-password"><i class="far fa-eye"></i></button>
                                 </div>
                             </div>
-
                             <div class="form-group">
                                 <label for="register-confirm-password">Confirm Password</label>
                                 <div class="input-icon-wrapper">
@@ -227,14 +216,12 @@
                                     <input type="password" id="register-confirm-password" name="confirm_password" required placeholder="Confirm your password">
                                 </div>
                             </div>
-
                             <div class="form-options">
                                 <div class="terms">
                                     <input type="checkbox" id="terms" name="terms" required>
-                                    <label for="terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+                                    <label for="terms">I agree to the <a href="terms.php" target="_blank">Terms of Service</a> and <a href="privacy.php" target="_blank">Privacy Policy</a></label>
                                 </div>
                             </div>
-
                             <button type="submit" class="btn-primary btn-register">
                                 <i class="fas fa-user-plus"></i> Create Account
                             </button>
@@ -246,247 +233,422 @@
     </section>
 
     <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section about">
-                    <div class="footer-logo">
-                        <a href="index.html" class="logo-button">
-                            <h3 class="logo-text">Stitch House</h3>
-                        </a>
-                    </div>
-                    <p>Your premium destination for high-quality fabrics and exceptional service.</p>
-                    <div class="social-icons">
-                        <a href="#" class="facebook"><i class="fab fa-facebook"></i></a>
-                        <a href="#" class="instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="pinterest"><i class="fab fa-pinterest"></i></a>
-                        <a href="#" class="youtube"><i class="fab fa-youtube"></i></a>
-                    </div>
+    <div class="container">
+        <!-- Newsletter Section -->
+        <div class="footer-newsletter reveal">
+            <h3>Stay Updated</h3>
+            <p>Subscribe for exclusive offers, new arrivals, and seasonal collections</p>
+            <form class="newsletter-form" onsubmit="event.preventDefault(); this.querySelector('button').textContent='Subscribed!'; this.querySelector('input').value='';">
+                <input type="email" placeholder="Enter your email address" required>
+                <button type="submit">Subscribe</button>
+            </form>
+        </div>
+
+        <div class="footer-content">
+            <div class="footer-section about reveal">
+                <div class="footer-logo">
+                    <a href="index.php" class="logo-button">
+                        <h3 class="logo-text">Stitch House</h3>
+                    </a>
                 </div>
-                <div class="footer-section links">
-                    <h3>Quick Links</h3>
-                    <ul>
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="order.html">Shop Now</a></li>
-                        <li><a href="myorder.html">My Order</a></li>
-                        <li><a href="contact.html">Contact Us</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section contact">
-                    <h3>Contact Info</h3>
-                    <p><i class="fas fa-map-marker-alt"></i> Main Gulberg, Lahore, Pakistan</p>
-                    <p><i class="fas fa-phone"></i> 0304-2292813</p>
-                    <p><i class="fas fa-envelope"></i> info@stitchhouse.com</p>
+                <p>Your premium destination for high-quality fabrics and exceptional tailoring service in Lahore.</p>
+                <div class="social-icons">
+                    <a href="#" class="facebook"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="pinterest"><i class="fab fa-pinterest"></i></a>
+                    <a href="#" class="youtube"><i class="fab fa-youtube"></i></a>
                 </div>
             </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 Stitch House. All Rights Reserved.</p>
+            <div class="footer-section links reveal reveal-delay-1">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.php">Home</a></li>
+                    <li><a href="order.php">Shop Now</a></li>
+                    <li><a href="myorder.php">My Order</a></li>
+                    <li><a href="contact.php">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="footer-section customer-service reveal reveal-delay-2">
+                <h3>Customer Service</h3>
+                <ul>
+                    <li><a href="shipping-policy.php">Shipping Policy</a></li>
+                    <li><a href="returns.php">Returns &amp; Exchange</a></li>
+                    <li><a href="size-guide.php">Size Guide</a></li>
+                    <li><a href="faqs.php">FAQs</a></li>
+                </ul>
+            </div>
+            <div class="footer-section contact reveal reveal-delay-3">
+                <h3>Contact Info</h3>
+                <p><i class="fas fa-map-marker-alt"></i> Main Gulberg, Lahore, Pakistan</p>
+                <p><i class="fas fa-phone"></i> 0304-2292813</p>
+                <p><i class="fas fa-envelope"></i> info@stitchhouse.com</p>
             </div>
         </div>
-    </footer>
-
-    <div class="back-to-top">
-        <i class="fas fa-arrow-up"></i>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Stitch House. All Rights Reserved.</p>
+        </div>
     </div>
+</footer>
+
+<div class="back-to-top">
+    <i class="fas fa-arrow-up"></i>
+</div>
+
+<button type="button" class="cart-float" id="cart-float-btn" aria-label="Open cart" title="Your Cart">
+    <i class="fas fa-shopping-bag"></i>
+    <span class="cart-float-count is-empty">0</span>
+</button>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ==========================================
+    // HEADER SCROLL EFFECT
+    // ==========================================
+    const header = document.querySelector('header');
+    if (header) {
+        window.addEventListener('scroll', () => {
+            header.classList.toggle('header-scrolled', window.scrollY > 50);
+        });
+    }
+
+    // ==========================================
+    // SIDE NAVIGATION
+    // ==========================================
+    const sideNavToggle = document.querySelector('.menu-toggle');
+    const sideNav = document.querySelector('.side-nav');
+    const sideNavBackdrop = document.querySelector('.side-nav-backdrop');
+    const sideNavClose = document.querySelector('.close-sidenav');
+
+    if (sideNavToggle && sideNav) {
+        sideNavToggle.addEventListener('click', () => {
+            sideNav.classList.add('open');
+            sideNavBackdrop.classList.add('active');
+            document.body.classList.add('no-scroll');
+        });
+    }
+
+    function closeSideNav() {
+        if (sideNav) {
+            sideNav.classList.remove('open');
+            sideNavBackdrop.classList.remove('active');
+            document.body.classList.remove('no-scroll');
+        }
+    }
+
+    if (sideNavClose) sideNavClose.addEventListener('click', closeSideNav);
+    if (sideNavBackdrop) sideNavBackdrop.addEventListener('click', closeSideNav);
+
+    // ==========================================
+    // BACK TO TOP BUTTON
+    // ==========================================
+    const backToTopBtn = document.querySelector('.back-to-top');
+    if (backToTopBtn) {
+        window.addEventListener('scroll', () => {
+            backToTopBtn.classList.toggle('show', window.pageYOffset > 300);
+        });
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+
+    // ==========================================
+    // MOBILE NAV TOGGLE
+    // ==========================================
+    const menuToggle = document.querySelector('.menu-toggle');
+    const nav = document.querySelector('nav');
+    if (menuToggle && nav) {
+        menuToggle.addEventListener('click', () => nav.classList.toggle('active'));
+    }
+
+    // ==========================================
+    // IMAGE ERROR HANDLING
+    // ==========================================
+    document.querySelectorAll('img').forEach(img => {
+        img.addEventListener('error', function() {
+            if (!this.src.includes('placeholder')) {
+                const src = this.src;
+                if (src.endsWith('.jpg')) {
+                    this.src = src.replace('.jpg', '.webp');
+                } else if (src.endsWith('.webp')) {
+                    this.src = 'images/placeholder.jpg';
+                } else {
+                    this.src = 'images/placeholder.jpg';
+                }
+            }
+        });
+    });
+
+    // ==========================================
+    // ANNOUNCEMENT BAR
+    // ==========================================
+    const announcementBar = document.getElementById('announcement-bar');
+    const announcementClose = document.getElementById('announcement-close');
+    if (announcementBar && sessionStorage.getItem('announcementClosed') === 'true') {
+        announcementBar.style.display = 'none';
+    }
+    if (announcementClose) {
+        announcementClose.addEventListener('click', () => {
+            announcementBar.style.display = 'none';
+            sessionStorage.setItem('announcementClosed', 'true');
+        });
+    }
+
+    // ==========================================
+    // SCROLL REVEAL ANIMATIONS
+    // ==========================================
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+                revealObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    // ==========================================
+    // CART DRAWER
+    // ==========================================
+    const cartDrawer = document.getElementById('cart-drawer');
+    const cartBackdrop = document.getElementById('cart-drawer-backdrop');
+    const cartClose = document.getElementById('cart-drawer-close');
+    const cartContinue = document.getElementById('cart-drawer-continue');
+    const cartTrigger = document.getElementById('cart-drawer-trigger');
+
+    function openCartDrawer(e) {
+        if (e) e.preventDefault();
+        if (cartDrawer) cartDrawer.classList.add('open');
+        if (cartBackdrop) cartBackdrop.classList.add('active');
+        document.body.classList.add('no-scroll');
+    }
+
+    function closeCartDrawer() {
+        if (cartDrawer) cartDrawer.classList.remove('open');
+        if (cartBackdrop) cartBackdrop.classList.remove('active');
+        document.body.classList.remove('no-scroll');
+    }
+
+    if (cartTrigger) {
+        const cartLink = cartTrigger.querySelector('a');
+        if (cartLink) {
+            cartLink.addEventListener('click', openCartDrawer);
+        }
+    }
+    const cartFloatBtn = document.getElementById('cart-float-btn');
+    if (cartFloatBtn) {
+        cartFloatBtn.addEventListener('click', openCartDrawer);
+        initCartFloatDrag(cartFloatBtn);
+    }
+    if (cartClose) cartClose.addEventListener('click', closeCartDrawer);
+    if (cartBackdrop) cartBackdrop.addEventListener('click', closeCartDrawer);
+    if (cartContinue) cartContinue.addEventListener('click', closeCartDrawer);
+
+    // Floating cart button — drag anywhere, click to open drawer
+    function initCartFloatDrag(btn) {
+        const STORAGE_KEY = 'cartFloatPos';
+        const DRAG_THRESHOLD = 5; // px to distinguish click from drag
+        let isDragging = false;
+        let didDrag = false;
+        let startX, startY, startLeft, startTop;
+
+        // Restore saved position (clamped to current viewport)
+        try {
+            const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+            if (saved && typeof saved.left === 'number' && typeof saved.top === 'number') {
+                const maxLeft = window.innerWidth - btn.offsetWidth;
+                const maxTop = window.innerHeight - btn.offsetHeight;
+                btn.style.left = Math.max(0, Math.min(saved.left, maxLeft)) + 'px';
+                btn.style.top = Math.max(0, Math.min(saved.top, maxTop)) + 'px';
+                btn.style.right = 'auto';
+                btn.style.bottom = 'auto';
+            }
+        } catch (_) {}
+
+        function getPos(e) {
+            if (e.touches && e.touches[0]) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            return { x: e.clientX, y: e.clientY };
+        }
+
+        function onStart(e) {
+            const rect = btn.getBoundingClientRect();
+            const pos = getPos(e);
+            startX = pos.x;
+            startY = pos.y;
+            startLeft = rect.left;
+            startTop = rect.top;
+            isDragging = true;
+            didDrag = false;
+            btn.style.cursor = 'grabbing';
+            if (e.touches) e.preventDefault();
+        }
+
+        function onMove(e) {
+            if (!isDragging) return;
+            const pos = getPos(e);
+            const dx = pos.x - startX;
+            const dy = pos.y - startY;
+            if (!didDrag && Math.hypot(dx, dy) > DRAG_THRESHOLD) didDrag = true;
+            if (!didDrag) return;
+            if (e.cancelable) e.preventDefault();
+
+            const maxLeft = window.innerWidth - btn.offsetWidth;
+            const maxTop = window.innerHeight - btn.offsetHeight;
+            btn.style.left = Math.max(0, Math.min(startLeft + dx, maxLeft)) + 'px';
+            btn.style.top  = Math.max(0, Math.min(startTop + dy, maxTop)) + 'px';
+            btn.style.right = 'auto';
+            btn.style.bottom = 'auto';
+        }
+
+        function onEnd() {
+            if (!isDragging) return;
+            isDragging = false;
+            btn.style.cursor = 'grab';
+            if (didDrag) {
+                const rect = btn.getBoundingClientRect();
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify({ left: rect.left, top: rect.top }));
+                } catch (_) {}
+            }
+        }
+
+        // Suppress click immediately after a drag so we don't open the drawer
+        btn.addEventListener('click', function(e) {
+            if (didDrag) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                // Reset flag after this tick so next click works
+                setTimeout(() => { didDrag = false; }, 0);
+            }
+        }, true); // capture phase — runs before the openCartDrawer listener
+
+        btn.addEventListener('mousedown', onStart);
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onEnd);
+        btn.addEventListener('touchstart', onStart, { passive: false });
+        document.addEventListener('touchmove', onMove, { passive: false });
+        document.addEventListener('touchend', onEnd);
+
+        // Keep button on-screen when the window resizes
+        window.addEventListener('resize', () => {
+            if (btn.style.left) {
+                const maxLeft = window.innerWidth - btn.offsetWidth;
+                const maxTop = window.innerHeight - btn.offsetHeight;
+                btn.style.left = Math.max(0, Math.min(parseInt(btn.style.left, 10), maxLeft)) + 'px';
+                btn.style.top = Math.max(0, Math.min(parseInt(btn.style.top, 10), maxTop)) + 'px';
+            }
+        });
+    }
+
+    // ==========================================
+    // TESTIMONIAL CAROUSEL
+    // ==========================================
+    const testimonialSlides = document.querySelectorAll('.testimonial-slide');
+    const testimonialDotsContainer = document.querySelector('.testimonial-dots');
+
+    if (testimonialSlides.length > 1 && testimonialDotsContainer) {
+        let currentTestimonial = 0;
+
+        // Create dots
+        testimonialSlides.forEach((_, i) => {
+            const dot = document.createElement('button');
+            dot.className = 'testimonial-dot' + (i === 0 ? ' active' : '');
+            dot.addEventListener('click', () => goToTestimonial(i));
+            testimonialDotsContainer.appendChild(dot);
+        });
+
+        function goToTestimonial(index) {
+            testimonialSlides.forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.testimonial-dot').forEach(d => d.classList.remove('active'));
+            testimonialSlides[index].classList.add('active');
+            document.querySelectorAll('.testimonial-dot')[index].classList.add('active');
+            currentTestimonial = index;
+        }
+
+        setInterval(() => {
+            goToTestimonial((currentTestimonial + 1) % testimonialSlides.length);
+        }, 5000);
+    }
+
+    // ==========================================
+    // USER DROPDOWN
+    // ==========================================
+    document.addEventListener('click', function(e) {
+        document.querySelectorAll('.user-dropdown').forEach(dropdown => {
+            if (!dropdown.contains(e.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+    });
+});
+
+// Global function for user dropdown toggle
+function toggleUserDropdown(btn) {
+    const dropdown = btn.closest('.user-dropdown');
+    if (dropdown) dropdown.classList.toggle('active');
+}
+
+// Cart drawer quantity update (PHP version - full page form post)
+function updateDrawerQty(index, delta) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'cart.php';
+    form.innerHTML = '<input type="hidden" name="action" value="update_quantity">' +
+        '<input type="hidden" name="index" value="' + index + '">' +
+        '<input type="hidden" name="quantity" value="' + Math.max(1, delta) + '">';
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function removeDrawerItem(index) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'cart.php';
+    form.innerHTML = '<input type="hidden" name="action" value="remove_item">' +
+        '<input type="hidden" name="index" value="' + index + '">';
+    document.body.appendChild(form);
+    form.submit();
+}
+</script>
+<script src="3d-effects.js"></script>
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Tab switching functionality
-        const tabBtns = document.querySelectorAll('.tab-btn');
-        const formPanels = document.querySelectorAll('.form-panel');
-
-        tabBtns.forEach(btn => {
+        // Tab switching — update URL so refresh keeps the tab
+        document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                const tabToShow = btn.getAttribute('data-tab');
-
-                // Update active button
-                tabBtns.forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
                 btn.classList.add('active');
-
-                // Show selected form panel
-                formPanels.forEach(panel => {
-                    panel.classList.remove('active');
-                    if (panel.id === tabToShow + '-form') {
-                        panel.classList.add('active');
-                    }
-                });
+                document.getElementById(btn.dataset.tab + '-form').classList.add('active');
+                const newUrl = btn.dataset.tab === 'register'
+                    ? 'login.php?tab=register'
+                    : 'login.php';
+                history.replaceState(null, '', newUrl);
             });
         });
 
         // Toggle password visibility
-        const togglePasswordBtns = document.querySelectorAll('.toggle-password');
-        togglePasswordBtns.forEach(btn => {
+        document.querySelectorAll('.toggle-password').forEach(btn => {
             btn.addEventListener('click', function() {
-                const passwordField = this.previousElementSibling;
+                const input = this.previousElementSibling;
                 const icon = this.querySelector('i');
-
-                if (passwordField.type === 'password') {
-                    passwordField.type = 'text';
+                if (input.type === 'password') {
+                    input.type = 'text';
                     icon.className = 'far fa-eye-slash';
                 } else {
-                    passwordField.type = 'password';
+                    input.type = 'password';
                     icon.className = 'far fa-eye';
                 }
             });
         });
 
-        // Password strength indicator
-        const passwordInput = document.getElementById('register-password');
-        const strengthBar = document.querySelector('.strength-bar');
-
-        if (passwordInput && strengthBar) {
-            passwordInput.addEventListener('input', function() {
-                const password = this.value;
-                let strength = 0;
-
-                if (password.length >= 8) strength += 25;
-                if (password.match(/[a-z]+/)) strength += 25;
-                if (password.match(/[A-Z]+/)) strength += 25;
-                if (password.match(/[0-9]+/)) strength += 25;
-
-                strengthBar.style.width = strength + '%';
-
-                if (strength <= 25) {
-                    strengthBar.style.backgroundColor = '#ff4d4d';
-                } else if (strength <= 50) {
-                    strengthBar.style.backgroundColor = '#ffa64d';
-                } else if (strength <= 75) {
-                    strengthBar.style.backgroundColor = '#ffff4d';
-                } else {
-                    strengthBar.style.backgroundColor = '#4CAF50';
-                }
-            });
-        }
-
-        // Form validation for registration
-        const registerForm = document.querySelector('#register-form form');
-        const confirmPasswordInput = document.getElementById('register-confirm-password');
-
-        if (registerForm) {
-            registerForm.addEventListener('submit', function(e) {
-                if (passwordInput.value !== confirmPasswordInput.value) {
-                    e.preventDefault();
-                    alert('Passwords do not match. Please try again.');
-                    return false;
-                }
-            });
-        }
-
-        // Side navigation functionality
-        const sideNavToggle = document.querySelector('.menu-toggle');
-        const sideNav = document.querySelector('.side-nav');
-        const sideNavBackdrop = document.querySelector('.side-nav-backdrop');
-        const sideNavClose = document.querySelector('.close-sidenav');
-
-        if (sideNavToggle && sideNav) {
-            sideNavToggle.addEventListener('click', () => {
-                sideNav.classList.add('open');
-                sideNavBackdrop.classList.add('active');
-                document.body.classList.add('no-scroll');
-            });
-        }
-
-        function closeSideNav() {
-            if (sideNav) {
-                sideNav.classList.remove('open');
-                sideNavBackdrop.classList.remove('active');
-                document.body.classList.remove('no-scroll');
-            }
-        }
-
-        if (sideNavClose) sideNavClose.addEventListener('click', closeSideNav);
-        if (sideNavBackdrop) sideNavBackdrop.addEventListener('click', closeSideNav);
-
-        // Back to top button
-        const backToTopBtn = document.querySelector('.back-to-top');
-
-        window.addEventListener('scroll', () => {
-            if (window.pageYOffset > 300) {
-                backToTopBtn.classList.add('show');
-            } else {
-                backToTopBtn.classList.remove('show');
-            }
+        // Auto-hide alerts
+        document.querySelectorAll('.alert').forEach(alert => {
+            setTimeout(() => alert.style.display = 'none', 5000);
         });
-
-        backToTopBtn.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-
-        // Load cart counts from localStorage
-        updateCartCount();
     });
-
-    function updateCartCount() {
-        const cartCountEl = document.querySelector('.cart-count');
-        const myorderCountEl = document.querySelector('.myorder-count');
-        const shoppingCart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
-        const finalCart = JSON.parse(localStorage.getItem('finalCart')) || [];
-
-        // My Order count - items waiting for customization
-        let myOrderTotal = 0;
-        shoppingCart.forEach(item => myOrderTotal += item.quantity || 1);
-        if (myorderCountEl) myorderCountEl.textContent = myOrderTotal;
-
-        // Cart count - only customized items ready for checkout
-        let cartTotal = 0;
-        finalCart.forEach(item => cartTotal += item.quantity || 1);
-        if (cartCountEl) cartCountEl.textContent = cartTotal;
-    }
-
-    // Handle login form submission
-    function handleLogin(event) {
-        event.preventDefault();
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
-
-        if (email && password) {
-            // Store login info in localStorage
-            localStorage.setItem('userEmail', email);
-            localStorage.setItem('isLoggedIn', 'true');
-
-            // If no userName exists, extract from email
-            if (!localStorage.getItem('userName')) {
-                const nameFromEmail = email.split('@')[0];
-                // Capitalize first letter
-                const formattedName = nameFromEmail.charAt(0).toUpperCase() + nameFromEmail.slice(1);
-                localStorage.setItem('userName', formattedName);
-            }
-
-            window.location.href = 'index.html';
-        }
-        return false;
-    }
-
-    // Handle register form submission
-    function handleRegister(event) {
-        event.preventDefault();
-        const name = document.getElementById('register-name').value;
-        const email = document.getElementById('register-email').value;
-        const phone = document.getElementById('register-phone').value;
-        const password = document.getElementById('register-password').value;
-        const confirmPassword = document.getElementById('register-confirm-password').value;
-
-        if (!name || !email || !phone || !password || !confirmPassword) {
-            return false;
-        }
-
-        if (password !== confirmPassword) {
-            return false;
-        }
-
-        if (password.length < 8) {
-            return false;
-        }
-
-        // Store registration info in localStorage
-        localStorage.setItem('userName', name);
-        localStorage.setItem('userEmail', email);
-        localStorage.setItem('userPhone', phone);
-        localStorage.setItem('isLoggedIn', 'true');
-
-        window.location.href = 'index.html';
-        return false;
-    }
     </script>
 </body>
 </html>

@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#F5F0E8">
+<title>Shipping Policy - Stitch House</title>
+<style>html,body{background-color:#F5F0E8;margin:0;}</style>
+<link rel="stylesheet" href="variables.css?v=1776672380">
+<link rel="stylesheet" href="styles.css?v=1777055578">
+<link rel="stylesheet" href="info-page.css?v=1777056701">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;500;600;700&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="3d-effects.css?v=1776672380">
+</head>
+<body>
+    <!-- Side Navigation -->
+<div class="side-nav">
+    <div class="side-nav-content">
+        <div class="side-nav-header">
+            <div class="logo-container">
+                <h2 class="logo-text">Stitch House</h2>
+            </div>
+            <button class="close-sidenav">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="side-nav-links">
+            <ul>
+                <li><a href="order.php" class="shop-link"><i class="fas fa-shopping-bag"></i>Shop Now</a></li>
+                <li><a href="order.php#cotton-section"><i class="fas fa-tshirt"></i>Cotton Fabrics</a></li>
+                <li><a href="order.php#lattha-section"><i class="fas fa-scroll"></i>Lattha Fabrics</a></li>
+                <li><a href="order.php#karandi-section"><i class="fas fa-layer-group"></i>Karandi Fabrics</a></li>
+                <li><a href="order.php#boski-section"><i class="fas fa-square"></i>Boski Fabrics</a></li>
+                <li><a href="order.php#linen-section"><i class="fas fa-wind"></i>Linen Fabrics</a></li>
+                <li><a href="order.php#washandwear-section"><i class="fas fa-tshirt"></i>Wash and Wear</a></li>
+                <li><a href="order.php#silk-section"><i class="fas fa-stream"></i>Silk Fabrics</a></li>
+                <li><a href="order.php#khaddar-section"><i class="fas fa-border-all"></i>Khaddar Fabrics</a></li>
+            </ul>
+        </div>
+        <div class="side-nav-footer">
+            <div class="social-icons">
+                <a href="#" class="facebook"><i class="fab fa-facebook"></i></a>
+                <a href="#" class="instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="pinterest"><i class="fab fa-pinterest"></i></a>
+                <a href="#" class="youtube"><i class="fab fa-youtube"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="side-nav-backdrop"></div>
+
+<header>
+    <div class="container">
+        <div class="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+        <div class="site-title">
+            <a href="index.php">
+                <h1 class="logo-text">Stitch House</h1>
+            </a>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.php" class="nav-link">Home</a></li>
+                <li><a href="order.php" class="nav-link">Shop Now</a></li>
+                <li><a href="myorder.php" class="nav-link">My Order</a></li>
+                <li><a href="contact.php" class="nav-link">Contact Us</a></li>
+            </ul>
+        </nav>
+        <div class="header-actions">
+                        <div class="login-link">
+                <a href="login.php">
+                    <i class="fas fa-user"></i>
+                </a>
+            </div>
+            
+            <div class="myorder-link">
+                <a href="myorder.php" title="My Order">
+                    <i class="fas fa-cut"></i>
+                    <span class="myorder-count">0</span>
+                </a>
+            </div>
+
+            <div class="cart-link" id="cart-drawer-trigger">
+                <a href="cart.php" title="Cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                </a>
+            </div>
+
+                    </div>
+    </div>
+</header>
+
+<!-- Cart Drawer -->
+<div class="cart-drawer-backdrop" id="cart-drawer-backdrop"></div>
+<div class="cart-drawer" id="cart-drawer">
+    <div class="cart-drawer-header">
+        <h3>Your Cart <span class="cart-drawer-count">(0 items)</span></h3>
+        <button class="cart-drawer-close" id="cart-drawer-close">&times;</button>
+    </div>
+    <div class="cart-drawer-items" id="cart-drawer-items">
+                <div class="cart-drawer-empty">
+            <i class="fas fa-shopping-cart"></i>
+            <p>Your cart is empty</p>
+        </div>
+            </div>
+    <div class="cart-drawer-footer">
+        <div class="cart-drawer-total">
+            <span>Subtotal</span>
+            <span class="total-amount">PKR 0</span>
+        </div>
+        <a href="cart.php" class="cart-drawer-btn checkout">View Cart & Checkout</a>
+        <button class="cart-drawer-btn continue" id="cart-drawer-continue">Continue Shopping</button>
+    </div>
+</div>
+
+    <section class="page-banner">
+        <div class="container">
+            <h1>Shipping Policy</h1>
+            <div class="breadcrumb">
+                <a href="index.php">Home</a> / <span>Shipping Policy</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="info-section">
+        <div class="container">
+            <div class="info-panel">
+                <p class="info-intro">
+                    At Stitch House, we deliver your custom-stitched kameez to every corner of Pakistan.
+                    Here's everything you need to know about how your order reaches you.
+                </p>
+
+                <h2><i class="fas fa-truck"></i> Delivery Charges</h2>
+                <ul class="info-list">
+                    <li><strong>Free delivery</strong> on orders over <strong>PKR 5,000</strong>.</li>
+                    <li>Flat <strong>PKR 200</strong> shipping fee for orders under PKR 5,000.</li>
+                    <li>No hidden fees at checkout — what you see is what you pay.</li>
+                </ul>
+
+                <h2><i class="fas fa-clock"></i> Delivery Timelines</h2>
+                <p>
+                    Because every kameez is custom-stitched to your measurements, orders take longer than
+                    off-the-shelf retail. Typical timelines:
+                </p>
+                <div class="info-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Stage</th>
+                                <th>Duration</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Order confirmation</td><td>Within 24 hours</td></tr>
+                            <tr><td>Fabric cutting &amp; tailoring</td><td>5–7 working days</td></tr>
+                            <tr><td>Quality check</td><td>1 day</td></tr>
+                            <tr><td>Dispatch &amp; delivery</td><td>2–4 working days</td></tr>
+                            <tr><td><strong>Total estimate</strong></td><td><strong>8–12 working days</strong></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2><i class="fas fa-map-marker-alt"></i> Coverage Area</h2>
+                <p>
+                    We deliver nationwide across Pakistan, including but not limited to:
+                </p>
+                <ul class="info-list two-col">
+                    <li>Karachi</li>
+                    <li>Lahore</li>
+                    <li>Islamabad</li>
+                    <li>Rawalpindi</li>
+                    <li>Faisalabad</li>
+                    <li>Multan</li>
+                    <li>Peshawar</li>
+                    <li>Quetta</li>
+                    <li>Sialkot</li>
+                    <li>Gujranwala</li>
+                    <li>Hyderabad</li>
+                    <li>Bahawalpur</li>
+                </ul>
+                <p>
+                    Orders to remote areas may take an additional 2–3 working days.
+                </p>
+
+                <h2><i class="fas fa-money-bill-wave"></i> Payment on Delivery</h2>
+                <p>
+                    Cash on Delivery (COD) is available across all serviceable cities. Pay the full
+                    amount in cash to the courier at your doorstep — no advance required.
+                </p>
+
+                <h2><i class="fas fa-box"></i> Courier Partners</h2>
+                <p>
+                    We ship through trusted local courier services — TCS, Leopards Courier, and
+                    Pakistan Post — selected based on your city for fastest delivery.
+                </p>
+
+                <h2><i class="fas fa-search"></i> Tracking Your Order</h2>
+                <p>
+                    Once logged in, visit <a href="dashboard.php?tab=orders">My Account → Order History</a>
+                    to see your live status timeline:
+                    <em>Pending → Processing → In Tailoring → Shipped → Completed</em>.
+                </p>
+
+                <div class="info-callout">
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                        <strong>Still have questions?</strong>
+                        Head to our <a href="contact.php">Contact Us</a> page or reach us on WhatsApp —
+                        our team responds within a few hours on working days.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+    <div class="container">
+        <!-- Newsletter Section -->
+        <div class="footer-newsletter reveal">
+            <h3>Stay Updated</h3>
+            <p>Subscribe for exclusive offers, new arrivals, and seasonal collections</p>
+            <form class="newsletter-form" onsubmit="event.preventDefault(); this.querySelector('button').textContent='Subscribed!'; this.querySelector('input').value='';">
+                <input type="email" placeholder="Enter your email address" required>
+                <button type="submit">Subscribe</button>
+            </form>
+        </div>
+
+        <div class="footer-content">
+            <div class="footer-section about reveal">
+                <div class="footer-logo">
+                    <a href="index.php" class="logo-button">
+                        <h3 class="logo-text">Stitch House</h3>
+                    </a>
+                </div>
+                <p>Your premium destination for high-quality fabrics and exceptional tailoring service in Lahore.</p>
+                <div class="social-icons">
+                    <a href="#" class="facebook"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="pinterest"><i class="fab fa-pinterest"></i></a>
+                    <a href="#" class="youtube"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="footer-section links reveal reveal-delay-1">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.php">Home</a></li>
+                    <li><a href="order.php">Shop Now</a></li>
+                    <li><a href="myorder.php">My Order</a></li>
+                    <li><a href="contact.php">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="footer-section customer-service reveal reveal-delay-2">
+                <h3>Customer Service</h3>
+                <ul>
+                    <li><a href="shipping-policy.php">Shipping Policy</a></li>
+                    <li><a href="returns.php">Returns &amp; Exchange</a></li>
+                    <li><a href="size-guide.php">Size Guide</a></li>
+                    <li><a href="faqs.php">FAQs</a></li>
+                </ul>
+            </div>
+            <div class="footer-section contact reveal reveal-delay-3">
+                <h3>Contact Info</h3>
+                <p><i class="fas fa-map-marker-alt"></i> Main Gulberg, Lahore, Pakistan</p>
+                <p><i class="fas fa-phone"></i> 0304-2292813</p>
+                <p><i class="fas fa-envelope"></i> info@stitchhouse.com</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Stitch House. All Rights Reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<div class="back-to-top">
+    <i class="fas fa-arrow-up"></i>
+</div>
+
+<button type="button" class="cart-float" id="cart-float-btn" aria-label="Open cart" title="Your Cart">
+    <i class="fas fa-shopping-bag"></i>
+    <span class="cart-float-count is-empty">0</span>
+</button>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ==========================================
+    // HEADER SCROLL EFFECT
+    // ==========================================
+    const header = document.querySelector('header');
+    if (header) {
+        window.addEventListener('scroll', () => {
+            header.classList.toggle('header-scrolled', window.scrollY > 50);
+        });
+    }
+
+    // ==========================================
+    // SIDE NAVIGATION
+    // ==========================================
+    const sideNavToggle = document.querySelector('.menu-toggle');
+    const sideNav = document.querySelector('.side-nav');
+    const sideNavBackdrop = document.querySelector('.side-nav-backdrop');
+    const sideNavClose = document.querySelector('.close-sidenav');
+
+    if (sideNavToggle && sideNav) {
+        sideNavToggle.addEventListener('click', () => {
+            sideNav.classList.add('open');
+            sideNavBackdrop.classList.add('active');
+            document.body.classList.add('no-scroll');
+        });
+    }
+
+    function closeSideNav() {
+        if (sideNav) {
+            sideNav.classList.remove('open');
+            sideNavBackdrop.classList.remove('active');
+            document.body.classList.remove('no-scroll');
+        }
+    }
+
+    if (sideNavClose) sideNavClose.addEventListener('click', closeSideNav);
+    if (sideNavBackdrop) sideNavBackdrop.addEventListener('click', closeSideNav);
+
+    // ==========================================
+    // BACK TO TOP BUTTON
+    // ==========================================
+    const backToTopBtn = document.querySelector('.back-to-top');
+    if (backToTopBtn) {
+        window.addEventListener('scroll', () => {
+            backToTopBtn.classList.toggle('show', window.pageYOffset > 300);
+        });
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+
+    // ==========================================
+    // MOBILE NAV TOGGLE
+    // ==========================================
+    const menuToggle = document.querySelector('.menu-toggle');
+    const nav = document.querySelector('nav');
+    if (menuToggle && nav) {
+        menuToggle.addEventListener('click', () => nav.classList.toggle('active'));
+    }
+
+    // ==========================================
+    // IMAGE ERROR HANDLING
+    // ==========================================
+    document.querySelectorAll('img').forEach(img => {
+        img.addEventListener('error', function() {
+            if (!this.src.includes('placeholder')) {
+                const src = this.src;
+                if (src.endsWith('.jpg')) {
+                    this.src = src.replace('.jpg', '.webp');
+                } else if (src.endsWith('.webp')) {
+                    this.src = 'images/placeholder.jpg';
+                } else {
+                    this.src = 'images/placeholder.jpg';
+                }
+            }
+        });
+    });
+
+    // ==========================================
+    // ANNOUNCEMENT BAR
+    // ==========================================
+    const announcementBar = document.getElementById('announcement-bar');
+    const announcementClose = document.getElementById('announcement-close');
+    if (announcementBar && sessionStorage.getItem('announcementClosed') === 'true') {
+        announcementBar.style.display = 'none';
+    }
+    if (announcementClose) {
+        announcementClose.addEventListener('click', () => {
+            announcementBar.style.display = 'none';
+            sessionStorage.setItem('announcementClosed', 'true');
+        });
+    }
+
+    // ==========================================
+    // SCROLL REVEAL ANIMATIONS
+    // ==========================================
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+                revealObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    // ==========================================
+    // CART DRAWER
+    // ==========================================
+    const cartDrawer = document.getElementById('cart-drawer');
+    const cartBackdrop = document.getElementById('cart-drawer-backdrop');
+    const cartClose = document.getElementById('cart-drawer-close');
+    const cartContinue = document.getElementById('cart-drawer-continue');
+    const cartTrigger = document.getElementById('cart-drawer-trigger');
+
+    function openCartDrawer(e) {
+        if (e) e.preventDefault();
+        if (cartDrawer) cartDrawer.classList.add('open');
+        if (cartBackdrop) cartBackdrop.classList.add('active');
+        document.body.classList.add('no-scroll');
+    }
+
+    function closeCartDrawer() {
+        if (cartDrawer) cartDrawer.classList.remove('open');
+        if (cartBackdrop) cartBackdrop.classList.remove('active');
+        document.body.classList.remove('no-scroll');
+    }
+
+    if (cartTrigger) {
+        const cartLink = cartTrigger.querySelector('a');
+        if (cartLink) {
+            cartLink.addEventListener('click', openCartDrawer);
+        }
+    }
+    const cartFloatBtn = document.getElementById('cart-float-btn');
+    if (cartFloatBtn) cartFloatBtn.addEventListener('click', openCartDrawer);
+    if (cartClose) cartClose.addEventListener('click', closeCartDrawer);
+    if (cartBackdrop) cartBackdrop.addEventListener('click', closeCartDrawer);
+    if (cartContinue) cartContinue.addEventListener('click', closeCartDrawer);
+
+    // ==========================================
+    // TESTIMONIAL CAROUSEL
+    // ==========================================
+    const testimonialSlides = document.querySelectorAll('.testimonial-slide');
+    const testimonialDotsContainer = document.querySelector('.testimonial-dots');
+
+    if (testimonialSlides.length > 1 && testimonialDotsContainer) {
+        let currentTestimonial = 0;
+
+        // Create dots
+        testimonialSlides.forEach((_, i) => {
+            const dot = document.createElement('button');
+            dot.className = 'testimonial-dot' + (i === 0 ? ' active' : '');
+            dot.addEventListener('click', () => goToTestimonial(i));
+            testimonialDotsContainer.appendChild(dot);
+        });
+
+        function goToTestimonial(index) {
+            testimonialSlides.forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.testimonial-dot').forEach(d => d.classList.remove('active'));
+            testimonialSlides[index].classList.add('active');
+            document.querySelectorAll('.testimonial-dot')[index].classList.add('active');
+            currentTestimonial = index;
+        }
+
+        setInterval(() => {
+            goToTestimonial((currentTestimonial + 1) % testimonialSlides.length);
+        }, 5000);
+    }
+
+    // ==========================================
+    // USER DROPDOWN
+    // ==========================================
+    document.addEventListener('click', function(e) {
+        document.querySelectorAll('.user-dropdown').forEach(dropdown => {
+            if (!dropdown.contains(e.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+    });
+});
+
+// Global function for user dropdown toggle
+function toggleUserDropdown(btn) {
+    const dropdown = btn.closest('.user-dropdown');
+    if (dropdown) dropdown.classList.toggle('active');
+}
+
+// Cart drawer quantity update (PHP version - full page form post)
+function updateDrawerQty(index, delta) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'cart.php';
+    form.innerHTML = '<input type="hidden" name="action" value="update_quantity">' +
+        '<input type="hidden" name="index" value="' + index + '">' +
+        '<input type="hidden" name="quantity" value="' + Math.max(1, delta) + '">';
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function removeDrawerItem(index) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'cart.php';
+    form.innerHTML = '<input type="hidden" name="action" value="remove_item">' +
+        '<input type="hidden" name="index" value="' + index + '">';
+    document.body.appendChild(form);
+    form.submit();
+}
+</script>
+<script src="3d-effects.js"></script>
+</body>
+</html>

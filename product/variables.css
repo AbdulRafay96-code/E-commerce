@@ -1,6 +1,6 @@
 /**
  * Stitch House - CSS Variables (Single Source of Truth)
- * Theme: Black, White, Gold (#d4af37)
+ * Theme: Refined Luxe - Near-Black, Warm Cream, Muted Gold (#C9A96E), Burgundy (#8B1538)
  * Fonts: Playfair Display (headers), Montserrat (body), Dancing Script (logo)
  *
  * IMPORTANT: This is the ONLY file that should contain :root variables.
@@ -9,31 +9,34 @@
 
 :root {
     /* Primary Colors */
-    --primary-color: #000000;
-    --primary-dark: #0a0a0a;
-    --accent-color: #333333;
-    --dark-color: #0a0a0a;
+    --primary-color: #1A1A1A;
+    --primary-dark: #0f0f0f;
+    --accent-color: #2C2C2C;
+    --dark-color: #0f0f0f;
 
-    /* Gold Accent - OFFICIAL BRAND COLOR */
-    --gold-color: #d4af37;
+    /* Gold Accent - REFINED BRAND COLOR */
+    --gold-color: #C9A96E;
+
+    /* Burgundy Accent - Sale badges, urgency, secondary CTAs */
+    --burgundy-color: #8B1538;
 
     /* Background Colors */
-    --bg-light: #ffffff;
-    --bg-dark: #0a0a0a;
-    --bg-gray: #f5f5f5;
-    --bg-white: #ffffff;
-    --light-color: #f5f5f5;
+    --bg-light: #F5F0E8;
+    --bg-dark: #1A1A1A;
+    --bg-gray: #E8E3DC;
+    --bg-white: #FDFBF7;
+    --light-color: #E8E3DC;
 
     /* Text Colors */
-    --text-color: #1a1a1a;
-    --text-light: #ffffff;
-    --text-muted: #666666;
+    --text-color: #1C1C1C;
+    --text-light: #F5F0E8;
+    --text-muted: #7A7267;
 
     /* Border & Shadow */
-    --border-color: #e0e0e0;
-    --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.05);
-    --shadow-medium: 0 5px 15px rgba(0, 0, 0, 0.1);
-    --shadow-dark: 0 5px 15px rgba(0, 0, 0, 0.3);
+    --border-color: #D6D0C6;
+    --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.06);
+    --shadow-medium: 0 5px 20px rgba(0, 0, 0, 0.1);
+    --shadow-dark: 0 10px 30px rgba(0, 0, 0, 0.2);
 
     /* Fonts */
     --font-heading: 'Playfair Display', serif;
@@ -41,7 +44,11 @@
     --font-logo: 'Dancing Script', cursive;
 
     /* Status Colors */
-    --success-color: #28a745;
-    --error-color: #dc3545;
-    --warning-color: #ffc107;
+    --success-color: #2D5A4A;
+    --error-color: #A4343A;
+    --warning-color: #D4A017;
+
+    /* Transitions */
+    --transition-base: 0.3s ease;
+    --transition-slow: 0.6s ease;
 }

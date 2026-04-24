@@ -1,0 +1,720 @@
+/**
+ * Stitch House - 3D Effects & Premium Animations
+ * Adds depth, tilt, shimmer, particles, and premium visual effects
+ * Does NOT override existing functionality — purely additive
+ */
+
+/* ============================================
+   1. PAGE LOAD ENTRANCE ANIMATION
+   ============================================ */
+/* Page entrance handled by html.page-ready transition */
+
+/* ============================================
+   2. GOLD SHIMMER TEXT ON HEADINGS
+   ============================================ */
+@keyframes goldShimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+}
+
+.featured-products h2,
+.section-header h2,
+.page-banner h1,
+.testimonial-quotes h2 {
+    background: linear-gradient(
+        90deg,
+        var(--text-color) 0%,
+        var(--text-color) 35%,
+        var(--gold-color) 50%,
+        var(--text-color) 65%,
+        var(--text-color) 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: goldShimmer 4s ease-in-out infinite;
+}
+
+.page-banner h1 {
+    background: linear-gradient(
+        90deg,
+        #ffffff 0%,
+        #ffffff 35%,
+        var(--gold-color) 50%,
+        #ffffff 65%,
+        #ffffff 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: goldShimmer 3s ease-in-out infinite;
+}
+
+/* ============================================
+   3. FROSTED GLASS NAVBAR ON SCROLL
+   ============================================ */
+header.header-scrolled {
+    background: rgba(253, 251, 247, 0.88) !important;
+    backdrop-filter: blur(16px) saturate(1.4);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08),
+                0 1px 0 rgba(201, 169, 110, 0.1);
+    border-bottom: 1px solid rgba(201, 169, 110, 0.15);
+}
+
+/* ============================================
+   4. 3D PRODUCT CARD TILT EFFECT
+   ============================================ */
+.shop-product-card {
+    transform-style: preserve-3d;
+    perspective: 1000px;
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                box-shadow 0.4s ease;
+}
+
+.shop-product-card.tilt-active {
+    transition: none;
+}
+
+.shop-product-card .product-image img {
+    transition: transform 0.5s ease;
+}
+
+.shop-product-card:hover .product-image img {
+    transform: scale(1.06) translateZ(20px);
+}
+
+/* Gloss shimmer overlay on product cards */
+.shop-product-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+        105deg,
+        transparent 40%,
+        rgba(255, 255, 255, 0.12) 45%,
+        rgba(255, 255, 255, 0.25) 50%,
+        rgba(255, 255, 255, 0.12) 55%,
+        transparent 60%
+    );
+    transition: left 0.7s ease;
+    z-index: 3;
+    pointer-events: none;
+    border-radius: inherit;
+}
+
+.shop-product-card:hover::after {
+    left: 120%;
+}
+
+/* Depth shadow on hover */
+.shop-product-card:hover {
+    box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.12),
+        0 8px 16px rgba(0, 0, 0, 0.08),
+        0 0 0 1px rgba(201, 169, 110, 0.2);
+}
+
+/* ============================================
+   5. BENTO CARD 3D FLIP EFFECT
+   ============================================ */
+.bento-card {
+    perspective: 1000px;
+    overflow: hidden;
+}
+
+.bento-card .bento-flip-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.6s ease;
+}
+
+.bento-card:hover .bento-flip-inner {
+    transform: rotateY(180deg);
+}
+
+.bento-card .bento-front,
+.bento-card .bento-back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.bento-card .bento-front {
+    z-index: 2;
+    transform: rotateY(0deg);
+}
+
+.bento-card .bento-front img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+}
+
+.bento-card .bento-back {
+    transform: rotateY(180deg);
+    z-index: 1;
+    background: linear-gradient(135deg, #1A1A1A 0%, #2C2C2C 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    text-align: center;
+}
+
+.bento-card .bento-back h3 {
+    font-family: var(--font-heading);
+    color: var(--gold-color);
+    font-size: 18px;
+    margin-bottom: 6px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.bento-card .bento-back p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 12px;
+    line-height: 1.5;
+    max-width: 220px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    flex-shrink: 1;
+}
+
+.bento-card .bento-back .flip-cta {
+    margin-top: 10px;
+    padding: 8px 22px;
+    background: var(--gold-color);
+    color: white;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+    transition: all 0.3s;
+    flex-shrink: 0;
+}
+
+.bento-card .bento-back .flip-cta:hover {
+    background: white;
+    color: var(--primary-color);
+    transform: scale(1.05);
+}
+
+/* For non-flip bento cards (fallback for cards without flip structure) */
+.bento-card:not(:has(.bento-flip-inner)) {
+    transform-style: preserve-3d;
+}
+
+.bento-card:not(:has(.bento-flip-inner)):hover img {
+    transform: scale(1.08);
+}
+
+/* ============================================
+   6. HERO CAROUSEL 3D PARALLAX DEPTH
+   ============================================ */
+.carousel {
+    perspective: 1200px;
+    overflow: hidden;
+}
+
+.carousel-item.active-slide .carousel-caption {
+    transform: translateZ(60px);
+    transform-style: preserve-3d;
+}
+
+.carousel-item.active-slide .carousel-caption h2 {
+    transform: translateZ(30px);
+    text-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.carousel-item.active-slide .carousel-caption p {
+    transform: translateZ(15px);
+}
+
+.carousel-item.active-slide .carousel-caption .btn-shop-now {
+    transform: translateZ(40px);
+}
+
+/* ============================================
+   7. 3D CART DRAWER (subtle perspective)
+   ============================================ */
+.cart-drawer {
+    transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.4s ease;
+}
+
+.cart-drawer.open {
+    box-shadow: -10px 0 40px rgba(0, 0, 0, 0.15);
+}
+
+/* ============================================
+   8. 3D BUTTON EFFECTS
+   ============================================ */
+@keyframes glowPulse {
+    0%, 100% {
+        box-shadow: 0 4px 15px rgba(201, 169, 110, 0.3);
+    }
+    50% {
+        box-shadow: 0 4px 25px rgba(201, 169, 110, 0.6),
+                    0 0 40px rgba(201, 169, 110, 0.15);
+    }
+}
+
+.btn-add-to-order,
+.btn-shop-now,
+.btn-view-all,
+.checkout-btn,
+.btn-primary,
+.btn-submit,
+.order-popup-btn,
+.cart-drawer-btn.checkout {
+    transform-style: preserve-3d;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Hover: lift + glow pulse */
+.btn-add-to-order:hover,
+.btn-shop-now:hover,
+.btn-view-all:hover,
+.checkout-btn:hover,
+.btn-primary:hover,
+.btn-submit:hover,
+.order-popup-btn:hover,
+.cart-drawer-btn.checkout:hover {
+    animation: glowPulse 1.5s ease-in-out infinite;
+    transform: translateY(-3px) translateZ(5px);
+}
+
+/* Active: 3D press down */
+.btn-add-to-order:active,
+.btn-shop-now:active,
+.btn-view-all:active,
+.checkout-btn:active,
+.btn-primary:active,
+.btn-submit:active,
+.order-popup-btn:active,
+.cart-drawer-btn.checkout:active {
+    transform: translateY(1px) scale(0.97);
+    box-shadow: 0 2px 8px rgba(201, 169, 110, 0.2) !important;
+    animation: none;
+    transition: all 0.1s ease;
+}
+
+/* ============================================
+   9. FLOATING PARTICLE CANVAS (positioned by JS)
+   ============================================ */
+#particle-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+}
+
+/* Ensure content sits above particles (don't override header/nav/drawer z-index) */
+.carousel,
+.moving-text-banner,
+.testimonial-quotes,
+.stats-counter-section,
+.featured-products,
+.product-section,
+.page-banner,
+.my-order-section,
+.cart-section,
+.checkout-section,
+.contact-section,
+.login-section,
+.confirmation-section,
+.fabric-slider-section,
+footer {
+    position: relative;
+    z-index: 1;
+}
+
+/* ============================================
+   10. FABRIC SLIDER 3D DEPTH
+   ============================================ */
+.slider-item {
+    transform-style: preserve-3d;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.slider-item:hover {
+    transform: translateY(-10px) translateZ(20px);
+}
+
+.slider-item img {
+    transition: all 0.4s ease;
+}
+
+.slider-item:hover img {
+    box-shadow:
+        0 15px 35px rgba(201, 169, 110, 0.25),
+        0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================
+   11. ENHANCED SCROLL REVEAL WITH 3D
+   ============================================ */
+.reveal {
+    opacity: 0;
+    transform: translateY(40px) perspective(800px) rotateX(2deg);
+    transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0) perspective(800px) rotateX(0deg);
+}
+
+/* ============================================
+   12. MISC PREMIUM TOUCHES
+   ============================================ */
+
+/* Gold line separator animation */
+@keyframes lineExpand {
+    from { width: 0; }
+    to { width: 60px; }
+}
+
+.page-banner h1::after {
+    animation: lineExpand 0.8s ease 0.3s forwards;
+    width: 0;
+}
+
+/* Subtle breathing animation on WhatsApp button */
+@keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.whatsapp-float {
+    animation: breathe 3s ease-in-out infinite;
+}
+
+.whatsapp-float:hover {
+    animation: none;
+    transform: scale(1.15) translateY(-3px);
+}
+
+/* Newsletter input focus glow */
+.newsletter-form input[type="email"]:focus {
+    box-shadow: 0 0 20px rgba(201, 169, 110, 0.2);
+    border-color: var(--gold-color);
+}
+
+/* Cart drawer item hover */
+.cart-drawer-item:hover {
+    background: rgba(201, 169, 110, 0.04);
+    border-radius: 8px;
+}
+
+/* Testimonial slide transition with depth */
+.testimonial-slide.active {
+    animation: testimonialIn 0.6s ease forwards;
+}
+
+@keyframes testimonialIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ============================================
+   13. RESPONSIVE - REDUCE 3D ON MOBILE
+   ============================================ */
+@media (max-width: 768px) {
+    .shop-product-card::after {
+        display: none; /* No gloss shimmer on touch */
+    }
+
+    .bento-card:hover .bento-flip-inner {
+        transform: none; /* No flip on touch devices */
+    }
+
+    .carousel-item.active-slide .carousel-caption {
+        transform: none;
+    }
+
+    .carousel-item.active-slide .carousel-caption h2,
+    .carousel-item.active-slide .carousel-caption p,
+    .carousel-item.active-slide .carousel-caption .btn-shop-now {
+        transform: none;
+    }
+
+    .reveal {
+        transform: translateY(30px);
+    }
+
+    .reveal.active {
+        transform: translateY(0);
+    }
+
+    #particle-canvas {
+        display: none; /* No particles on mobile */
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+    #particle-canvas, #cursor-trail-canvas { display: none; }
+}
+
+/* ============================================
+   14. SCROLL PROGRESS BAR
+   ============================================ */
+#scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    width: 0%;
+    background: linear-gradient(90deg, var(--gold-color), #E8C97A, var(--gold-color));
+    z-index: 9999;
+    transition: width 0.05s linear;
+    box-shadow: 0 0 8px rgba(201, 169, 110, 0.5);
+}
+
+/* ============================================
+   15. COUNTER ANIMATION
+   ============================================ */
+.stats-counter-section {
+    padding: 50px 0;
+    background: var(--bg-white);
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.stats-grid {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    text-align: center;
+    min-width: 140px;
+}
+
+.stat-number {
+    font-family: var(--font-heading);
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--gold-color);
+    line-height: 1;
+    margin-bottom: 8px;
+}
+
+.stat-label {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.stat-divider {
+    width: 1px;
+    height: 50px;
+    background: var(--border-color);
+    align-self: center;
+}
+
+@media (max-width: 768px) {
+    .stats-grid { gap: 30px; }
+    .stat-number { font-size: 36px; }
+    .stat-divider { display: none; }
+}
+
+/* ============================================
+   16. 3D PRODUCT FLOAT ON HOVER
+   ============================================ */
+.shop-product-card:hover {
+    transform: perspective(800px) translateY(-12px) translateZ(15px);
+    box-shadow:
+        0 30px 60px rgba(0, 0, 0, 0.15),
+        0 15px 25px rgba(0, 0, 0, 0.08),
+        0 0 0 1px rgba(201, 169, 110, 0.15);
+}
+
+.shop-product-card:hover .product-image img {
+    transform: scale(1.06);
+}
+
+/* Floating shadow beneath the card */
+.shop-product-card::before {
+    content: '';
+    position: absolute;
+    bottom: -15px;
+    left: 10%;
+    width: 80%;
+    height: 20px;
+    background: radial-gradient(ellipse, rgba(0,0,0,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: -1;
+    filter: blur(5px);
+}
+
+.shop-product-card:hover::before {
+    opacity: 1;
+}
+
+/* ============================================
+   17. CURSOR GOLD TRAIL CANVAS
+   ============================================ */
+#cursor-trail-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9998;
+}
+
+@media (max-width: 768px) {
+    #cursor-trail-canvas { display: none; }
+}
+
+/* ============================================
+   18. SECTION DIVIDER LINE DRAW
+   ============================================ */
+.section-header::before {
+    content: '';
+    display: block;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold-color), transparent);
+    margin: 0 auto 25px;
+    transition: width 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.section-header.reveal.active::before {
+    width: 120px;
+}
+
+/* ============================================
+   19. FORM INPUT 3D FOCUS
+   ============================================ */
+.checkout-form input,
+.checkout-form textarea,
+.checkout-form select,
+.contact-form input,
+.contact-form textarea,
+.login-container input,
+.newsletter-form input {
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.checkout-form input:focus,
+.checkout-form textarea:focus,
+.checkout-form select:focus,
+.contact-form input:focus,
+.contact-form textarea:focus,
+.login-container input:focus,
+.newsletter-form input:focus {
+    transform: translateY(-2px);
+    box-shadow:
+        0 4px 12px rgba(201, 169, 110, 0.15),
+        0 1px 3px rgba(0, 0, 0, 0.08);
+    border-color: var(--gold-color) !important;
+    outline: none;
+}
+
+/* ============================================
+   20. 3D MAP PIN DROP (Contact Page)
+   ============================================ */
+.map-section {
+    position: relative;
+}
+
+.map-pin-3d {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    pointer-events: none;
+    animation: pinDrop 1s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+               pinBounce 2s ease-in-out 1s infinite;
+}
+
+@keyframes pinDrop {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-200px) scale(0.5);
+    }
+    60% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(10px) scale(1.1);
+    }
+    80% {
+        transform: translateX(-50%) translateY(-5px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(1);
+    }
+}
+
+@keyframes pinBounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(-8px); }
+}
+
+.map-pin-3d .pin-icon {
+    font-size: 42px;
+    color: var(--gold-color);
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.3));
+    display: block;
+}
+
+.map-pin-3d .pin-shadow {
+    width: 30px;
+    height: 8px;
+    background: radial-gradient(ellipse, rgba(0,0,0,0.25) 0%, transparent 70%);
+    border-radius: 50%;
+    margin: 2px auto 0;
+    animation: pinShadowPulse 2s ease-in-out 1s infinite;
+}
+
+@keyframes pinShadowPulse {
+    0%, 100% { transform: scale(1); opacity: 0.3; }
+    50% { transform: scale(0.7); opacity: 0.15; }
+}
+

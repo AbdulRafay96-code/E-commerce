@@ -55,7 +55,7 @@
 
 .contact-info > p {
     margin-bottom: 30px;
-    color: #666;
+    color: var(--text-muted);
     line-height: 1.6;
 }
 
@@ -86,7 +86,7 @@
 }
 
 .info-item .details p {
-    color: #666;
+    color: var(--text-muted);
     line-height: 1.6;
 }
 
@@ -175,21 +175,24 @@
 }
 
 .btn-submit {
-    background-color: var(--gold-color);
+    background: linear-gradient(135deg, var(--gold-color), #A68B52);
     color: white;
+    padding: 14px 40px;
     border: none;
-    padding: 14px 30px;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
-    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.4s ease;
+    box-shadow: 0 4px 15px rgba(201, 169, 110, 0.3);
+    border-radius: 4px;
     display: inline-block;
 }
 
 .btn-submit:hover {
-    background-color: var(--primary-color);
-    transform: translateY(-3px);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(201, 169, 110, 0.5);
 }
 
 /* Map Section Styling */

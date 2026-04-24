@@ -21,6 +21,22 @@ function getCartCount() {
 }
 
 /**
+ * Calculate My Order (pre-customization) item count from session
+ * @return int Total number of items awaiting customization
+ */
+function getMyOrderCount() {
+    $count = 0;
+
+    if (isset($_SESSION['shoppingCart']) && is_array($_SESSION['shoppingCart'])) {
+        foreach ($_SESSION['shoppingCart'] as $item) {
+            $count += isset($item['quantity']) ? (int)$item['quantity'] : 0;
+        }
+    }
+
+    return $count;
+}
+
+/**
  * Calculate cart subtotal
  * @return float Subtotal amount
  */
@@ -117,6 +133,47 @@ function initializeCart() {
 }
 
 /**
+ * Get product stock quantity from DB. Returns null if product not found.
+ * SRS §3.2.3.5 — out-of-stock handling.
+ */
+function getProductStock($productId) {
+    global $conn;
+    if (!$conn || !$productId) return null;
+    $stmt = $conn->prepare("SELECT stock_quantity FROM products WHERE id = ? LIMIT 1");
+    if (!$stmt) return null;
+    $stmt->bind_param("s", $productId);
+    $stmt->execute();
+    $row = $stmt->get_result()->fetch_assoc();
+    return $row ? (int)$row['stock_quantity'] : null;
+}
+
+/**
+ * Check if a product has enough stock for requested quantity.
+ * Unknown products (null stock) are treated as in-stock for backward compatibility.
+ */
+function hasStock($productId, $requestedQty = 1) {
+    $stock = getProductStock($productId);
+    if ($stock === null) return true; // product not catalogued in DB
+    return $stock >= $requestedQty;
+}
+
+/**
+ * Decrement product stock atomically. Returns true on success.
+ */
+function decrementStock($productId, $qty) {
+    global $conn;
+    if (!$conn || !$productId || $qty <= 0) return false;
+    $stmt = $conn->prepare(
+        "UPDATE products SET stock_quantity = stock_quantity - ?
+         WHERE id = ? AND stock_quantity >= ?"
+    );
+    if (!$stmt) return false;
+    $stmt->bind_param("isi", $qty, $productId, $qty);
+    $stmt->execute();
+    return $stmt->affected_rows > 0;
+}
+
+/**
  * Get measurement value from array or direct value
  * @param mixed $measurement
  * @return array ['value' => string, 'confidence' => float]
@@ -140,7 +197,43 @@ function getMeasurementValue($measurement) {
  * @return string CSS color
  */
 function getConfidenceColor($confidence) {
-    if ($confidence >= 0.85) return '#28a745';
-    if ($confidence >= 0.75) return '#ffc107';
-    return '#dc3545';
+    if ($confidence >= 0.85) return '#2D5A4A';
+    if ($confidence >= 0.75) return '#D4A017';
+    return '#A4343A';
+}
+
+/**
+ * CSRF token — lazily generated once per session.
+ * Protects state-changing POST forms (SRS §3.5.4 Security).
+ */
+function csrfToken() {
+    if (empty($_SESSION['_csrf'])) {
+        $_SESSION['_csrf'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['_csrf'];
+}
+
+/**
+ * Hidden input for forms — drop into any POST <form>.
+ */
+function csrfField() {
+    return '<input type="hidden" name="_csrf" value="' . e(csrfToken()) . '">';
+}
+
+/**
+ * Verify a submitted CSRF token. Returns true on match.
+ * Use on every state-changing POST handler.
+ */
+function csrfVerify() {
+    $submitted = $_POST['_csrf'] ?? '';
+    return !empty($_SESSION['_csrf']) && hash_equals($_SESSION['_csrf'], $submitted);
+}
+
+/**
+ * Regenerate session ID — call on login to prevent session fixation.
+ */
+function sessionRegenerate() {
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        session_regenerate_id(true);
+    }
 }
