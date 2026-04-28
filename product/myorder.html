@@ -1199,15 +1199,33 @@
             
             console.log('📊 Displaying measurements:', measurements);
             
-            // Fill measurement inputs
+            // Fill measurement inputs + render confidence dots (SDD §6 — green/yellow/red)
             Object.entries(measurements).forEach(([key, data]) => {
                 const input = document.getElementById(`webcam-${key}`);
                 if (input && data && data.value) {
                     input.value = data.value.toFixed(1);
-                    console.log(`✅ Set ${key}: ${data.value.toFixed(1)}`);
+                    console.log(`✅ Set ${key}: ${data.value.toFixed(1)} (conf=${(data.confidence ?? 0.8).toFixed(2)})`);
+
+                    // Place a confidence dot next to the input
+                    const conf = data.confidence ?? 0.8;
+                    let color = '#28a745', label = 'High';
+                    if (conf < 0.6) { color = '#dc3545'; label = 'Low'; }
+                    else if (conf < 0.8) { color = '#ffc107'; label = 'Medium'; }
+
+                    let dotEl = document.getElementById(`webcam-${key}-dot`);
+                    if (!dotEl && input.parentElement) {
+                        dotEl = document.createElement('span');
+                        dotEl.id = `webcam-${key}-dot`;
+                        dotEl.style.cssText = 'display:inline-block; width:10px; height:10px; border-radius:50%; margin-left:8px; vertical-align:middle;';
+                        input.insertAdjacentElement('afterend', dotEl);
+                    }
+                    if (dotEl) {
+                        dotEl.style.background = color;
+                        dotEl.title = `Confidence: ${label} (${(conf * 100).toFixed(0)}%)`;
+                    }
                 }
             });
-            
+
             resultsDiv.style.display = 'block';
             
             // Remove existing save button to avoid duplicates
@@ -1253,7 +1271,7 @@
             formData.append('action', 'save_measurements');
             formData.append('index', currentMeasurementIndex);
             formData.append('source', 'ai_webcam');
-            formData.append('csrf_token', '96a6386b481a31803a13c8ddc932158883ca60658bf7ce5d4c19922c0c74023f');
+            formData.append('csrf_token', '08fc57304013bb0b78155d8a4c4e904677ce52ec2ee044afb9b84508afc23049');
             
             let validMeasurementCount = 0;
             

@@ -19,26 +19,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $username = trim($_POST['username'] ?? '');
         $password = $_POST['password'] ?? '';
 
-        // Query to check admin credentials (include role per SRS §3.4)
-        $stmt = $conn->prepare("SELECT id, username, password, role FROM admins WHERE username = ?");
-        $stmt->bind_param("s", $username);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        // NFR-SEC + SDD §3.5 — admin gets stricter limit (3 attempts / 15 min)
+        $rate = checkLoginRateLimit($username ?: 'anonymous', 'admin', 3, 15);
+        if ($rate['locked']) {
+            $error = "Too many failed admin attempts. Try again in " . ceil($rate['retry_after_seconds'] / 60) . " minute(s).";
+        } else {
+            $stmt = $conn->prepare("SELECT id, username, password, role FROM admins WHERE username = ?");
+            $stmt->bind_param("s", $username);
+            $stmt->execute();
+            $result = $stmt->get_result();
 
-        if ($result->num_rows === 1) {
-            $row = $result->fetch_assoc();
-            if (password_verify($password, $row['password'])) {
-                sessionRegenerate(); // prevent session fixation
-                $_SESSION['admin_id'] = $row['id'];
-                $_SESSION['admin_username'] = $row['username'];
-                $_SESSION['admin_role'] = $row['role'] ?? 'super';
-                header("Location: admin/admin_dashboard.php");
-                exit();
+            if ($result->num_rows === 1) {
+                $row = $result->fetch_assoc();
+                if (password_verify($password, $row['password'])) {
+                    recordLoginAttempt($username, 'admin', true);
+                    sessionRegenerate();
+                    $_SESSION['admin_id'] = $row['id'];
+                    $_SESSION['admin_username'] = $row['username'];
+                    $_SESSION['admin_role'] = $row['role'] ?? 'super';
+                    header("Location: admin/admin_dashboard.php");
+                    exit();
+                } else {
+                    recordLoginAttempt($username, 'admin', false);
+                    $error = "Invalid credentials (" . ($rate['attempts_left'] - 1) . " attempts left)";
+                }
             } else {
+                recordLoginAttempt($username, 'admin', false);
                 $error = "Invalid credentials";
             }
-        } else {
-            $error = "Invalid credentials";
         }
     }
 }

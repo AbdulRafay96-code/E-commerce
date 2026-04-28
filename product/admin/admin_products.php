@@ -44,9 +44,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 }
 
-// Fetch products grouped by category
+// Fetch products grouped by category — include reorder_level (SDD §4.1.4)
 $result = $conn->query(
-    "SELECT id, name, price, stock_quantity, category, image
+    "SELECT id, name, price, stock_quantity, reorder_level, category, image
      FROM products
      ORDER BY category, id"
 );
@@ -56,12 +56,12 @@ while ($row = $result->fetch_assoc()) {
     $productsByCategory[$row['category']][] = $row;
 }
 
-// Overall counts
+// Overall counts — low_stock now uses per-product reorder_level (SDD §3.7)
 $counts = ['total'=>0,'out_of_stock'=>0,'low_stock'=>0];
 $cRes = $conn->query(
     "SELECT COUNT(*) total,
             SUM(stock_quantity = 0) out_of_stock,
-            SUM(stock_quantity > 0 AND stock_quantity <= 5) low_stock
+            SUM(stock_quantity > 0 AND stock_quantity <= reorder_level) low_stock
      FROM products"
 );
 if ($cRes && ($row = $cRes->fetch_assoc())) {
@@ -132,7 +132,8 @@ if ($cRes && ($row = $cRes->fetch_assoc())) {
                     <tbody>
                         <?php foreach ($rows as $p):
                             $isOut = ((int)$p['stock_quantity']) <= 0;
-                            $isLow = !$isOut && ((int)$p['stock_quantity']) <= 5;
+                            $reorderLvl = max(1, (int)($p['reorder_level'] ?? 5));
+                            $isLow = !$isOut && ((int)$p['stock_quantity']) <= $reorderLvl;
                             $formId = 'pf-' . $p['id'];
                         ?>
                         <tr style="border-bottom:1px solid #eee;">
@@ -151,15 +152,15 @@ if ($cRes && ($row = $cRes->fetch_assoc())) {
                                 <input form="<?php echo $formId; ?>" type="number" name="price" value="<?php echo (int)$p['price']; ?>" min="0" step="1" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:4px; text-align:right;">
                             </td>
                             <td style="padding:10px;">
-                                <input form="<?php echo $formId; ?>" type="number" name="stock_quantity" value="<?php echo (int)$p['stock_quantity']; ?>" min="0" style="width:100%; padding:6px; border:1px solid #ddd; border-radius:4px; text-align:center;">
+                                <input form="<?php echo $formId; ?>" type="number" name="stock_quantity" value="<?php echo (int)$p['stock_quantity']; ?>" min="0" title="Reorder threshold: <?php echo $reorderLvl; ?>" style="width:100%; padding:6px; border:1px solid <?php echo $isLow ? '#C9A96E' : '#ddd'; ?>; border-radius:4px; text-align:center; <?php echo $isLow ? 'background:#FFF8E1;' : ''; ?>">
                             </td>
                             <td style="padding:10px; text-align:center;">
                                 <?php if ($isOut): ?>
-                                    <span class="status-chip" style="background:#A4343A; color:#fff;">Out</span>
+                                    <span class="status-chip" style="background:#A4343A; color:#fff;" title="Out of stock — reorder needed">⚠ Out</span>
                                 <?php elseif ($isLow): ?>
-                                    <span class="status-chip" style="background:#C9A96E; color:#1A1A1A;">Low</span>
+                                    <span class="status-chip" style="background:#C9A96E; color:#1A1A1A;" title="Below reorder threshold (<?php echo $reorderLvl; ?>) — reorder soon">⚠ Reorder</span>
                                 <?php else: ?>
-                                    <span class="status-chip" style="background:#2D5A4A; color:#fff;">OK</span>
+                                    <span class="status-chip" style="background:#2D5A4A; color:#fff;">✓ OK</span>
                                 <?php endif; ?>
                             </td>
                             <td style="padding:10px;">

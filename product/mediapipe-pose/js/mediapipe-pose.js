@@ -25,7 +25,7 @@ class MediaPipeMeasurement {
 
         // Measurement smoothing buffers
         this.measurementBuffers = new Map();
-        this.bufferSize = 10;
+        this.bufferSize = 20; // SDD §3.2 — 20-50 frame window for trimmed-median filter
 
         // Distance tracking
         this.optimalBodyHeightRatio = 0.75; // Body should be 75% of frame height
@@ -476,17 +476,31 @@ class MediaPipeMeasurement {
             buffer.shift();
         }
 
-        // Weighted average (more weight to recent values)
-        let weightedSum = 0;
-        let totalWeight = 0;
-
-        buffer.forEach((value, index) => {
-            const weight = Math.pow(0.8, buffer.length - 1 - index);
-            weightedSum += value * weight;
-            totalWeight += weight;
-        });
-
-        let smoothedValue = weightedSum / totalWeight;
+        // SDD §3.2 — robust statistic: trimmed median.
+        // Sort buffer, drop the bottom and top 20%, then weight-average the middle.
+        // This rejects transient outlier frames (jitter, blink, brief occlusion) far
+        // better than a plain weighted mean.
+        let smoothedValue;
+        if (buffer.length >= 5) {
+            const sorted = [...buffer].sort((a, b) => a - b);
+            const trim = Math.floor(sorted.length * 0.2);
+            const middle = sorted.slice(trim, sorted.length - trim);
+            // True median for the trimmed window
+            const mid = Math.floor(middle.length / 2);
+            smoothedValue = middle.length % 2
+                ? middle[mid]
+                : (middle[mid - 1] + middle[mid]) / 2;
+        } else {
+            // Not enough samples yet — fall back to weighted mean
+            let weightedSum = 0;
+            let totalWeight = 0;
+            buffer.forEach((value, index) => {
+                const weight = Math.pow(0.8, buffer.length - 1 - index);
+                weightedSum += value * weight;
+                totalWeight += weight;
+            });
+            smoothedValue = weightedSum / totalWeight;
+        }
 
         // Validate against ranges
         const range = this.MEASUREMENT_RANGES[measurementType];

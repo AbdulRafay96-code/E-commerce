@@ -25,7 +25,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !csrfVerify()) {
         $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
         $password = $_POST['password'] ?? '';
 
-        if (empty($email) || empty($password)) {
+        // NFR-SEC + SDD §3.5 — rate limit failed login attempts
+        $rate = checkLoginRateLimit($email ?: 'anonymous', 'user');
+        if ($rate['locked']) {
+            $error = "Too many failed attempts. Please try again in " . ceil($rate['retry_after_seconds'] / 60) . " minute(s).";
+        } elseif (empty($email) || empty($password)) {
             $error = "Please fill in all fields";
         } else {
             $stmt = $conn->prepare("SELECT id, name, email, password FROM users WHERE email = ?");
@@ -36,6 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !csrfVerify()) {
             if ($result->num_rows === 1) {
                 $user = $result->fetch_assoc();
                 if (password_verify($password, $user['password'])) {
+                    recordLoginAttempt($email, 'user', true);
                     sessionRegenerate(); // prevent session fixation
                     $_SESSION['user_id'] = $user['id'];
                     $_SESSION['user_name'] = $user['name'];
@@ -43,9 +48,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !csrfVerify()) {
                     header("Location: dashboard.php");
                     exit;
                 } else {
-                    $error = "Invalid password";
+                    recordLoginAttempt($email, 'user', false);
+                    $error = "Invalid password (" . ($rate['attempts_left'] - 1) . " attempts left)";
                 }
             } else {
+                recordLoginAttempt($email, 'user', false);
                 $error = "No account found with that email";
             }
         }

@@ -1795,15 +1795,33 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
             
             console.log('📊 Displaying measurements:', measurements);
             
-            // Fill measurement inputs
+            // Fill measurement inputs + render confidence dots (SDD §6 — green/yellow/red)
             Object.entries(measurements).forEach(([key, data]) => {
                 const input = document.getElementById(`webcam-${key}`);
                 if (input && data && data.value) {
                     input.value = data.value.toFixed(1);
-                    console.log(`✅ Set ${key}: ${data.value.toFixed(1)}`);
+                    console.log(`✅ Set ${key}: ${data.value.toFixed(1)} (conf=${(data.confidence ?? 0.8).toFixed(2)})`);
+
+                    // Place a confidence dot next to the input
+                    const conf = data.confidence ?? 0.8;
+                    let color = '#28a745', label = 'High';
+                    if (conf < 0.6) { color = '#dc3545'; label = 'Low'; }
+                    else if (conf < 0.8) { color = '#ffc107'; label = 'Medium'; }
+
+                    let dotEl = document.getElementById(`webcam-${key}-dot`);
+                    if (!dotEl && input.parentElement) {
+                        dotEl = document.createElement('span');
+                        dotEl.id = `webcam-${key}-dot`;
+                        dotEl.style.cssText = 'display:inline-block; width:10px; height:10px; border-radius:50%; margin-left:8px; vertical-align:middle;';
+                        input.insertAdjacentElement('afterend', dotEl);
+                    }
+                    if (dotEl) {
+                        dotEl.style.background = color;
+                        dotEl.title = `Confidence: ${label} (${(conf * 100).toFixed(0)}%)`;
+                    }
                 }
             });
-            
+
             resultsDiv.style.display = 'block';
             
             // Remove existing save button to avoid duplicates
