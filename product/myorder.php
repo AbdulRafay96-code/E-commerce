@@ -205,20 +205,42 @@ if (isset($_POST['action']) && $_POST['action'] === 'save_measurements' && isset
                 $pick = fn($f) => isset($validMeasurements[$f]['value']) ? (string)$validMeasurements[$f]['value'] : null;
                 $notesVal = $validMeasurements['notes']['value'] ?? null;
 
+                // SDD §4.1.3 — persist confidence_score + raw_landmarks (AI captures only)
+                $confidenceScore = null;
+                $rawLandmarks = null;
+                if ($capturedVia === 'ai') {
+                    // Average per-measurement confidence into a single score
+                    $confs = array_filter(array_map(fn($f) => $validMeasurements[$f]['confidence'] ?? null,
+                                                    ['chest','waist','hip','shoulder','sleeve_length','trouser_length','kameez_length','neck']));
+                    if ($confs) {
+                        $confidenceScore = round(array_sum($confs) / count($confs), 3);
+                    }
+                    // raw_landmarks comes from the JS side as a JSON string
+                    if (isset($_POST['raw_landmarks']) && $_POST['raw_landmarks'] !== '') {
+                        $rawLandmarks = $_POST['raw_landmarks']; // already JSON-encoded
+                        // Validate it parses (defense against malformed input)
+                        if (json_decode($rawLandmarks) === null && json_last_error() !== JSON_ERROR_NONE) {
+                            $rawLandmarks = null;
+                        }
+                    }
+                }
+
                 $stmt = $conn->prepare(
                     "INSERT INTO measurements
-                     (user_id, label, chest, waist, hip, shoulder, sleeve_length, trouser_length, kameez_length, neck, notes, captured_via)
-                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                     (user_id, label, chest, waist, hip, shoulder, sleeve_length, trouser_length, kameez_length, neck, notes, captured_via, confidence_score, raw_landmarks)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
                 );
                 if ($stmt) {
                     $uid = (int)getUserId();
                     $chest = $pick('chest'); $waist = $pick('waist'); $hip = $pick('hip');
                     $shoulder = $pick('shoulder'); $sleeve = $pick('sleeve_length');
                     $trouser = $pick('trouser_length'); $kameez = $pick('kameez_length'); $neck = $pick('neck');
+                    // 14 params: i + 11s + d + s
                     $stmt->bind_param(
-                        "isssssssssss",
+                        "isssssssssssds",
                         $uid, $label, $chest, $waist, $hip, $shoulder,
-                        $sleeve, $trouser, $kameez, $neck, $notesVal, $capturedVia
+                        $sleeve, $trouser, $kameez, $neck, $notesVal, $capturedVia,
+                        $confidenceScore, $rawLandmarks
                     );
                     $stmt->execute();
                 }
@@ -1840,6 +1862,16 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
                     validMeasurementCount++;
                 }
             });
+
+            // SDD §4.1.3 — include raw landmarks JSON for audit/reprocessing
+            try {
+                if (mediaPipeMeasurement && typeof mediaPipeMeasurement.getLastLandmarks === 'function') {
+                    const landmarks = mediaPipeMeasurement.getLastLandmarks();
+                    if (landmarks) {
+                        formData.append('raw_landmarks', JSON.stringify(landmarks));
+                    }
+                }
+            } catch (_) { /* non-fatal — proceed without landmarks */ }
             
             if (validMeasurementCount < 3) {
                 alert(`Only ${validMeasurementCount} valid measurements found. At least 3 required.`);

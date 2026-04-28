@@ -24,9 +24,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         if ($productId === '' || $newName === '') {
             $flash = "Name is required.";
         } else {
+            // Capture before-state for audit diff
+            $beforeRow = $conn->query("SELECT name, price, stock_quantity FROM products WHERE id = '" . $conn->real_escape_string($productId) . "'")->fetch_assoc();
+
             $stmt = $conn->prepare("UPDATE products SET name = ?, price = ?, stock_quantity = ? WHERE id = ?");
             $stmt->bind_param("sdis", $newName, $newPrice, $newStock, $productId);
             if ($stmt->execute()) {
+                // SDD §4.1.9 — audit log
+                auditLog('product.update', 'product', null, [
+                    'product_id' => $productId,
+                    'before' => $beforeRow,
+                    'after' => ['name' => $newName, 'price' => $newPrice, 'stock_quantity' => $newStock],
+                ]);
                 $flash = "$productId updated (name, price, stock).";
             } else {
                 $flash = "Failed to update $productId.";

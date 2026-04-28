@@ -47,6 +47,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !csrfVerify()) {
 
             $orderId = $conn->insert_id;
 
+            // SDD §4.1.8 — seed initial status into the log
+            logOrderStatus($orderId, 'pending', null, 'Order placed by customer');
+
             // Insert order items
             foreach ($_SESSION['finalCart'] as $item) {
                 // Revalidate stock before committing (SRS §3.2.3.5)

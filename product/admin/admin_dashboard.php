@@ -109,6 +109,12 @@ if ($result) {
                 <?php endif; ?>
                 <?php if (adminHasRole([])): // super only ?>
                 <div class="admin-menu-item">
+                    <a href="admin_audit_log.php">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Audit Log</span>
+                    </a>
+                </div>
+                <div class="admin-menu-item">
                     <a href="admin_settings.php">
                         <i class="fas fa-cog"></i>
                         <span>Settings</span>

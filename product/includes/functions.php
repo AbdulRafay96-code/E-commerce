@@ -237,3 +237,53 @@ function sessionRegenerate() {
         session_regenerate_id(true);
     }
 }
+
+// ============================================================
+// AUDIT LOGGING (SDD §4.1.9 — admin action audit trail)
+// ============================================================
+
+/**
+ * Append a row to audit_logs. Call from any admin-side state change.
+ * Silently no-ops if the table doesn't exist (safe pre-migration).
+ *
+ * @param string   $action      e.g. 'order.status_change', 'product.create'
+ * @param string   $entityType  e.g. 'order', 'product', 'customer'
+ * @param int|null $entityId    primary key of the affected row
+ * @param mixed    $details     scalar or array — array is JSON-encoded
+ */
+function auditLog($action, $entityType = null, $entityId = null, $details = null) {
+    global $conn;
+    if (!isset($conn) || !$conn) return;
+
+    $adminId = isset($_SESSION['admin_id']) ? (int)$_SESSION['admin_id'] : null;
+    $ip = $_SERVER['REMOTE_ADDR'] ?? null;
+    $detailsStr = is_array($details) ? json_encode($details, JSON_UNESCAPED_UNICODE) : ($details === null ? null : (string)$details);
+
+    $stmt = $conn->prepare(
+        "INSERT INTO audit_logs (admin_id, action, entity_type, entity_id, details, ip_address)
+         VALUES (?, ?, ?, ?, ?, ?)"
+    );
+    if ($stmt) {
+        $stmt->bind_param('ississ', $adminId, $action, $entityType, $entityId, $detailsStr, $ip);
+        $stmt->execute();
+        $stmt->close();
+    }
+}
+
+/**
+ * Append a row to order_status_logs (SDD §4.1.8). Called whenever an order's
+ * status changes — by admin or by the system on order creation.
+ */
+function logOrderStatus($orderId, $status, $changedBy = null, $notes = null) {
+    global $conn;
+    if (!isset($conn) || !$conn) return;
+    $stmt = $conn->prepare(
+        "INSERT INTO order_status_logs (order_id, status, changed_by, notes)
+         VALUES (?, ?, ?, ?)"
+    );
+    if ($stmt) {
+        $stmt->bind_param('isis', $orderId, $status, $changedBy, $notes);
+        $stmt->execute();
+        $stmt->close();
+    }
+}

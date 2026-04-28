@@ -1253,7 +1253,7 @@
             formData.append('action', 'save_measurements');
             formData.append('index', currentMeasurementIndex);
             formData.append('source', 'ai_webcam');
-            formData.append('csrf_token', 'c1830a8216de6bba7598e19ce5c97008de0e428e3fc4443b257914a8268fe6bb');
+            formData.append('csrf_token', '96a6386b481a31803a13c8ddc932158883ca60658bf7ce5d4c19922c0c74023f');
             
             let validMeasurementCount = 0;
             
@@ -1266,6 +1266,16 @@
                     validMeasurementCount++;
                 }
             });
+
+            // SDD §4.1.3 — include raw landmarks JSON for audit/reprocessing
+            try {
+                if (mediaPipeMeasurement && typeof mediaPipeMeasurement.getLastLandmarks === 'function') {
+                    const landmarks = mediaPipeMeasurement.getLastLandmarks();
+                    if (landmarks) {
+                        formData.append('raw_landmarks', JSON.stringify(landmarks));
+                    }
+                }
+            } catch (_) { /* non-fatal — proceed without landmarks */ }
             
             if (validMeasurementCount < 3) {
                 alert(`Only ${validMeasurementCount} valid measurements found. At least 3 required.`);

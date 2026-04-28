@@ -185,6 +185,9 @@ class MediaPipeMeasurement {
         }
 
         if (results.poseLandmarks) {
+            // Cache last landmarks for audit (SDD §4.1.3 raw_landmarks JSON)
+            this.lastLandmarks = results.poseLandmarks;
+
             // Draw skeleton
             if (this.canvasCtx) {
                 this.drawLandmarks(results.poseLandmarks);
@@ -553,6 +556,11 @@ class MediaPipeMeasurement {
 
     getCurrentMeasurements() {
         return this.currentMeasurements;
+    }
+
+    // SDD §4.1.3 — return the last frame's 33 landmarks for audit/reprocessing
+    getLastLandmarks() {
+        return this.lastLandmarks || null;
     }
 
     getSimpleMeasurements() {
