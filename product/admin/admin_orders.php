@@ -24,9 +24,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $newStatus = $_POST['status'] ?? '';
 
     if ($_POST['action'] === 'update_status' && $orderId > 0 && in_array($newStatus, $validStatuses, true)) {
+        // Capture previous status for audit detail
+        $prevRow = $conn->query("SELECT status FROM orders WHERE id = " . (int)$orderId)->fetch_assoc();
+        $prev = $prevRow['status'] ?? null;
+
         $stmt = $conn->prepare("UPDATE orders SET status = ? WHERE id = ?");
         $stmt->bind_param("si", $newStatus, $orderId);
         if ($stmt->execute()) {
+            // SDD §4.1.8 — append status history
+            $adminId = (int)($_SESSION['admin_id'] ?? 0);
+            logOrderStatus($orderId, $newStatus, $adminId, "Advanced via admin panel");
+            // SDD §4.1.9 — audit trail
+            auditLog('order.status_change', 'order', $orderId, ['from' => $prev, 'to' => $newStatus]);
+
             $flash = "Order #$orderId status updated to " . str_replace('_', ' ', $newStatus) . ".";
         } else {
             $flash = "Failed to update order #$orderId.";
@@ -177,8 +187,15 @@ function statusLabel($s) { return ucwords(str_replace('_',' ',$s)); }
                             </form>
                             <?php endif; ?>
 
+                            <?php if (!in_array($o['status'], ['cancelled'], true)): ?>
+                            <a href="production_sheet.php?order_id=<?php echo (int)$o['id']; ?>" class="btn-advance" style="background:#1A1A1A; color:var(--gold-color); border:1px solid var(--gold-color);" target="_blank">
+                                <i class="fas fa-file-alt"></i> Production Sheet
+                            </a>
+                            <?php endif; ?>
+
                             <?php if (!in_array($o['status'], ['completed','cancelled'], true)): ?>
                             <form method="post" class="inline" onsubmit="return confirm('Cancel this order?');">
+                                <?php echo csrfField(); ?>
                                 <input type="hidden" name="action" value="update_status">
                                 <input type="hidden" name="id" value="<?php echo (int)$o['id']; ?>">
                                 <input type="hidden" name="status" value="cancelled">

@@ -15,6 +15,7 @@ $stats = [
     'total_orders'    => 0,
     'pending_orders'  => 0,
     'open_tickets'    => 0,
+    'low_stock'       => 0,
     'revenue'         => 0.0,
 ];
 
@@ -32,6 +33,10 @@ if ($r = $conn->query("SELECT COUNT(*) AS c FROM orders WHERE status = 'pending'
 }
 if ($r = $conn->query("SELECT COUNT(*) AS c FROM contact_messages WHERE status IN ('open','in_progress')")->fetch_assoc()) {
     $stats['open_tickets'] = (int)$r['c'];
+}
+// SDD §4.1.4 — products at or below their reorder threshold
+if ($r = $conn->query("SELECT COUNT(*) AS c FROM products WHERE stock_quantity <= reorder_level")->fetch_assoc()) {
+    $stats['low_stock'] = (int)$r['c'];
 }
 // Revenue = sum of non-cancelled orders
 if ($r = $conn->query("SELECT COALESCE(SUM(total_amount),0) AS s FROM orders WHERE status <> 'cancelled'")->fetch_assoc()) {
@@ -98,6 +103,12 @@ if ($result) {
                         <span>Customers</span>
                     </a>
                 </div>
+                <div class="admin-menu-item">
+                    <a href="admin_measurements.php">
+                        <i class="fas fa-ruler"></i>
+                        <span>Measurements</span>
+                    </a>
+                </div>
                 <?php endif; ?>
                 <?php if (adminHasRole(['support'])): ?>
                 <div class="admin-menu-item">
@@ -108,6 +119,12 @@ if ($result) {
                 </div>
                 <?php endif; ?>
                 <?php if (adminHasRole([])): // super only ?>
+                <div class="admin-menu-item">
+                    <a href="admin_audit_log.php">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Audit Log</span>
+                    </a>
+                </div>
                 <div class="admin-menu-item">
                     <a href="admin_settings.php">
                         <i class="fas fa-cog"></i>
@@ -203,7 +220,42 @@ if ($result) {
                     </div>
                 </div>
                 <?php endif; ?>
+
+                <?php if (adminHasRole(['order_manager']) && $stats['low_stock'] > 0): ?>
+                <div class="stat-card" style="border-left: 4px solid #C9A96E;">
+                    <div class="stat-icon" style="background: #C9A96E;"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="stat-info">
+                        <h3>Reorder Alert</h3>
+                        <p>
+                            <?php echo $stats['low_stock']; ?> products
+                            <a href="admin_products.php" style="font-size:12px; color:#8B6914; display:block; margin-top:4px;">Reorder now →</a>
+                        </p>
+                    </div>
+                </div>
+                <?php endif; ?>
             </div>
+
+            <?php if (adminHasRole([])): // super only — CSV exports ?>
+            <div class="admin-card" style="margin-bottom:18px;">
+                <div class="admin-card-header">
+                    <h2><i class="fas fa-download"></i> Reports / Exports</h2>
+                </div>
+                <div style="padding:14px 18px; display:flex; flex-wrap:wrap; gap:10px;">
+                    <a href="admin_export.php?type=orders" style="background:#1A1A1A; color:var(--gold-color); border:1px solid var(--gold-color); padding:8px 16px; border-radius:6px; text-decoration:none; font-size:13px;">
+                        <i class="fas fa-file-csv"></i> Orders CSV
+                    </a>
+                    <a href="admin_export.php?type=products" style="background:#1A1A1A; color:var(--gold-color); border:1px solid var(--gold-color); padding:8px 16px; border-radius:6px; text-decoration:none; font-size:13px;">
+                        <i class="fas fa-file-csv"></i> Products CSV
+                    </a>
+                    <a href="admin_export.php?type=customers" style="background:#1A1A1A; color:var(--gold-color); border:1px solid var(--gold-color); padding:8px 16px; border-radius:6px; text-decoration:none; font-size:13px;">
+                        <i class="fas fa-file-csv"></i> Customers CSV
+                    </a>
+                    <a href="admin_export.php?type=audit" style="background:#1A1A1A; color:var(--gold-color); border:1px solid var(--gold-color); padding:8px 16px; border-radius:6px; text-decoration:none; font-size:13px;">
+                        <i class="fas fa-file-csv"></i> Audit Log CSV
+                    </a>
+                </div>
+            </div>
+            <?php endif; ?>
 
             <!-- Recent Orders -->
             <div class="admin-card">

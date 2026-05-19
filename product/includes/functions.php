@@ -237,3 +237,208 @@ function sessionRegenerate() {
         session_regenerate_id(true);
     }
 }
+
+// ============================================================
+// AUDIT LOGGING (SDD §4.1.9 — admin action audit trail)
+// ============================================================
+
+/**
+ * Append a row to audit_logs. Call from any admin-side state change.
+ * Silently no-ops if the table doesn't exist (safe pre-migration).
+ *
+ * @param string   $action      e.g. 'order.status_change', 'product.create'
+ * @param string   $entityType  e.g. 'order', 'product', 'customer'
+ * @param int|null $entityId    primary key of the affected row
+ * @param mixed    $details     scalar or array — array is JSON-encoded
+ */
+function auditLog($action, $entityType = null, $entityId = null, $details = null) {
+    global $conn;
+    if (!isset($conn) || !$conn) return;
+
+    $adminId = isset($_SESSION['admin_id']) ? (int)$_SESSION['admin_id'] : null;
+    $ip = $_SERVER['REMOTE_ADDR'] ?? null;
+    $detailsStr = is_array($details) ? json_encode($details, JSON_UNESCAPED_UNICODE) : ($details === null ? null : (string)$details);
+
+    $stmt = $conn->prepare(
+        "INSERT INTO audit_logs (admin_id, action, entity_type, entity_id, details, ip_address)
+         VALUES (?, ?, ?, ?, ?, ?)"
+    );
+    if ($stmt) {
+        $stmt->bind_param('ississ', $adminId, $action, $entityType, $entityId, $detailsStr, $ip);
+        $stmt->execute();
+        $stmt->close();
+    }
+}
+
+/**
+ * Append a row to order_status_logs (SDD §4.1.8). Called whenever an order's
+ * status changes — by admin or by the system on order creation.
+ */
+function logOrderStatus($orderId, $status, $changedBy = null, $notes = null) {
+    global $conn;
+    if (!isset($conn) || !$conn) return;
+    $stmt = $conn->prepare(
+        "INSERT INTO order_status_logs (order_id, status, changed_by, notes)
+         VALUES (?, ?, ?, ?)"
+    );
+    if ($stmt) {
+        $stmt->bind_param('isis', $orderId, $status, $changedBy, $notes);
+        $stmt->execute();
+        $stmt->close();
+    }
+}
+
+// ============================================================
+// LOGIN RATE LIMITING (NFR-SEC, SDD §3.5)
+// ============================================================
+
+/**
+ * Record a login attempt (success or failure) for throttling.
+ */
+function recordLoginAttempt($identifier, $type = 'user', $success = false) {
+    global $conn;
+    if (!isset($conn) || !$conn) return;
+    $ip = $_SERVER['REMOTE_ADDR'] ?? null;
+    $successInt = $success ? 1 : 0;
+    $stmt = $conn->prepare(
+        "INSERT INTO login_attempts (identifier, attempt_type, success, ip_address)
+         VALUES (?, ?, ?, ?)"
+    );
+    if ($stmt) {
+        $stmt->bind_param('ssis', $identifier, $type, $successInt, $ip);
+        $stmt->execute();
+        $stmt->close();
+    }
+}
+
+/**
+ * Check if login is currently locked out due to too many recent failures.
+ * Default: 5 failed attempts within 15 minutes triggers a 15-minute lockout.
+ *
+ * @return array ['locked' => bool, 'retry_after_seconds' => int|null, 'attempts_left' => int]
+ */
+function checkLoginRateLimit($identifier, $type = 'user', $maxAttempts = 5, $windowMin = 15) {
+    global $conn;
+    if (!isset($conn) || !$conn) return ['locked' => false, 'retry_after_seconds' => null, 'attempts_left' => $maxAttempts];
+
+    $stmt = $conn->prepare(
+        "SELECT COUNT(*) AS fails, MAX(attempted_at) AS last_attempt
+         FROM login_attempts
+         WHERE identifier = ?
+           AND attempt_type = ?
+           AND success = 0
+           AND attempted_at > DATE_SUB(NOW(), INTERVAL ? MINUTE)"
+    );
+    $stmt->bind_param('ssi', $identifier, $type, $windowMin);
+    $stmt->execute();
+    $row = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    $fails = (int)($row['fails'] ?? 0);
+    if ($fails >= $maxAttempts) {
+        $lastTs = strtotime($row['last_attempt']);
+        $unlockTs = $lastTs + ($windowMin * 60);
+        $retryAfter = max(0, $unlockTs - time());
+        return ['locked' => true, 'retry_after_seconds' => $retryAfter, 'attempts_left' => 0];
+    }
+    return ['locked' => false, 'retry_after_seconds' => null, 'attempts_left' => $maxAttempts - $fails];
+}
+
+// ============================================================
+// IDEMPOTENCY (SDD §3.5 — duplicate-submission protection)
+// ============================================================
+
+/**
+ * Check if an idempotency key was already used. If yes, returns the previous
+ * result_id (e.g. previously-created order_id) so the caller can return that
+ * instead of creating a duplicate.
+ *
+ * @return int|null  prior result_id if seen, null if first-time
+ */
+function idempotencyLookup($clientKey, $userId, $endpoint) {
+    global $conn;
+    if (empty($clientKey)) return null;
+    $hash = hash('sha256', $clientKey . '|' . $userId . '|' . $endpoint);
+
+    $stmt = $conn->prepare("SELECT result_id FROM idempotency_keys WHERE key_hash = ? LIMIT 1");
+    $stmt->bind_param('s', $hash);
+    $stmt->execute();
+    $row = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+    return $row ? (int)$row['result_id'] : null;
+}
+
+/**
+ * Record that a key was used and what result it produced.
+ */
+function idempotencyStore($clientKey, $userId, $endpoint, $resultId) {
+    global $conn;
+    if (empty($clientKey)) return;
+    $hash = hash('sha256', $clientKey . '|' . $userId . '|' . $endpoint);
+    $stmt = $conn->prepare(
+        "INSERT INTO idempotency_keys (key_hash, user_id, endpoint, result_id)
+         VALUES (?, ?, ?, ?)
+         ON DUPLICATE KEY UPDATE result_id = VALUES(result_id)"
+    );
+    $stmt->bind_param('sisi', $hash, $userId, $endpoint, $resultId);
+    $stmt->execute();
+    $stmt->close();
+}
+
+// ============================================================
+// INVENTORY RESERVATIONS (SDD §3.5 — temporary stock locks)
+// ============================================================
+
+/**
+ * Reserve N units of a product for a user during checkout.
+ * Reservations expire after $minutes (default 15) — past that the stock frees up.
+ */
+function reserveInventory($productId, $userId, $quantity, $minutes = 15) {
+    global $conn;
+    if (!isset($conn) || !$conn) return false;
+    $stmt = $conn->prepare(
+        "INSERT INTO inventory_reservations (product_id, user_id, quantity, expires_at)
+         VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL ? MINUTE))"
+    );
+    $stmt->bind_param('siii', $productId, $userId, $quantity, $minutes);
+    $ok = $stmt->execute();
+    $stmt->close();
+    return $ok;
+}
+
+/**
+ * Mark all reservations for a user as consumed (typically on successful order).
+ */
+function consumeReservations($userId) {
+    global $conn;
+    if (!isset($conn) || !$conn) return;
+    $stmt = $conn->prepare(
+        "UPDATE inventory_reservations SET consumed = 1
+         WHERE user_id = ? AND consumed = 0 AND expires_at > NOW()"
+    );
+    $stmt->bind_param('i', $userId);
+    $stmt->execute();
+    $stmt->close();
+}
+
+/**
+ * Compute effective stock = stock_quantity - currently active reservations from OTHER users.
+ */
+function effectiveStock($productId, $excludeUserId = 0) {
+    global $conn;
+    if (!isset($conn) || !$conn) return 0;
+    $stmt = $conn->prepare(
+        "SELECT p.stock_quantity
+              - COALESCE((SELECT SUM(r.quantity) FROM inventory_reservations r
+                          WHERE r.product_id = p.id
+                            AND r.consumed = 0
+                            AND r.expires_at > NOW()
+                            AND r.user_id != ?), 0) AS effective
+         FROM products p WHERE p.id = ?"
+    );
+    $stmt->bind_param('is', $excludeUserId, $productId);
+    $stmt->execute();
+    $row = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+    return (int)($row['effective'] ?? 0);
+}

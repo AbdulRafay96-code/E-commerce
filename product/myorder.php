@@ -205,20 +205,42 @@ if (isset($_POST['action']) && $_POST['action'] === 'save_measurements' && isset
                 $pick = fn($f) => isset($validMeasurements[$f]['value']) ? (string)$validMeasurements[$f]['value'] : null;
                 $notesVal = $validMeasurements['notes']['value'] ?? null;
 
+                // SDD §4.1.3 — persist confidence_score + raw_landmarks (AI captures only)
+                $confidenceScore = null;
+                $rawLandmarks = null;
+                if ($capturedVia === 'ai') {
+                    // Average per-measurement confidence into a single score
+                    $confs = array_filter(array_map(fn($f) => $validMeasurements[$f]['confidence'] ?? null,
+                                                    ['chest','waist','hip','shoulder','sleeve_length','trouser_length','kameez_length','neck']));
+                    if ($confs) {
+                        $confidenceScore = round(array_sum($confs) / count($confs), 3);
+                    }
+                    // raw_landmarks comes from the JS side as a JSON string
+                    if (isset($_POST['raw_landmarks']) && $_POST['raw_landmarks'] !== '') {
+                        $rawLandmarks = $_POST['raw_landmarks']; // already JSON-encoded
+                        // Validate it parses (defense against malformed input)
+                        if (json_decode($rawLandmarks) === null && json_last_error() !== JSON_ERROR_NONE) {
+                            $rawLandmarks = null;
+                        }
+                    }
+                }
+
                 $stmt = $conn->prepare(
                     "INSERT INTO measurements
-                     (user_id, label, chest, waist, hip, shoulder, sleeve_length, trouser_length, kameez_length, neck, notes, captured_via)
-                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                     (user_id, label, chest, waist, hip, shoulder, sleeve_length, trouser_length, kameez_length, neck, notes, captured_via, confidence_score, raw_landmarks)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
                 );
                 if ($stmt) {
                     $uid = (int)getUserId();
                     $chest = $pick('chest'); $waist = $pick('waist'); $hip = $pick('hip');
                     $shoulder = $pick('shoulder'); $sleeve = $pick('sleeve_length');
                     $trouser = $pick('trouser_length'); $kameez = $pick('kameez_length'); $neck = $pick('neck');
+                    // 14 params: i + 11s + d + s
                     $stmt->bind_param(
-                        "isssssssssss",
+                        "isssssssssssds",
                         $uid, $label, $chest, $waist, $hip, $shoulder,
-                        $sleeve, $trouser, $kameez, $neck, $notesVal, $capturedVia
+                        $sleeve, $trouser, $kameez, $neck, $notesVal, $capturedVia,
+                        $confidenceScore, $rawLandmarks
                     );
                     $stmt->execute();
                 }
@@ -1773,15 +1795,33 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
             
             console.log('📊 Displaying measurements:', measurements);
             
-            // Fill measurement inputs
+            // Fill measurement inputs + render confidence dots (SDD §6 — green/yellow/red)
             Object.entries(measurements).forEach(([key, data]) => {
                 const input = document.getElementById(`webcam-${key}`);
                 if (input && data && data.value) {
                     input.value = data.value.toFixed(1);
-                    console.log(`✅ Set ${key}: ${data.value.toFixed(1)}`);
+                    console.log(`✅ Set ${key}: ${data.value.toFixed(1)} (conf=${(data.confidence ?? 0.8).toFixed(2)})`);
+
+                    // Place a confidence dot next to the input
+                    const conf = data.confidence ?? 0.8;
+                    let color = '#28a745', label = 'High';
+                    if (conf < 0.6) { color = '#dc3545'; label = 'Low'; }
+                    else if (conf < 0.8) { color = '#ffc107'; label = 'Medium'; }
+
+                    let dotEl = document.getElementById(`webcam-${key}-dot`);
+                    if (!dotEl && input.parentElement) {
+                        dotEl = document.createElement('span');
+                        dotEl.id = `webcam-${key}-dot`;
+                        dotEl.style.cssText = 'display:inline-block; width:10px; height:10px; border-radius:50%; margin-left:8px; vertical-align:middle;';
+                        input.insertAdjacentElement('afterend', dotEl);
+                    }
+                    if (dotEl) {
+                        dotEl.style.background = color;
+                        dotEl.title = `Confidence: ${label} (${(conf * 100).toFixed(0)}%)`;
+                    }
                 }
             });
-            
+
             resultsDiv.style.display = 'block';
             
             // Remove existing save button to avoid duplicates
@@ -1840,6 +1880,16 @@ $user_name = $logged_in ? $_SESSION['user_name'] : '';
                     validMeasurementCount++;
                 }
             });
+
+            // SDD §4.1.3 — include raw landmarks JSON for audit/reprocessing
+            try {
+                if (mediaPipeMeasurement && typeof mediaPipeMeasurement.getLastLandmarks === 'function') {
+                    const landmarks = mediaPipeMeasurement.getLastLandmarks();
+                    if (landmarks) {
+                        formData.append('raw_landmarks', JSON.stringify(landmarks));
+                    }
+                }
+            } catch (_) { /* non-fatal — proceed without landmarks */ }
             
             if (validMeasurementCount < 3) {
                 alert(`Only ${validMeasurementCount} valid measurements found. At least 3 required.`);

@@ -34,6 +34,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !csrfVerify()) {
         $error = "You must agree to the Terms of Service and Privacy Policy.";
     } else {
         $userId = isLoggedIn() ? $_SESSION['user_id'] : null;
+
+        // SDD §3.5 — idempotency check (prevents duplicate orders from double-clicks)
+        $idempKey = $_POST['_idempotency_key'] ?? '';
+        if ($idempKey && $userId) {
+            $existingOrderId = idempotencyLookup($idempKey, $userId, 'checkout.place_order');
+            if ($existingOrderId) {
+                // Already processed — silently redirect to confirmation
+                $_SESSION['order_success'] = true;
+                $_SESSION['order_id'] = $existingOrderId;
+                header("Location: order-confirmation.php");
+                exit;
+            }
+        }
+
         $conn->begin_transaction();
 
         try {
@@ -46,6 +60,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !csrfVerify()) {
             }
 
             $orderId = $conn->insert_id;
+
+            // SDD §3.5 — record idempotency key for this order
+            if ($idempKey && $userId) {
+                idempotencyStore($idempKey, $userId, 'checkout.place_order', $orderId);
+            }
+
+            // SDD §3.5 — consume any active inventory reservations for this user
+            if ($userId) consumeReservations($userId);
+
+            // SDD §4.1.8 — seed initial status into the log
+            logOrderStatus($orderId, 'pending', null, 'Order placed by customer');
 
             // Insert order items
             foreach ($_SESSION['finalCart'] as $item) {
@@ -186,6 +211,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !csrfVerify()) {
                     <h2 class="reveal">Shipping Information</h2>
                     <form method="post">
                         <?php echo csrfField(); ?>
+                        <input type="hidden" name="_idempotency_key" value="<?php echo bin2hex(random_bytes(16)); ?>">
                         <div class="form-group">
                             <label for="name">Full Name</label>
                             <input type="text" id="name" name="name" required

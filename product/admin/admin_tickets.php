@@ -35,6 +35,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         );
         $stmt->bind_param("sssi", $response, $status, $resolvedAt, $ticketId);
         $stmt->execute();
+        // SDD §4.1.9 — audit log
+        auditLog('ticket.respond', 'ticket', $ticketId, ['status' => $status, 'response_length' => strlen($response)]);
         $flash = "Ticket #$ticketId updated.";
     }
     }
